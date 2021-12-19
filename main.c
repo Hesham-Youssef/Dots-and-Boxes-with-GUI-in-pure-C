@@ -3,11 +3,6 @@
 #include <conio.h>
 #include <math.h>
 
-
-
-
-
-
 int playerturn = 0;
 void printworld(int rows,int cols,char array[rows][cols]){
     for(int i=0;i<rows;i++){
@@ -41,7 +36,7 @@ int upperright(int n1,int m1,int rows,int cols,char array[rows][cols]){
                 }
             }
     }
-                                                    return 0;
+   return 0;
 }
 int upperleft(int n1,int m1,int rows,int cols,char array[rows][cols]){
     if((m1 == 0) || (n1 == 0) || array[n1-1][m1-1] == '1')
