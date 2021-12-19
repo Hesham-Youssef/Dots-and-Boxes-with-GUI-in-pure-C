@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1639893577 source:c:\users\hesham youssef\desktop\pro\rabsodotsandboxes\main.c
+	<stdio.h>
+	<stdlib.h>
+	<conio.h>
+	<math.h>
+
