@@ -94,16 +94,17 @@ void checkforsquares(int n1,int m1,int rows,int cols,char array[rows][cols],int 
 }
 
 void makeamove(int rows,int cols,char array[rows][cols],int n1,int m1,int n2,int m2,int points[]){
+    int N1,M1,N2,M2;
     printf("enter the row: ");
-    scanf("%d",&n1);
+    scanf("%d",&N1);
     printf("enter the col: ");
-    scanf("%d",&m1);
+    scanf("%d",&M1);
 
     printf("enter the row: ");
-    scanf("%d",&n2);
+    scanf("%d",&N2);
     printf("enter the col: ");
-    scanf("%d",&m2);
-
+    scanf("%d",&M2);
+    n1 = 2*N1-2;m1 = 2*M1-2;n2 = 2*N2-2;m2 = 2*M2-2;
     if((array[(n1+n2)/2][(m1+m2)/2] =='1'))
         return;
 
