@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <math.h>
-
+int playerturn = 0;
 void printworld(int rows,int cols,char array[rows][cols]){
     for(int i=0;i<rows;i++){
         for(int j=0;j<cols;j++){
@@ -89,8 +89,15 @@ int downleft(int n1,int m1,int rows,int cols,char array[rows][cols]){
 
 
 void checkforsquares(int n1,int m1,int rows,int cols,char array[rows][cols],int points[]){
-
-    points[0] += upperright(n1,m1,rows,cols,array) + upperleft(n1,m1,rows,cols,array) + downright(n1,m1,rows,cols,array) + downleft(n1,m1,rows,cols,array);
+    int sum;
+    sum = upperright(n1,m1,rows,cols,array) + upperleft(n1,m1,rows,cols,array) + downright(n1,m1,rows,cols,array) + downleft(n1,m1,rows,cols,array);
+    if(playerturn % 2)
+        points[1] += sum;
+    else
+        points[0] += sum;
+    playerturn++;
+    if(sum != 0)
+        playerturn++;
 }
 
 void makeamove(int rows,int cols,char array[rows][cols],int n1,int m1,int n2,int m2,int points[]){
