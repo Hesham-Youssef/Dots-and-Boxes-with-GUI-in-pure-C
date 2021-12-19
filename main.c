@@ -2,10 +2,6 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <math.h>
-<<<<<<< HEAD
-=======
-
->>>>>>> 0e91cc00a777b98291a01c74dbbc7c0c47bc7e05
 int playerturn = 0;
 void printworld(int rows,int cols,char array[rows][cols]){
     for(int i=0;i<rows;i++){
