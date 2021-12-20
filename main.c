@@ -195,11 +195,9 @@ void checkForSquares(int n1,int m1,int dim,char array[dim][dim],int points[]){
 
 void undo(int dim,int history[2*(dim/2)*((dim/2)+1)][7],int lastMoves[2*(dim/2)*((dim/2)+1)][7],int points[2],int moves[2],int player,int playerTurn){
     if(totalMoves==0){
-        points[0]=0;points[1]=0;player=1;moves[0]=0;moves[1]=0;playerTurn=0;
+        points[0]=0;points[1]=0;moves[0]=0;moves[1]=0;playerTurn=0;player=1;
     }else{
-        if(points[0]<history[totalMoves-1][4]||points[1]<history[totalMoves-1][5])
-            playerTurn--;
-        else if(points[0]==history[totalMoves-1][4]&&points[1]==history[totalMoves-1][5])
+        if(points[0]>history[totalMoves-1][4]||points[1]>history[totalMoves-1][5])
             playerTurn--;
         points[0]=history[totalMoves-1][4];points[1]=history[totalMoves-1][5];player=history[totalMoves][6];
         switch(player){
@@ -209,13 +207,13 @@ void undo(int dim,int history[2*(dim/2)*((dim/2)+1)][7],int lastMoves[2*(dim/2)*
             case 2:
                 moves[1]--;
         }
-        player=history[totalMoves-1][6];
     }
     for(int i=0;i<dim;i++){
         lastMoves[movesBack][i] = history[totalMoves][i];
         history[totalMoves][i] = 0;
     }
     movesBack++;
+    playerTurn--;
 }
 void redo(int dim,int history[2*(dim/2)*((dim/2)+1)][7],int lastMoves[2*(dim/2)*((dim/2)+1)][7],int points[2],int moves[2],int player){
     for(int i=0;i<dim;i++){
@@ -251,9 +249,9 @@ void makeA_Move(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poi
             undo(dim,history,lastMoves,points,moves,player,playerTurn);
             n1 = 2*N1-2;m1 = 2*M1-2;n2 = 2*N2-2;m2 = 2*M2-2;
             array[(n1+n2)/2][(m1+m2)/2] =' ';
-            if(array[n1+1][m1]==' '&&array[n1-1][m1]==' '&&array[n1][m1+1]==' '&&array[n1][m1-1]==' ')
+            if(array[n1+1][m1]!=1&&array[n1-1][m1]!=1&&array[n1][m1+1]!=1&&array[n1][m1-1]!=1)
                 array[n1][m1] = '0';
-            if(array[n2+1][m2]==' '&&array[n2-1][m2]==' '&&array[n2][m2+1]==' '&&array[n2][m2-1]==' ')
+            if(array[n2+1][m2]!=1&&array[n2-1][m2]!=1&&array[n2][m2+1]!=1&&array[n2][m2-1]!=1)
                 array[n2][m2] = '0';
             if(n1==n2){
                 array[n1+1][(m1+m2)/2]=' ';
@@ -378,8 +376,6 @@ int main()
 
             printHistory(dim,history);
 
-            printRedo(dim,movesBack,lastMoves);
-
             }while((moves[0] + moves[1]) < 2 * (dim/2) * (dim/2 + 1));
 
             system("cls");
@@ -388,7 +384,7 @@ int main()
 
 
 
-            printf("\nFirst player: %d\n\nSecond player: %d\n\nFirst player moves: %i\n\nSecond player moves: %i\n\nTurn player no.: %d\n\n",points[0],points[1],moves[0],moves[1],player);
+            printf("\nFirst player: %d\n\nSecond player: %d\n\nFirst player moves: %i\n\nSecond player moves: %i\n\nTurn player no.: %d\n\nT=\n\n",points[0],points[1],moves[0],moves[1],player,totalMoves);
             if(points[1]>points[0])
                 printf("Congratulation for player no. 2 and hard luck for player no. 1");
             else if(points[0]>points[1])
