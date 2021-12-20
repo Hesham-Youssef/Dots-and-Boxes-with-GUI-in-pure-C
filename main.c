@@ -197,7 +197,7 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
     scanf("%d",&M2);
 
     if(N1 == -1 && M1 == -1 && N2 == -1 && M2 == -1){
-        redo(history);
+        undo();
         return;
     }
     if((array[((N1+N2)-2)][((M1+M2)-2)] =='1') || (N1 > (dim/2) + 1) || (M1 > (dim/2) + 1) || (N2 > (dim/2) + 1) || (M2 > (dim/2) + 1) || (N1 < 1) || (M1 < 1) || (N2 < 1) || (M2 < 1) || !(((abs(N1-N2) == 1) && (M1==M2)) ^ ((abs(M1-M2) == 1) && (N1==N2)))){
@@ -207,7 +207,7 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
 
 
     history[totalmoves][0] = 2*N1-2 ; history[totalmoves][1] = 2*M1-2 ;history[totalmoves][2] = 2*N2-2 ; history[totalmoves][3] = 2*M2-2;
-
+    history[totalmoves][6] = player;
     if(!(history[totalmoves][1]%2 || history[totalmoves][0]%2 )){
         array[history[totalmoves][0]][history[totalmoves][1]] = '1';
         array[history[totalmoves][2]][history[totalmoves][3]] = '1';
@@ -219,12 +219,13 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
 
     checkforsquares(history[totalmoves][0],history[totalmoves][1],dim,array,history);
 
-
     totalmoves++;
 
 }
 
 void undo(){
+
+
 
 }
 
@@ -281,7 +282,7 @@ int main()
             printf("\n\n\n\n");
             printworld(dim,world);
 
-            printf("\nFirst player: %d\n\nSecond player: %d\n\nFirst player moves: %i\n\nSecond player moves: %i\n\nTurn player no.: %d\n\n",points[0],points[1],moves[0],moves[1],player);
+            printf("\nFirst player: %d\n\nSecond player: %d\n\nFirst player moves: %i\n\nSecond player moves: %i\n\nTurn player no.: %d\n\n",history[totalmoves][4],history[totalmoves][5],moves[0],moves[1],player);
 
             printf("\n enter -1,-1,-1,-1 to redo\n\n");
 
@@ -298,7 +299,7 @@ int main()
 
 
 
-            printf("\nFirst player: %d\n\nSecond player: %d\n\nFirst player moves: %i\n\nSecond player moves: %i\n\nTurn player no.: %d\n\n",points[0],points[1],moves[0],moves[1],player);
+            printf("\nFirst player: %d\n\nSecond player: %d\n\nFirst player moves: %i\n\nSecond player moves: %i\n\nTurn player no.: %d\n\n",history[totalmoves][4],history[totalmoves][5],moves[0],moves[1],player);
             if(points[1]>points[0])
                 printf("Congratulation for player no. 2 and hard luck for player no. 1");
             else if(points[0]>points[1])
