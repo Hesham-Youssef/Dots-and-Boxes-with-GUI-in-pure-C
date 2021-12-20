@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <math.h>
-int playerturn = 0, player = 1,moves[2] = {0},totalmoves=0;
+int playerTurn = 0, player = 1,moves[2] = {0},totalMoves=0,movesBack=0,sum=0;
 void black(){
     printf("\033[1;30m");
 }
@@ -34,7 +34,8 @@ void normal(){
     printf("\033[0m");
 }
 
-void printhistory(int dim,int array[2 * (dim/2) * ((dim/2) + 1)][7]){
+
+void printHistory(int dim,int array[2 * (dim/2) * ((dim/2) + 1)][7]){
     for(int i=0;i<2 * (dim/2) * ((dim/2) + 1);i++){
         for(int j=0;j<7;j++){
             printf("  %d -",array[i][j]);
@@ -45,9 +46,7 @@ void printhistory(int dim,int array[2 * (dim/2) * ((dim/2) + 1)][7]){
 
 
 
-
-
-void printworld(int dim,char array[dim][dim]){
+void printWorld(int dim,char array[dim][dim]){
     for(int i=0;i<dim;i++){
         for(int j=0;j<dim;j++){
             printf("%c  ",array[i][j]);
@@ -55,7 +54,7 @@ void printworld(int dim,char array[dim][dim]){
         printf("\n");
     }
 }
-void createworld(int dim,char array[dim][dim]){
+void createWorld(int dim,char array[dim][dim]){
     for(int i=0;i<dim;i++){
         for(int j=0;j<dim;j++){
             if(!(j%2 || i%2))
@@ -65,14 +64,14 @@ void createworld(int dim,char array[dim][dim]){
         }
     }
 }
-void createhistory(int dim,int history[2 * (dim/2) * ((dim/2) + 1)][7]){
+void createHistoryAndLastMoves(int dim,int history[2 * (dim/2) * ((dim/2) + 1)][7],int lastmoves[2 * (dim/2) * ((dim/2) + 1)][7]){
     for(int i=0;i<2 * (dim/2) * ((dim/2) + 1);i++){
         for(int j=0;j<7;j++){
             history[i][j] = 0;
         }
     }
 }
-void writehistory(int n1,int m1,int n2,int m2,int points0,int points1,int player,int totalmoves,int dim,int history[2 * (dim/2) * ((dim/2) + 1)][7]){
+void writeHistory(int n1,int m1,int n2,int m2,int points0,int points1,int player,int totalmoves,int dim,int history[2 * (dim/2) * ((dim/2) + 1)][7]){
     history[totalmoves][0] = n1;
     history[totalmoves][1] = m1;
     history[totalmoves][2] = n2;
@@ -84,7 +83,7 @@ void writehistory(int n1,int m1,int n2,int m2,int points0,int points1,int player
 
 
 
-int upperright(int n1,int m1,int dim,char array[dim][dim]){
+int upperRight(int n1,int m1,int dim,char array[dim][dim]){
     if((m1 == dim -1) || (n1 == 0) || array[n1-1][m1+1] == 'X' || array[n1-1][m1+1] == 'O')
         return 0;
     if(array[n1][m1+1]=='1'){
@@ -106,7 +105,7 @@ int upperright(int n1,int m1,int dim,char array[dim][dim]){
     }
    return 0;
 }
-int upperleft(int n1,int m1,int dim,char array[dim][dim]){
+int upperLeft(int n1,int m1,int dim,char array[dim][dim]){
     if((m1 == 0) || (n1 == 0) || array[n1-1][m1-1] == 'X' || array[n1-1][m1-1] == 'O')
         return 0;
     if(array[n1][m1-1]=='1'){
@@ -128,7 +127,7 @@ int upperleft(int n1,int m1,int dim,char array[dim][dim]){
     }
     return 0;
 }
-int downright(int n1,int m1,int dim,char array[dim][dim]){
+int downRight(int n1,int m1,int dim,char array[dim][dim]){
     if((m1 == dim -1) || (n1 == dim -1) || array[n1+1][m1+1] == 'X' || array[n1+1][m1+1] == 'O')
         return 0;
     if(array[n1][m1+1]=='1'){
@@ -150,7 +149,7 @@ int downright(int n1,int m1,int dim,char array[dim][dim]){
     }
     return 0;
 }
-int downleft(int n1,int m1,int dim,char array[dim][dim]){
+int downLeft(int n1,int m1,int dim,char array[dim][dim]){
     if((m1 == 0) || (n1 == dim-1) || array[n1+1][m1-1] == 'X' || array[n1+1][m1-1] == 'O')
         return 0;
     if(array[n1][m1-1]=='1'){
@@ -178,14 +177,13 @@ int downleft(int n1,int m1,int dim,char array[dim][dim]){
 
 
 
-void checkforsquares(int n1,int m1,int dim,char array[dim][dim],int points[]){
-    int sum=0;
-    sum = upperright(n1,m1,dim,array) + upperleft(n1,m1,dim,array) + downright(n1,m1,dim,array) + downleft(n1,m1,dim,array);
-    if(playerturn % 2)
+void checkForSquares(int n1,int m1,int dim,char array[dim][dim],int points[]){
+    sum = upperRight(n1,m1,dim,array) + upperLeft(n1,m1,dim,array) + downRight(n1,m1,dim,array) + downLeft(n1,m1,dim,array);
+    if(playerTurn % 2)
         points[1] += sum;
     else
         points[0] += sum;
-    playerturn++;
+    playerTurn++;
     switch(player){
         case 1:
             moves[0]++;
@@ -193,15 +191,49 @@ void checkforsquares(int n1,int m1,int dim,char array[dim][dim],int points[]){
         case 2:
             moves[1]++;
     }
-    if(sum != 0)
-        playerturn++;
-    else{
-        player=player==1?2:1;
-    }
-
 }
 
-void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int points[],int history[2 * (dim/2) * ((dim/2) + 1)][7]){
+void undo(int dim,int history[2*(dim/2)*((dim/2)+1)][7],int lastMoves[2*(dim/2)*((dim/2)+1)][7],int points[2],int moves[2],int player,int playerTurn){
+    if(totalMoves==0){
+        points[0]=0;points[1]=0;player=1;moves[0]=0;moves[1]=0;playerTurn=0;
+    }else{
+        if(points[0]<history[totalMoves-1][4]||points[1]<history[totalMoves-1][5])
+            playerTurn--;
+        else if(points[0]==history[totalMoves-1][4]&&points[1]==history[totalMoves-1][5])
+            playerTurn--;
+        points[0]=history[totalMoves-1][4];points[1]=history[totalMoves-1][5];player=history[totalMoves][6];
+        switch(player){
+            case 1:
+                moves[0]--;
+                break;
+            case 2:
+                moves[1]--;
+        }
+        player=history[totalMoves-1][6];
+    }
+    for(int i=0;i<dim;i++){
+        lastMoves[movesBack][i] = history[totalMoves][i];
+        history[totalMoves][i] = 0;
+    }
+    movesBack++;
+}
+void redo(int dim,int history[2*(dim/2)*((dim/2)+1)][7],int lastMoves[2*(dim/2)*((dim/2)+1)][7],int points[2],int moves[2],int player){
+    for(int i=0;i<dim;i++){
+        history[totalMoves][i] = lastMoves[movesBack][i];
+        lastMoves[movesBack][i] = 0;
+    }
+    totalMoves++;
+}
+void printRedo(int dim,int movesBack,int lastMoves[2*(dim/2)*((dim/2)+1)][7]){
+    if(movesBack!=0){
+        for(int j=0;j<movesBack;j++){
+            for(int k=0;k<dim;k++)
+                printf("%i- ",lastMoves[j][k]);
+        }
+        printf("\n");
+    }
+}
+void makeA_Move(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int points[2],int moves[2],int history[2 * (dim/2) * ((dim/2) + 1)][7],int lastMoves[2 * (dim/2) * ((dim/2) + 1)][7]){
     int N1,M1,N2,M2;
     printf("enter the row: ");
     scanf("%d",&N1);
@@ -212,49 +244,77 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
     printf("enter the col: ");
     scanf("%d",&M2);
 
-    if(N1 == -1 && M1 == -1 && N2 == -1 && M2 == -1){
-        redo(history);
-        return;
+    if(N1 == 0 && M1 == 0 && N2 == 0 && M2 == 0){
+        if(totalMoves!=0){
+            totalMoves--;
+            N1=history[totalMoves][0];M1=history[totalMoves][1];N2=history[totalMoves][2];M2=history[totalMoves][3];
+            undo(dim,history,lastMoves,points,moves,player,playerTurn);
+            n1 = 2*N1-2;m1 = 2*M1-2;n2 = 2*N2-2;m2 = 2*M2-2;
+            array[(n1+n2)/2][(m1+m2)/2] =' ';
+            if(array[n1+1][m1]==' '&&array[n1-1][m1]==' '&&array[n1][m1+1]==' '&&array[n1][m1-1]==' ')
+                array[n1][m1] = '0';
+            if(array[n2+1][m2]==' '&&array[n2-1][m2]==' '&&array[n2][m2+1]==' '&&array[n2][m2-1]==' ')
+                array[n2][m2] = '0';
+            if(n1==n2){
+                array[n1+1][(m1+m2)/2]=' ';
+                array[n1-1][(m1+m2)/2]=' ';
+            }else{
+                array[(n1+n2)/2][m1+1]=' ';
+                array[(n1+n2)/2][m1-1]=' ';
+            }
+            return;
+        }else{
+            printf("You should start");
+            return;
+        }
     }
-
-
-    n1 = 2*N1-2;m1 = 2*M1-2;n2 = 2*N2-2;m2 = 2*M2-2;
-
-
-    if((array[(n1+n2)/2][(m1+m2)/2] =='1') || (n1 > dim) || (m1 > dim) || (n2 > dim) || (m2 > dim) ||(n1 < 0) || (m1 < 0) || (n2 < 0) || (m2 < 0)){
-        printf("enter a valid move\n");
-        return;
-
-    }
-    else if((!(m1%2 || n1%2 ) && (((abs(n1-n2) == 2) && (m1==m2)) || ((abs(m1-m2) == 2) && (n1==n2))))){
-        array[n1][m1] = '1';
-        array[n2][m2] = '1';
-        array[(n1+n2)/2][(m1+m2)/2] ='1';
+    else if(N1 == -1 && M1 == -1 && N2 == -1 && M2 == -1){
+        if(movesBack!=0){
+            movesBack--;
+            redo(dim,history,lastMoves,points,moves,player);
+            N1=history[totalMoves][0];M1=history[totalMoves][1];N2=history[totalMoves][2];M2=history[totalMoves][3];
+            n1 = 2*N1-2;m1 = 2*M1-2;n2 = 2*N2-2;m2 = 2*M2-2;
+            array[n1][m1] = '1';
+            array[n2][m2] = '1';
+            array[(n1+n2)/2][(m1+m2)/2] ='1';
+            checkForSquares(n1,m1,dim,array,points);
+            return;
+        }else{
+            printf("No redo left");
+            return;
+        }
     }
     else{
-        printf("enter a valid thing");
+        n1 = 2*N1-2;m1 = 2*M1-2;n2 = 2*N2-2;m2 = 2*M2-2;
+
+
+        if((array[(n1+n2)/2][(m1+m2)/2] =='1') || (n1 > dim) || (m1 > dim) || (n2 > dim) || (m2 > dim) ||(n1 < 0) || (m1 < 0) || (n2 < 0) || (m2 < 0)){
+            printf("enter a valid move\n");
+            return;
+        }
+        else if((!(m1%2 || n1%2 ) && (((abs(n1-n2) == 2) && (m1==m2)) || ((abs(m1-m2) == 2) && (n1==n2))))){
+            array[n1][m1] = '1';
+            array[n2][m2] = '1';
+            array[(n1+n2)/2][(m1+m2)/2] ='1';
+        }
+        else{
+            printf("enter a valid thing");
+        }
+
+
+        checkForSquares(n1,m1,dim,array,points);
+
+        writeHistory(N1,M1,N2,M2,points[0],points[1],player,totalMoves,dim,history);
+
+        if(sum != 0)
+            playerTurn++;
+        else{
+            player=player==1?2:1;
+        }
+
+        totalMoves++;
     }
-
-
-    checkforsquares(n1,m1,dim,array,points);
-
-    writehistory(N1,M1,N2,M2,points[0],points[1],player,totalmoves,dim,history);
-
-    totalmoves++;
-
 }
-
-void redo(){
-
-
-
-
-
-
-
-}
-
-
 
 
 
@@ -286,42 +346,45 @@ int main()
                         dim = 15;
                         break;
                     default:
-                        printf("\nenter a valid input: ");
+                        printf("\nEnter a valid input: ");
 
                 }
             }while(dim == 0);
 
-            int history[2 * (dim/2) * ((dim/2) + 1)][7];
+            int history[2 * (dim/2) * ((dim/2) + 1)][7],lastMoves[2 * (dim/2) * ((dim/2) + 1)][7];
             char world[dim][dim];
 
 
-            createworld(dim,world);
+            createWorld(dim,world);
 
 
-            createhistory(dim,history);
+            createHistoryAndLastMoves(dim,history,lastMoves);
 
 
             do{
             system("cls");
-            printhistory(dim,history);
-            printf("\n\n\n\n");
-            printworld(dim,world);
+            printHistory(dim,history);
+            printf("______________________________________________________\n");
+            printWorld(dim,world);
 
             printf("\nFirst player: %d\n\nSecond player: %d\n\nFirst player moves: %i\n\nSecond player moves: %i\n\nTurn player no.: %d\n\n",points[0],points[1],moves[0],moves[1],player);
 
-            printf("\n enter -1,-1,-1,-1 to redo\n\n");
+            printf("\nEnter 0,0,0,0 to undo\t\t\tEnter -1,-1,-1,-1 to redo\n\n");
 
 
 
-            makeamove(dim,world,NULL,NULL,NULL,NULL,points,history);
 
-            printworld(dim,history);
+            makeA_Move(dim,world,NULL,NULL,NULL,NULL,points,moves,history,lastMoves);
+
+            printHistory(dim,history);
+
+            printRedo(dim,movesBack,lastMoves);
 
             }while((moves[0] + moves[1]) < 2 * (dim/2) * (dim/2 + 1));
 
             system("cls");
 
-            printworld(dim,world);
+            printWorld(dim,world);
 
 
 
