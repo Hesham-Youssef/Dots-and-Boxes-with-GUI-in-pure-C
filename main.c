@@ -182,9 +182,11 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
     printf("enter the col: ");
     scanf("%d",&M2);
     n1 = 2*N1-2;m1 = 2*M1-2;n2 = 2*N2-2;m2 = 2*M2-2;
-    if((array[(n1+n2)/2][(m1+m2)/2] =='1'))
+    if((array[(n1+n2)/2][(m1+m2)/2] =='1') || (n1 > dim) || (m1 > dim) || (n2 > dim) || (m2 > dim) ||(n1 < 0) || (m1 < 0) || (n2 < 0) || (m2 < 0)){
+        printf("enter a valid move\n");
         return;
 
+    }
     else if((!(m1%2 || n1%2 ) && (((abs(n1-n2) == 2) && (m1==m2)) || ((abs(m1-m2) == 2) && (n1==n2))))){
         array[n1][m1] = '1';
         array[n2][m2] = '1';
@@ -234,14 +236,16 @@ int main()
             }
             char world[dim][dim];
             createworld(dim,world);
-            while(1){
+            do{
             system("cls");
-
             printworld(dim,world);
             printf("\nFirst player: %d\n\nSecond player: %d\n\nFirst player moves: %i\n\nSecond player moves: %i\n\nTurn player no.: %d\n\n",points[0],points[1],moves[0],moves[1],player);
             makeamove(dim,world,NULL,NULL,NULL,NULL,points);
 
-            }
+            }while((moves[0] + moves[1]) < 2 * (dim/2) * (dim/2 + 1));
+            system("cls");
+            printworld(dim,world);
+            printf("\nFirst player: %d\n\nSecond player: %d\n\nFirst player moves: %i\n\nSecond player moves: %i\n\nTurn player no.: %d\n\n",points[0],points[1],moves[0],moves[1],player);
             if(points[1]>points[0])
                 printf("Congratulation for player no. 2 and hard luck for player no. 1");
             else if(points[0]>points[1])
