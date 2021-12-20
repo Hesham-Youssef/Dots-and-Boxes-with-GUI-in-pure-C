@@ -31,10 +31,10 @@ void normal(){
     printf("\033[0m");
 }
 
-void printhistory(int dim,int array[2 * (dim/2) * ((dim/2) + 1)][7]){
-    for(int i=0;i<2 * (dim/2) * ((dim/2) + 1);i++){
+void printhistory(int dim,int history[][7]){
+    for(int i=0;i<totalmoves;i++){
         for(int j=0;j<7;j++){
-            printf("  %d -",array[i][j]);
+            printf("  %d -",history[i][j]);
         }
         printf("\n");
     }
@@ -69,15 +69,7 @@ void createhistory(int dim,int history[2 * (dim/2) * ((dim/2) + 1)][7]){
         }
     }
 }
-void writehistory(int n1,int m1,int n2,int m2,int points0,int points1,int player,int totalmoves,int dim,int history[2 * (dim/2) * ((dim/2) + 1)][7]){
-    history[totalmoves][0] = n1;
-    history[totalmoves][1] = m1;
-    history[totalmoves][2] = n2;
-    history[totalmoves][3] = m2;
-    history[totalmoves][4] = points0;
-    history[totalmoves][5] = points1;
-    history[totalmoves][6] = player;
-}
+
 
 
 
@@ -169,13 +161,14 @@ int downleft(int n1,int m1,int dim,char array[dim][dim]){
     }
     return 0;
 }
-void checkforsquares(int n1,int m1,int dim,char array[dim][dim],int points[]){
+void checkforsquares(int n1,int m1,int dim,char array[dim][dim],int history[][dim]){
     int sum=0;
     sum = upperright(n1,m1,dim,array) + upperleft(n1,m1,dim,array) + downright(n1,m1,dim,array) + downleft(n1,m1,dim,array);
     if(playerturn % 2)
-        points[1] += sum;
+        history[totalmoves][5] += sum;
     else
-        points[0] += sum;
+        history[totalmoves][4] += sum;
+
     playerturn++;
     switch(player){
         case 1:
@@ -192,7 +185,7 @@ void checkforsquares(int n1,int m1,int dim,char array[dim][dim],int points[]){
 
 }
 
-void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int points[],int history[2 * (dim/2) * ((dim/2) + 1)][7]){
+void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int points[],int history[][7]){
     int N1,M1,N2,M2;
     printf("enter the row: ");
     scanf("%d",&N1);
@@ -207,39 +200,31 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
         redo(history);
         return;
     }
-
-
-    n1 = 2*N1-2;m1 = 2*M1-2;n2 = 2*N2-2;m2 = 2*M2-2;
-
-
-    if((array[(n1+n2)/2][(m1+m2)/2] =='1') || (n1 > dim) || (m1 > dim) || (n2 > dim) || (m2 > dim) ||(n1 < 0) || (m1 < 0) || (n2 < 0) || (m2 < 0)){
+    if((array[((N1+N2)-2)][((M1+M2)-2)] =='1') || (N1 > (dim/2) + 1) || (M1 > (dim/2) + 1) || (N2 > (dim/2) + 1) || (M2 > (dim/2) + 1) || (N1 < 1) || (M1 < 1) || (N2 < 1) || (M2 < 1) || !(((abs(N1-N2) == 1) && (M1==M2)) ^ ((abs(M1-M2) == 1) && (N1==N2)))){
         printf("enter a valid move\n");
         return;
     }
-    else if((!(m1%2 || n1%2 ) && (((abs(n1-n2) == 2) && (m1==m2)) || ((abs(m1-m2) == 2) && (n1==n2))))){
-        array[n1][m1] = '1';
-        array[n2][m2] = '1';
-        array[(n1+n2)/2][(m1+m2)/2] ='1';
+
+
+    history[totalmoves][0] = 2*N1-2 ; history[totalmoves][1] = 2*M1-2 ;history[totalmoves][2] = 2*N2-2 ; history[totalmoves][3] = 2*M2-2;
+
+    if(!(history[totalmoves][1]%2 || history[totalmoves][0]%2 )){
+        array[history[totalmoves][0]][history[totalmoves][1]] = '1';
+        array[history[totalmoves][2]][history[totalmoves][3]] = '1';
+        array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='1';
     }
     else{
         printf("enter a valid thing");
     }
 
-    checkforsquares(n1,m1,dim,array,points);
+    checkforsquares(history[totalmoves][0],history[totalmoves][1],dim,array,history);
 
-    writehistory(N1,M1,N2,M2,points[0],points[1],player,totalmoves,dim,history);
 
     totalmoves++;
 
 }
 
-void redo(){
-
-
-
-
-
-
+void undo(){
 
 }
 
@@ -291,7 +276,7 @@ int main()
 
 
             do{
-            system("cls");
+
             printhistory(dim,history);
             printf("\n\n\n\n");
             printworld(dim,world);
@@ -304,7 +289,6 @@ int main()
 
             makeamove(dim,world,NULL,NULL,NULL,NULL,points,history);
 
-            printworld(dim,history);
 
             }while((moves[0] + moves[1]) < 2 * (dim/2) * (dim/2 + 1));
 
