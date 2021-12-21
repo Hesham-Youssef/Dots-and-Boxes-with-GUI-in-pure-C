@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <math.h>
+//#include "undo and redo.h"
 int playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0};
 
 
@@ -75,9 +76,11 @@ int upperright(int n1,int m1,int dim,char array[dim][dim]){
                     if(array[n1-2][m1+1]=='1'){
                         switch(player){
                             case 1:
+
                                 array[n1-1][m1+1] = 'X';
                                 break;
                             case 2:
+
                                 array[n1-1][m1+1] = 'O';
                                 break;
                         }
@@ -97,9 +100,11 @@ int upperleft(int n1,int m1,int dim,char array[dim][dim]){
                     if(array[n1-2][m1-1]=='1'){
                         switch(player){
                             case 1:
+
                                 array[n1-1][m1-1] = 'X';
                                 break;
                             case 2:
+
                                 array[n1-1][m1-1] = 'O';
                                 break;
                         }
@@ -119,9 +124,11 @@ int downright(int n1,int m1,int dim,char array[dim][dim]){
                     if(array[n1+2][m1+1]=='1'){
                         switch(player){
                             case 1:
+
                                 array[n1+1][m1+1] = 'X';
                                 break;
                             case 2:
+
                                 array[n1+1][m1+1] = 'O';
                                 break;
                         }
@@ -141,9 +148,11 @@ int downleft(int n1,int m1,int dim,char array[dim][dim]){
                     if(array[n1+2][m1-1]=='1'){
                         switch(player){
                             case 1:
+
                                 array[n1+1][m1-1] = 'X';
                                 break;
                             case 2:
+
                                 array[n1+1][m1-1] = 'O';
                                 break;
                         }
@@ -228,7 +237,7 @@ void undo(int dim,int history[][dim],char array[dim][dim]){
 }
 
 void redo(int dim,int history[][dim],char array[dim][dim]){
-    if(totalmoves <= maxmoves && maxmoves > 0){
+    if(totalmoves < maxmoves && maxmoves > 0){
         int n1 = history[totalmoves][0];int m1 = history[totalmoves][1];
         array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='1';
 
