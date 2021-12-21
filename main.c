@@ -213,6 +213,10 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
         undo(dim,history,array);
         return;
     }
+    else if(N1 == 1 && M1 == 1 && N2 == 1 && M2 == 1){
+        redo(dim,history,array);
+        return;
+    }
     if((array[((N1+N2)-2)][((M1+M2)-2)] =='1') || (N1 > (dim/2) + 1) || (M1 > (dim/2) + 1) || (N2 > (dim/2) + 1) || (M2 > (dim/2) + 1) || (N1 < 1) || (M1 < 1) || (N2 < 1) || (M2 < 1) || !(((abs(N1-N2) == 1) && (M1==M2)) ^ ((abs(M1-M2) == 1) && (N1==N2)))){
         printf("enter a valid move\n");
         return;
@@ -239,12 +243,27 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
 void undo(int dim,int history[][dim],char array[dim][dim]){
     if(totalmoves > 0){
     totalmoves--;
-    array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='0';
-    if((checkforotherlines(dim,history,array,history[totalmoves][0],history[totalmoves][1]) > 1))
+    array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] =' ';
+    if(!(checkforotherlines(dim,history,array,history[totalmoves][0],history[totalmoves][1]) > 1))
         array[history[totalmoves][0]][history[totalmoves][1]] = '0';
 
-    if((checkforotherlines(dim,history,array,history[totalmoves][2],history[totalmoves][3]) > 1))
+    if(!(checkforotherlines(dim,history,array,history[totalmoves][2],history[totalmoves][3]) > 1))
         array[history[totalmoves][2]][history[totalmoves][3]] = '0';
+
+    }else{
+        printf("how do you think supposed to undo IF YOU HAVEN'T PLAYER YET RE-FUCKING-TARD");
+
+    }
+}
+
+void redo(int dim,int history[][dim],char array[dim][dim]){
+    if(totalmoves > 0){
+    totalmoves;
+    array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='1';
+
+    array[history[totalmoves][0]][history[totalmoves][1]] = '1';
+
+    array[history[totalmoves][2]][history[totalmoves][3]] = '1';
 
     }else{
         printf("how do you think supposed to undo IF YOU HAVEN'T PLAYER YET RE-FUCKING-TARD");
@@ -307,7 +326,7 @@ int main()
 
             printf("\nFirst player: %d\n\nSecond player: %d\n\nFirst player moves: %i\n\nSecond player moves: %i\n\nTurn player no.: %d\n\n",history[totalmoves][4],history[totalmoves][5],moves[0],moves[1],player);
 
-            printf("\n enter -1,-1,-1,-1 to redo\n\n");
+            printf("\n enter 1,1,1,1 to redo\n\n");
 
 
 
@@ -352,5 +371,7 @@ int main()
     makeamove(dim,world,NULL,NULL,NULL,NULL,points);
     }
 */
+
+
     return 0;
 }
