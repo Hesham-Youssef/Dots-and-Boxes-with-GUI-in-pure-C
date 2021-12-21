@@ -70,6 +70,19 @@ void createhistory(int dim,int history[2 * (dim/2) * ((dim/2) + 1)][7]){
     }
 }
 
+int checkforotherlines(int dim,int history[][dim],char array[][dim],int n1,int m1){
+    int f=0;
+    if(array[n1][m1+1] == '1')
+        f++;
+    if(array[n1][m1-1] == '1')
+        f++;
+    if(array[n1+1][m1] == '1')
+        f++;
+    if(array[n1-1][m1] == '1')
+        f++;
+    return f;
+}
+
 
 
 
@@ -197,7 +210,7 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
     scanf("%d",&M2);
 
     if(N1 == -1 && M1 == -1 && N2 == -1 && M2 == -1){
-        undo();
+        undo(dim,history,array);
         return;
     }
     if((array[((N1+N2)-2)][((M1+M2)-2)] =='1') || (N1 > (dim/2) + 1) || (M1 > (dim/2) + 1) || (N2 > (dim/2) + 1) || (M2 > (dim/2) + 1) || (N1 < 1) || (M1 < 1) || (N2 < 1) || (M2 < 1) || !(((abs(N1-N2) == 1) && (M1==M2)) ^ ((abs(M1-M2) == 1) && (N1==N2)))){
@@ -223,10 +236,20 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
 
 }
 
-void undo(){
+void undo(int dim,int history[][dim],char array[dim][dim]){
+    if(totalmoves > 0){
+    totalmoves--;
+    array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='0';
+    if((checkforotherlines(dim,history,array,history[totalmoves][0],history[totalmoves][1]) > 1))
+        array[history[totalmoves][0]][history[totalmoves][1]] = '0';
 
+    if((checkforotherlines(dim,history,array,history[totalmoves][2],history[totalmoves][3]) > 1))
+        array[history[totalmoves][2]][history[totalmoves][3]] = '0';
 
+    }else{
+        printf("how do you think supposed to undo IF YOU HAVEN'T PLAYER YET RE-FUCKING-TARD");
 
+    }
 }
 
 
@@ -291,7 +314,7 @@ int main()
             makeamove(dim,world,NULL,NULL,NULL,NULL,points,history);
 
 
-            }while((moves[0] + moves[1]) < 2 * (dim/2) * (dim/2 + 1));
+            }while(1);
 
             system("cls");
 
