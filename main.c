@@ -3,7 +3,7 @@
 #include <conio.h>
 #include <math.h>
 //#include "undo and redo.h"
-int playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0};
+int playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0},dim=0;char game=0;
 
 
 
@@ -217,8 +217,16 @@ void undo(int dim,int history[][dim],char array[dim][dim]){
                 array[(n1+n2)/2][m1-1]=' ';
             }
         }
-        if(player==history[totalmoves][6])
+        if(player==history[totalmoves][6]){
             playerturn-=2;
+            switch(player){
+            case 1:
+                points[0]--;
+                break;
+            case 2:
+                points[1]--;
+            }
+        }
         else
             playerturn--;
         player = history[totalmoves][6];
@@ -231,7 +239,7 @@ void undo(int dim,int history[][dim],char array[dim][dim]){
                 break;
         }
     }else{
-        printf("how do you think supposed to undo IF YOU HAVEN'T PLAYER YET RE-FUCKING-TARD");
+        printf("How do you think it is supposed to undo IF YOU HAVEN'T PLAYED YET!\a\n");
 
     }
 }
@@ -249,7 +257,7 @@ void redo(int dim,int history[][dim],char array[dim][dim]){
         totalmoves++;
 
     }else{
-        printf("how do you think supposed to undo IF YOU HAVEN'T PLAYER YET RE-FUCKING-TARD");
+        printf("How do you think it is supposed to redo IF THERE IS NO UNDO MOVES!\a\n");
 
     }
 }
@@ -319,91 +327,130 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
         totalmoves++;
 }
 
+void oneNewGame(){
+    system("cls");
+    printf("Back(0)\n\nEnter difficulty:\nEasy(1)\nNormal(2)\nHard(3)\nVery hard(4)\n");
+    scanf("%c", &game);
+        if(game=='0')
+            return newGame();
+        else if(game=='1'){
+            dim = 7;
+
+        }
+        else if(game=='2'){
+            dim = 11;
+
+        }
+        else if(game=='3'){
+            dim = 11;
+
+        }
+        else if(game=='4'){
+            dim = 15;
+
+        }
+        else
+            return oneNewGame();
+}
+
+void twoNewGame(){
+    system("cls");
+    printf("Back(0)\n\nEnter difficulty:\nEasy(1)\nNormal(2)\nHard(3)\n");
+    scanf("%c", &game);
+        if(game=='0')
+            return newGame();
+        else if(game=='1')
+            dim = 7;
+        else if(game=='2')
+            dim = 11;
+        else if(game=='3')
+            dim = 15;
+        else
+            return twoNewGame();
+}
+
+void newGame(){
+    system("cls");
+    printf("Back(0)\n\nChoose a mode:\nVs Computer(1)\nVs Human(2)\n");
+    scanf("%c",&game);
+    if(game=='0')
+        return main();
+    else if(game=='1')
+        oneNewGame();
+    else if(game=='2')
+        twoNewGame();
+    else
+        return newGame();
+}
 
 
 
 
 
 
-
-
-
-
-int main()
-{
-    int dim=0,game=0;
+int main(){
+    int p=0;
     do{
+    system("cls");
     system("color f1");
-    printf("Welcome to dots and boxes by RABSOOO team\nNew game(1)\nLoad game(2)\nLeader board(3)\nSettings(4)\nExit(5)\n");
-    scanf("%d", &game);
+    printf("Welcome to dots and boxes by RABSOOO team\nNew game(1)\nLoad game(2)\nLeader board(3)\nSettings(4)\nExit(0)\n");
+    scanf("%c", &game);
     system("cls");
     switch(game){
-        case 1:{
-            system("color f0");
-            printf("Back(0)\n\nEnter difficulty:\nEasy(1)\nNormal(2)\nHard(3)\n");
-            do{
-            scanf("%d", &game);
-                switch(game){
-                    case 0:
-                        system("cls");
-                        return main();
-                        break;
-                    case 1:
-                        dim = 7;
-                        break;
-                    case 2:
-                        dim = 11;
-                        break;
-                    case 3:
-                        dim = 15;
-                        break;
-                    default:
-                        system("cls");
-                        printf("\nEnter a valid input: ");
-
-                }
-            }while(dim == 0);
-
-            int history[2 * (dim/2) * ((dim/2) + 1)][7];
-            char world[dim][dim];
-
-            system("color f4");
-            createworld(dim,world);
-
-
-            createhistory(dim,history);
-
-
-            while(totalmoves<2*((dim/2)+1)*(dim/2)){
-                printhistory(dim,history);
-                printf("\n\n\n\n");
-                printf("total moves:%d\t\t maximum moves:%d\n\n",totalmoves,maxmoves);
-                printworld(dim,world);
-                printf("\nFirst player: %d\n\nSecond player: %d\n\nFirst player moves: %i\n\nSecond player moves: %i\n\nTurn player no.: %d\n\n",history[totalmoves-1][4],history[totalmoves-1][5],moves[0],moves[1],player);
-                printf("\n enter -1 to redo\n\n");
-                printf("\n enter 0 to undo\n\n");
-                makeamove(dim,world,NULL,NULL,NULL,NULL,points,history);
-            }
-
-            system("cls");
-            system("color 04");
-            printworld(dim,world);
-
-            system("color 0e");
-            if(points[1]>points[0])
-                printf("Congratulation for player no. 2 and hard luck for player no. 1");
-            else
-                printf("Congratulation for player no. 1 and hard luck for player no. 2");
-            break;
+    case '1':{
+        system("color f0");
+        do{
+            newGame();
         }
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-            printf("thanks for playing :)\n");
-            break;
-        default:
-            printf("Enter a valid input\n\n");
+
+        while(dim == 0);
+
+        int history[2 * (dim/2) * ((dim/2) + 1)][7];
+        char world[dim][dim];
+
+        system("color f4");
+        createworld(dim,world);
+
+
+        createhistory(dim,history);
+
+
+        while(totalmoves<2*((dim/2)+1)*(dim/2)){
+            if(totalmoves!=0)
+                p = totalmoves;
+            else
+                p=1;
+            printhistory(dim,history);
+            printf("\n\n\n\n");
+            printf("total moves:%d\t\t maximum moves:%d\n\n",totalmoves,maxmoves);
+            printworld(dim,world);
+            printf("\nFirst player: %d\n\nSecond player: %d\n\nFirst player moves: %i\n\nSecond player moves: %i\n\nTurn player no.: %d\n\n",history[p-1][4],history[p-1][5],moves[0],moves[1],player);
+            printf("\n enter -1 to redo\n\n");
+            printf("\n enter 0 to undo\n\n");
+            makeamove(dim,world,NULL,NULL,NULL,NULL,points,history);
+        }
+
+        system("cls");
+        system("color 04");
+        printworld(dim,world);
+
+        system("color 0e");
+        if(points[1]>points[0])
+            printf("Congratulation for player no. 2 and hard luck for player no. 1");
+        else
+            printf("Congratulation for player no. 1 and hard luck for player no. 2");
+        break;
+    }
+    case '2':
+    case '3':
+    case '4':
+    case '0':
+        printf("thanks for playing :)\n");
+        break;
+    default:
+        system("cls");
+        printf("Enter a valid input\n");
+        return main();
     }
     }while(game < 1 || game >5);
 
