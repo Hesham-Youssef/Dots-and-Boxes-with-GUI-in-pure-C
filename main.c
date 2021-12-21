@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <math.h>
-int playerturn = 0, player = 1,moves[2] = {0},totalmoves=0;
+int playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0;
 void black(){
     printf("\033[1;30m");
 }
@@ -32,7 +32,7 @@ void normal(){
 }
 
 void printhistory(int dim,int history[][7]){
-    for(int i=0;i<totalmoves;i++){
+    for(int i=0;i<maxmoves;i++){
         for(int j=0;j<7;j++){
             printf("  %d -",history[i][j]);
         }
@@ -198,7 +198,20 @@ void checkforsquares(int n1,int m1,int dim,char array[dim][dim],int history[][di
 
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
 void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int points[],int history[][7]){
+
     int N1,M1,N2,M2;
     printf("enter the row: ");
     scanf("%d",&N1);
@@ -236,19 +249,41 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
 
     checkforsquares(history[totalmoves][0],history[totalmoves][1],dim,array,history);
 
+    maxmoves++;
     totalmoves++;
 
 }
 
 void undo(int dim,int history[][dim],char array[dim][dim]){
+
+    int n1 = history[totalmoves][0] , m1 = history[totalmoves][1];
+
     if(totalmoves > 0){
     totalmoves--;
     array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] =' ';
-    if(!(checkforotherlines(dim,history,array,history[totalmoves][0],history[totalmoves][1]) > 1))
+    if(!(checkforotherlines(dim,history,array,history[totalmoves][0],history[totalmoves][1]) >= 1))
         array[history[totalmoves][0]][history[totalmoves][1]] = '0';
 
-    if(!(checkforotherlines(dim,history,array,history[totalmoves][2],history[totalmoves][3]) > 1))
+    if(!(checkforotherlines(dim,history,array,history[totalmoves][2],history[totalmoves][3]) >= 1))
         array[history[totalmoves][2]][history[totalmoves][3]] = '0';
+
+    if(!(m1 == dim -1) || (n1 == 0) || array[n1-1][m1+1] == 'X' || array[n1-1][m1+1] == 'O'){
+        array[history[totalmoves][0]-1][history[totalmoves][1]+1] = ' ';
+        printf("upperright");
+    }
+    if(!(m1 == 0) || !(n1 == 0) || array[n1-1][m1-1] == 'X' || array[n1-1][m1-1] == 'O'){
+        array[history[totalmoves][0]-1][history[totalmoves][1]-1] = ' ';
+        printf("upperleft");
+    }
+    if(!(m1 == dim -1) || !(n1 == dim -1) || array[n1+1][m1+1] == 'X' || array[n1+1][m1+1] == 'O'){
+        array[history[totalmoves][0]+1][history[totalmoves][1]+1] = ' ';
+        printf("downright");
+    }
+
+    if(!(m1 == 0) || !(n1 == dim-1) || array[n1+1][m1-1] == 'X' || array[n1+1][m1-1] == 'O'){
+        array[history[totalmoves][0]+1][history[totalmoves][1]-1] = ' ';
+        printf("downleft");
+    }
 
     }else{
         printf("how do you think supposed to undo IF YOU HAVEN'T PLAYER YET RE-FUCKING-TARD");
@@ -257,13 +292,21 @@ void undo(int dim,int history[][dim],char array[dim][dim]){
 }
 
 void redo(int dim,int history[][dim],char array[dim][dim]){
-    if(totalmoves > 0){
-    totalmoves;
-    array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='1';
+    if(totalmoves < maxmoves){
 
-    array[history[totalmoves][0]][history[totalmoves][1]] = '1';
+        array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='1';
 
-    array[history[totalmoves][2]][history[totalmoves][3]] = '1';
+        array[history[totalmoves][0]][history[totalmoves][1]] = '1';
+
+        array[history[totalmoves][2]][history[totalmoves][3]] = '1';
+
+        upperleft(history[totalmoves][0],history[totalmoves][1],dim,array);
+        upperright(history[totalmoves][0],history[totalmoves][1],dim,array);
+        downleft(history[totalmoves][0],history[totalmoves][1],dim,array);
+        downright(history[totalmoves][0],history[totalmoves][1],dim,array);
+
+
+        totalmoves++;
 
     }else{
         printf("how do you think supposed to undo IF YOU HAVEN'T PLAYER YET RE-FUCKING-TARD");
@@ -322,13 +365,14 @@ int main()
 
             printhistory(dim,history);
             printf("\n\n\n\n");
+            printf("%d  %d\n\n",totalmoves,maxmoves);
             printworld(dim,world);
 
-            printf("\nFirst player: %d\n\nSecond player: %d\n\nFirst player moves: %i\n\nSecond player moves: %i\n\nTurn player no.: %d\n\n",history[totalmoves][4],history[totalmoves][5],moves[0],moves[1],player);
+            printf("\nFirst player: %d\n\nSecond player: %d\n\nFirst player moves: %i\n\nSecond player moves: %i\n\nTurn player no.: %d\n\n",history[totalmoves-1][4],history[totalmoves-1][5],moves[0],moves[1],player);
 
             printf("\n enter 1,1,1,1 to redo\n\n");
 
-
+            printf("\n enter -1,-1,-1,-1 to undo\n\n");
 
             makeamove(dim,world,NULL,NULL,NULL,NULL,points,history);
 
