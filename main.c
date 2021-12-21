@@ -31,8 +31,15 @@ void normal(){
     printf("\033[0m");
 }
 
+
+
+
+
+
+
+
 void printhistory(int dim,int history[][7]){
-    for(int i=0;i<maxmoves;i++){
+    for(int i=0;i<24;i++){
         for(int j=0;j<7;j++){
             printf("  %d -",history[i][j]);
         }
@@ -174,13 +181,13 @@ int downleft(int n1,int m1,int dim,char array[dim][dim]){
     }
     return 0;
 }
-void checkforsquares(int n1,int m1,int dim,char array[dim][dim],int history[][dim]){
+void checkforsquares(int n1,int m1,int dim,char array[dim][dim],int history[][dim],int points[]){
     int sum=0;
     sum = upperright(n1,m1,dim,array) + upperleft(n1,m1,dim,array) + downright(n1,m1,dim,array) + downleft(n1,m1,dim,array);
     if(playerturn % 2)
-        history[totalmoves][5] += sum;
+        points[1] += sum;
     else
-        history[totalmoves][4] += sum;
+        points[0] += sum;
 
     playerturn++;
     switch(player){
@@ -198,6 +205,84 @@ void checkforsquares(int n1,int m1,int dim,char array[dim][dim],int history[][di
 
 }
 
+void undo(int dim,int history[][dim],char array[dim][dim]){
+
+    int n1 = history[totalmoves][0] , m1 = history[totalmoves][1] ,  n2 = history[totalmoves][2] ,  m2 = history[totalmoves][3];
+
+    if(totalmoves > 0){
+    totalmoves--;
+    array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] =' ';
+    if(!(checkforotherlines(dim,history,array,history[totalmoves][0],history[totalmoves][1]) >= 1))
+        array[history[totalmoves][0]][history[totalmoves][1]] = '0';
+
+    if(!(checkforotherlines(dim,history,array,history[totalmoves][2],history[totalmoves][3]) >= 1))
+        array[history[totalmoves][2]][history[totalmoves][3]] = '0';
+
+    if(!((m1 == dim -1) || (n1 == 0)) && (array[n1-1][m1+1] == 'X' || array[n1-1][m1+1] == 'O') && (array[n2+1][m2+1] == 'X' || array[n2+1][m2+1] == 'O')){
+        array[n1-1][m1+1] = ' ';
+        printf("upperright\n");
+    }
+    if(!((m1 == 0) || (n1 == 0)) && (array[n1-1][m1-1] == 'X' || array[n1-1][m1-1] == 'O') && (array[n2+1][m2-1] == 'X' || array[n2+1][m2-1] == 'O')){
+        array[n1-1][m1-1] = ' ';
+        printf("upperleft\n");
+    }
+    if(!((m1 == dim -1) || (n1 == dim -1)) && (array[n1+1][m1+1] == 'X' || array[n1+1][m1+1] == 'O') && (array[n2-1][m2+1] == 'X' || array[n2-1][m2+1] == 'O')){
+        array[n1+1][m1+1] = ' ';
+        printf("downright\n");
+    }
+
+    if(!((m1 == 0) || (n1 == dim-1))&& (array[n1+1][m1-1] == 'X' || array[n1+1][m1-1] == 'O') && (array[n2-1][m2-1] == 'X' || array[n2-1][m2-1] == 'O')){
+        array[n1+1][m1-1] = ' ';
+        printf("downleft\n");
+    }
+    player = history[totalmoves][6];
+        switch(player){
+        case 1:
+            moves[0]--;
+            break;
+        case 2:
+            moves[1]--;
+            break;
+
+    }
+        printf("how do you think supposed to undo IF YOU HAVEN'T PLAYER YET RE-FUCKING-TARD");
+
+    }
+}
+
+void redo(int dim,int history[][dim],char array[dim][dim]){
+    if(totalmoves < maxmoves && maxmoves > 0){
+
+        array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='1';
+
+        array[history[totalmoves][0]][history[totalmoves][1]] = '1';
+
+        array[history[totalmoves][2]][history[totalmoves][3]] = '1';
+
+        upperleft(history[totalmoves][0],history[totalmoves][1],dim,array);
+        upperright(history[totalmoves][0],history[totalmoves][1],dim,array);
+        downleft(history[totalmoves][0],history[totalmoves][1],dim,array);
+        downright(history[totalmoves][0],history[totalmoves][1],dim,array);
+
+        player = history[totalmoves][6];
+        switch(player){
+        case 1:
+            moves[0]++;
+            break;
+        case 2:
+            moves[1]++;
+            break;
+
+        }
+
+        totalmoves++;
+
+    }else{
+        printf("how do you think supposed to undo IF YOU HAVEN'T PLAYER YET RE-FUCKING-TARD");
+
+    }
+}
+
 
 
 
@@ -211,16 +296,22 @@ void checkforsquares(int n1,int m1,int dim,char array[dim][dim],int history[][di
 
 
 void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int points[],int history[][7]){
-
+    char N1temp,M1temp,N2temp,M2temp;
     int N1,M1,N2,M2;
     printf("enter the row: ");
     scanf("%d",&N1);
+    printf("%d\n",N1);
     printf("enter the col: ");
     scanf("%d",&M1);
     printf("enter the row: ");
     scanf("%d",&N2);
     printf("enter the col: ");
     scanf("%d",&M2);
+
+
+
+
+
 
     if(N1 == -1 && M1 == -1 && N2 == -1 && M2 == -1){
         undo(dim,history,array);
@@ -247,72 +338,18 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
         printf("enter a valid thing");
     }
 
-    checkforsquares(history[totalmoves][0],history[totalmoves][1],dim,array,history);
+    checkforsquares(history[totalmoves][0],history[totalmoves][1],dim,array,history,points);
+    history[totalmoves][4] = points[0];
+    history[totalmoves][5] = points[1];
 
-    maxmoves++;
-    totalmoves++;
+    if(totalmoves < maxmoves)
+        maxmoves = totalmoves;
 
-}
-
-void undo(int dim,int history[][dim],char array[dim][dim]){
-
-    int n1 = history[totalmoves][0] , m1 = history[totalmoves][1];
-
-    if(totalmoves > 0){
-    totalmoves--;
-    array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] =' ';
-    if(!(checkforotherlines(dim,history,array,history[totalmoves][0],history[totalmoves][1]) >= 1))
-        array[history[totalmoves][0]][history[totalmoves][1]] = '0';
-
-    if(!(checkforotherlines(dim,history,array,history[totalmoves][2],history[totalmoves][3]) >= 1))
-        array[history[totalmoves][2]][history[totalmoves][3]] = '0';
-
-    if(!(m1 == dim -1) || (n1 == 0) || array[n1-1][m1+1] == 'X' || array[n1-1][m1+1] == 'O'){
-        array[history[totalmoves][0]-1][history[totalmoves][1]+1] = ' ';
-        printf("upperright");
-    }
-    if(!(m1 == 0) || !(n1 == 0) || array[n1-1][m1-1] == 'X' || array[n1-1][m1-1] == 'O'){
-        array[history[totalmoves][0]-1][history[totalmoves][1]-1] = ' ';
-        printf("upperleft");
-    }
-    if(!(m1 == dim -1) || !(n1 == dim -1) || array[n1+1][m1+1] == 'X' || array[n1+1][m1+1] == 'O'){
-        array[history[totalmoves][0]+1][history[totalmoves][1]+1] = ' ';
-        printf("downright");
-    }
-
-    if(!(m1 == 0) || !(n1 == dim-1) || array[n1+1][m1-1] == 'X' || array[n1+1][m1-1] == 'O'){
-        array[history[totalmoves][0]+1][history[totalmoves][1]-1] = ' ';
-        printf("downleft");
-    }
-
-    }else{
-        printf("how do you think supposed to undo IF YOU HAVEN'T PLAYER YET RE-FUCKING-TARD");
-
-    }
-}
-
-void redo(int dim,int history[][dim],char array[dim][dim]){
-    if(totalmoves < maxmoves){
-
-        array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='1';
-
-        array[history[totalmoves][0]][history[totalmoves][1]] = '1';
-
-        array[history[totalmoves][2]][history[totalmoves][3]] = '1';
-
-        upperleft(history[totalmoves][0],history[totalmoves][1],dim,array);
-        upperright(history[totalmoves][0],history[totalmoves][1],dim,array);
-        downleft(history[totalmoves][0],history[totalmoves][1],dim,array);
-        downright(history[totalmoves][0],history[totalmoves][1],dim,array);
-
-
+        maxmoves++;
         totalmoves++;
-
-    }else{
-        printf("how do you think supposed to undo IF YOU HAVEN'T PLAYER YET RE-FUCKING-TARD");
-
-    }
 }
+
+
 
 
 
