@@ -3,7 +3,7 @@
 #include <conio.h>
 #include <math.h>
 //#include "undo and redo.h"
-int playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0},dim=0,computer;char game=0;
+int w=0,playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0},dim=0,computer;char game=0,name1[25],name2[25]="Computer";
 
 void printAIwolrd(int dim,int AIworld[dim][dim]){
     for(int i=0;i<dim;i++){
@@ -32,19 +32,28 @@ void printhistory(int dim,int history[][7]){
 }
 
 
-void printworld(int dim,char array[dim][dim]){
-    for(int i=0;i<dim;i++){
-        for(int j=0;j<dim;j++){
+void printworld(int dim,char array[dim+2][dim+2]){
+    for(int i=0;i<dim+2;i++){
+        for(int j=0;j<dim+2;j++){
             printf("%c  ",array[i][j]);
         }
         printf("\n");
     }
 }
-void createworld(int dim,char array[dim][dim]){
-    for(int i=0;i<dim;i++){
-        for(int j=0;j<dim;j++){
-            if(!(j%2 || i%2))
+void createworld(int dim,char array[dim+2][dim+2]){
+    char q[6]={'1','2','3','4','5','6'};
+    for(int i=0;i<dim+2;i++){
+        for(int j=0;j<dim+2;j++){
+            if((i==dim+1)&&j==0)
+                w=0;
+            if((!(j%2 || i%2))&&(i<dim)&&(j<dim))
                 array[i][j]='0';
+            //else if((i==dim||j==dim)&&(i<dim+1&&j<dim+1))
+              //  array[i][j]='+';
+            else if((((i==dim+1)&&j%2==0)||((j==dim+1)&&i%2==0))&&(!(i==dim+1&&j==dim+1))){
+                array[i][j]=q[w];
+                w++;
+            }
             else
                 array[i][j]=' ';
         }
@@ -58,7 +67,7 @@ void createhistory(int dim,int history[2 * (dim/2) * ((dim/2) + 1)][7]){
     }
 }
 
-int checkforotherlines(int dim,int history[][7],char array[][dim],int n1,int m1){
+int checkforotherlines(int dim,int history[][7],char array[dim+2][dim+2],int n1,int m1){
     int f=0;
     if(array[n1][m1+1] == '1')
         f++;
@@ -74,7 +83,7 @@ int checkforotherlines(int dim,int history[][7],char array[][dim],int n1,int m1)
 
 
 
-int upperright(int n1,int m1,int dim,char array[dim][dim]){
+int upperright(int n1,int m1,int dim,char array[dim+2][dim+2]){
     if((m1 == dim -1) || (n1 == 0) || array[n1-1][m1+1] == 'X' || array[n1-1][m1+1] == 'O')
         return 0;
     if(array[n1][m1+1]=='1'){
@@ -98,7 +107,7 @@ int upperright(int n1,int m1,int dim,char array[dim][dim]){
     }
    return 0;
 }
-int upperleft(int n1,int m1,int dim,char array[dim][dim]){
+int upperleft(int n1,int m1,int dim,char array[dim+2][dim+2]){
     if((m1 == 0) || (n1 == 0) || array[n1-1][m1-1] == 'X' || array[n1-1][m1-1] == 'O')
         return 0;
     if(array[n1][m1-1]=='1'){
@@ -122,7 +131,7 @@ int upperleft(int n1,int m1,int dim,char array[dim][dim]){
     }
     return 0;
 }
-int downright(int n1,int m1,int dim,char array[dim][dim]){
+int downright(int n1,int m1,int dim,char array[dim+2][dim+2]){
     if((m1 == dim -1) || (n1 == dim -1) || array[n1+1][m1+1] == 'X' || array[n1+1][m1+1] == 'O')
         return 0;
     if(array[n1][m1+1]=='1'){
@@ -146,7 +155,7 @@ int downright(int n1,int m1,int dim,char array[dim][dim]){
     }
     return 0;
 }
-int downleft(int n1,int m1,int dim,char array[dim][dim]){
+int downleft(int n1,int m1,int dim,char array[dim+2][dim+2]){
     if((m1 == 0) || (n1 == dim-1) || array[n1+1][m1-1] == 'X' || array[n1+1][m1-1] == 'O')
         return 0;
     if(array[n1][m1-1]=='1'){
@@ -170,7 +179,7 @@ int downleft(int n1,int m1,int dim,char array[dim][dim]){
     }
     return 0;
 }
-void checkforsquares(int n1,int m1,int dim,char array[dim][dim],int history[][7],int points[]){
+void checkforsquares(int n1,int m1,int dim,char array[dim+2][dim+2],int history[][7],int points[]){
     int sum=0;
     sum = upperright(n1,m1,dim,array) + upperleft(n1,m1,dim,array) + downright(n1,m1,dim,array) + downleft(n1,m1,dim,array);
     if(playerturn % 2)
@@ -194,7 +203,7 @@ void checkforsquares(int n1,int m1,int dim,char array[dim][dim],int history[][7]
 
 }
 
-void undo(int dim,int history[][7],char array[dim][dim]){
+void undo(int dim,int history[][7],char array[dim+2][dim+2]){
     if(totalmoves > 0){
         totalmoves--;
         int n1 = history[totalmoves][0] , m1 = history[totalmoves][1] ,  n2 = history[totalmoves][2] ,  m2 = history[totalmoves][3];
@@ -251,7 +260,7 @@ void undo(int dim,int history[][7],char array[dim][dim]){
     }
 }
 
-void redo(int dim,int history[][7],char array[dim][dim]){
+void redo(int dim,int history[][7],char array[dim+2][dim+2]){
     if(totalmoves < maxmoves && maxmoves > 0){
         int n1 = history[totalmoves][0];int m1 = history[totalmoves][1];
         array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='1';
@@ -272,37 +281,36 @@ void redo(int dim,int history[][7],char array[dim][dim]){
 
 
 
-void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int points[],int history[][7],int AIworld[dim][dim]){
+void makeamove(int dim,char array[dim+2][dim+2],int n1,int m1,int n2,int m2,int points[],int history[][7],int AIworld[dim][dim]){
 
     if((!computer && player==2) || player == 1){
 
-    char term;
+    char term,a1[1],A1[1],a2[1],A2[1];
     int N1,M1,N2,M2,f=0;
-    printf("\nenter the row: ");
-    scanf("%d", &N1);
-
+    printf("\nEnter the row: ");
+    gets(a1);
+    N1=a1[0]-48;
     if(N1 == 0){
         undo(dim,history,array);
-        if(computer)
+        if(computer){
             while(history[totalmoves][6] != 1)
                 undo(dim,history,array);
+        }
         return;
     }
-    else if(N1 == -1){
+    else if(N1 == -2){
         redo(dim,history,array);
-
-
         return;
     }else{
-        printf("\nenter the col: ");
-        scanf("%d", &M1);
-
-        printf("\nenter the row: ");
-        scanf("%d", &N2);
-
-        printf("\nenter the col: ");
-        scanf("%d", &M2);
-
+        printf("\nEnter the col: ");
+        gets(A1);
+        M1=A1[0]-48;
+        printf("\nEnter the row: ");
+        gets(a2);
+        N2=a2[0]-48;
+        printf("\nEnter the col: ");
+        gets(A2);
+        M2=A2[0]-48;
         }
 
 
@@ -310,7 +318,7 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
 
 
     if((array[((N1+N2)-2)][((M1+M2)-2)] =='1') || (N1 > (dim/2) + 1) || (M1 > (dim/2) + 1) || (N2 > (dim/2) + 1) || (M2 > (dim/2) + 1) || (N1 < 1) || (M1 < 1) || (N2 < 1) || (M2 < 1) || !(((abs(N1-N2) == 1) && (M1==M2)) ^ ((abs(M1-M2) == 1) && (N1==N2)))){
-        printf("enter a valid move\n");
+        printf("Enter a valid move\n");
         return;
     }
 
@@ -331,7 +339,7 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
         array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='1';
     }
     else{
-        printf("enter a valid thing");
+        printf("Enter a valid thing\n");
     }
 
     checkforsquares(history[totalmoves][0],history[totalmoves][1],dim,array,history,points);
@@ -340,12 +348,13 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
 
     if((totalmoves < maxmoves) && !computer)
         maxmoves = totalmoves;
-
-        maxmoves++;
-        totalmoves++;
+    if((totalmoves < maxmoves) && computer)
+        maxmoves--;
+    maxmoves++;
+    totalmoves++;
 }
 
-void AI(int dim,char world[dim][dim],int AIworld[dim][dim],int history[][7]){
+void AI(int dim,char world[dim+2][dim+2],int AIworld[dim][dim],int history[][7]){
     int numberoflines1,numberoflines2;
     // checks horizontal lines
     for(int i=0;i<dim;i=i+2){
@@ -481,23 +490,26 @@ void oneNewGame(){
         case '0':
             return newGame();
             break;
-
         case '1':
+            printf("\nEnter player's name: ");
+            gets(name1);
             dim = 7;
             break;
-
         case '2':
+            printf("\nEnter player's name: ");
+            gets(name1);
             dim = 11;
             break;
-
         case '3':
+            printf("\nEnter player's name: ");
+            gets(name1);
             dim = 11;
             break;
-
         case '4':
+            printf("\nEnter player's name: ");
+            gets(name1);
             dim = 15;
             break;
-
         default:
             oneNewGame();
     }
@@ -512,12 +524,24 @@ void twoNewGame(){
             return newGame();
             break;
         case '1':
+            printf("\nEnter first player's name: ");
+            gets(name1);
+            printf("\nEnter second player's name: ");
+            gets(name2);
             dim = 7;
             break;
         case '2':
+            printf("\nEnter first player's name: ");
+            gets(name1);
+            printf("\nEnter second player's name: ");
+            gets(name2);
             dim = 11;
             break;
         case '3':
+            printf("\nEnter first player's name: ");
+            gets(name1);
+            printf("\nEnter second player's name: ");
+            gets(name2);
             dim = 15;
             break;
         default:
@@ -570,7 +594,7 @@ int main(){
         while(dim == 0);
 
         int history[2 * (dim/2) * ((dim/2) + 1)][7];
-        char world[dim][dim];
+        char world[dim+2][dim+2];
 
         system("color f4");
         createworld(dim,world);
@@ -591,16 +615,16 @@ int main(){
                 p=1;
             printhistory(dim,history);
             printf("\n\n\n\n");
-            printf("total moves:%d\t\t maximum moves:%d\n\n",totalmoves,maxmoves);
+            printf("Total moves:%d\t\t Maximum moves:%d\n\n",totalmoves,maxmoves);
             if(computer)
                 printAIwolrd(dim,AIworld);
 
             printf("\n\n\n\n");
 
             printworld(dim,world);
-            printf("\nFirst player: %d\n\nSecond player: %d\n\nFirst player moves: %i\n\nSecond player moves: %i\n\nTurn player no.: %d\n\n",history[p-1][4],history[p-1][5],moves[0],moves[1],player);
-            printf("\n enter -1 to redo\n\n");
-            printf("\n enter 0 to undo\n\n");
+            printf("\n%s: %d\n\n%s: %d\n\nFirst player moves: %i\n\nSecond player moves: %i\n\nTurn player no.: %d\n\n",name1,history[p-1][4],name2,history[p-1][5],moves[0],moves[1],player);
+            printf("\n Enter -1 to redo\n\n");
+            printf("\n Enter 0 to undo\n\n");
             if(!computer)
                 makeamove(dim,world,NULL,NULL,NULL,NULL,points,history,NULL);
             else
@@ -612,11 +636,18 @@ int main(){
         printworld(dim,world);
 
         system("color 0e");
-        if(points[1]>points[0])
-            printf("Congratulation for player no. 2 and hard luck for player no. 1");
-        else
-            printf("Congratulation for player no. 1 and hard luck for player no. 2");
-        break;
+        if(points[1]>points[0]){
+            if(!computer)
+                printf("Congratulation for %s and hard luck for %s",name2,name1);
+            else
+                printf("Hard luck %s",name1);
+        }else{
+            if(!computer)
+                printf("Congratulations for %s and hard luck for %s",name1,name2);
+            else
+                printf("Congratulations %s",name1);
+        }
+        return 0;
     }
     case '2':
     case '3':
