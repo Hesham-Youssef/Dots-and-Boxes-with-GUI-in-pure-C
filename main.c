@@ -274,7 +274,7 @@ void redo(int dim,int history[][7],char array[dim][dim]){
 
 void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int points[],int history[][7],int AIworld[dim][dim]){
 
-    if((!computer && player) || player == 1){
+    if((!computer && player==2) || player == 1){
 
     char term;
     int N1,M1,N2,M2,f=0;
@@ -290,8 +290,7 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
     }
     else if(N1 == -1){
         redo(dim,history,array);
-        if(computer)
-                redo(dim,history,array);
+
 
         return;
     }else{
@@ -339,7 +338,7 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
     history[totalmoves][4] = points[0];
     history[totalmoves][5] = points[1];
 
-    if(totalmoves < maxmoves)
+    if((totalmoves < maxmoves) && !computer)
         maxmoves = totalmoves;
 
         maxmoves++;
@@ -420,15 +419,25 @@ void AI(int dim,char world[dim][dim],int AIworld[dim][dim],int history[][7]){
             }
         }
     }
-    int maxi,maxj,max=0;
-    for(int i=0;i<dim;i++){
-        for(int j=0;j<dim;j++){
+    int maxi,maxj,max=-100;
+    for(int i=1;i<dim;i=i+2){
+        for(int j=0;j<dim;j=j+2){
             if(AIworld[i][j] > max){
                 max = AIworld[i][j];
                 maxi = i;
                 maxj = j;
             }
         }
+    }
+    for(int i=0;i<dim;i=i+2){
+        for(int j=1;j<dim;j=j+2){
+            if(AIworld[i][j] > max){
+                max = AIworld[i][j];
+                maxi = i;
+                maxj = j;
+            }
+        }
+        printf("%d\n\n\n",i);
     }
     printf("%d %d %d \n\n\n",max,maxi,maxj);
     if(!(maxi%2)){
