@@ -39,19 +39,11 @@ void update(char world[dim][dim]){
 
     for(int i=0;i<dim;i++){
         for(int j=0;j<dim;j++){
-            if(world[i][j] == '0'){
+            if(world[i][j] == '0' || world[i][j] == '1'){
+
+
 
                 SDL_SetRenderDrawColor(renderer,255,255,255,255);
-                SDL_Rect ballrect = {.x = i * WIDTH/dim + 30 , .y = j * HEIGHT/dim + 30 , .w = 50 , .h = 50};
-
-                SDL_RenderFillRect(renderer,&ballrect);
-            }
-            if(world[i][j] == '1'){
-
-                if(player == 1)
-                    SDL_SetRenderDrawColor(renderer,0,0,255,255);
-                else
-                    SDL_SetRenderDrawColor(renderer,255,0,0,255);
                 SDL_Rect ballrect = {.x = i * WIDTH/dim + 30 , .y = j * HEIGHT/dim + 30 , .w = 50 , .h = 50};
 
                 SDL_RenderFillRect(renderer,&ballrect);
@@ -610,8 +602,6 @@ int main(int argc,char* argv[]){
 
         int tempAI[dim][dim];
 
-        createAIwolrd(dim,tempAI);
-
         createAIwolrd(dim,AIworld);
 
         createhistory(dim,history);
@@ -637,8 +627,11 @@ int main(int argc,char* argv[]){
 
             update(world);
 
+            if(computer && (player == 2)){
+                printf("AAAAAAA\n");
+                makeamove(dim,world,NULL,NULL,NULL,NULL,points,history,AIworld);
 
-
+            }else{
             while(SDL_PollEvent(&event)){
                     int f = 0;
                     switch(event.type){
@@ -667,6 +660,7 @@ int main(int argc,char* argv[]){
                     }
                 }
             }
+        }
 
 
         killSDL();
