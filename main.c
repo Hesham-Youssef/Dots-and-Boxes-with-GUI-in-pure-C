@@ -608,6 +608,10 @@ int main(int argc,char* argv[]){
 
         int AIworld[dim][dim];
 
+        int tempAI[dim][dim];
+
+        createAIwolrd(dim,tempAI);
+
         createAIwolrd(dim,AIworld);
 
         createhistory(dim,history);
