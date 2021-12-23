@@ -2,8 +2,85 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <math.h>
+#include <SDL2/SDL.h>
+#include <stdbool.h>
+
+
+#define WIDTH 700
+#define HEIGHT 700
 //#include "undo and redo.h"
-int w=0,playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0},dim=0,computer;char game=0,name1[25],name2[25]="Computer";
+int playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0},dim=0,computer;char game=0;
+SDL_Window *window;
+SDL_Renderer *renderer;
+
+
+
+void initSDL(){
+    SDL_Init(SDL_INIT_VIDEO);
+
+        window = SDL_CreateWindow("dots and boxes",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,WIDTH,HEIGHT,SDL_WINDOW_SHOWN);
+
+        renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+}
+
+void killSDL(){
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+}
+
+void update(char world[dim][dim]){
+
+    SDL_SetRenderDrawColor(renderer,0,0,0,255);
+
+    SDL_RenderClear(renderer);
+
+
+    for(int i=0;i<dim;i++){
+        for(int j=0;j<dim;j++){
+            if(world[i][j] == '0'){
+
+                SDL_SetRenderDrawColor(renderer,255,255,255,255);
+                SDL_Rect ballrect = {.x = i * WIDTH/dim + 30 , .y = j * HEIGHT/dim + 30 , .w = 50 , .h = 50};
+
+                SDL_RenderFillRect(renderer,&ballrect);
+            }
+            if(world[i][j] == '1'){
+
+                if(player == 1)
+                    SDL_SetRenderDrawColor(renderer,0,0,255,255);
+                else
+                    SDL_SetRenderDrawColor(renderer,255,0,0,255);
+                SDL_Rect ballrect = {.x = i * WIDTH/dim + 30 , .y = j * HEIGHT/dim + 30 , .w = 50 , .h = 50};
+
+                SDL_RenderFillRect(renderer,&ballrect);
+            }
+            else if(world[i][j] == 'X'){
+
+                SDL_SetRenderDrawColor(renderer,255,0,0,255);
+                SDL_Rect ballrect = {.x = i * WIDTH/dim + 30 , .y = j * HEIGHT/dim + 30 , .w = 50 , .h = 50};
+
+                SDL_RenderFillRect(renderer,&ballrect);
+            }
+            else if(world[i][j] == 'O'){
+
+                SDL_SetRenderDrawColor(renderer,0,0,255,255);
+                SDL_Rect ballrect = {.x = i * WIDTH/dim + 30 , .y = j * HEIGHT/dim + 30 , .w = 50 , .h = 50};
+
+                SDL_RenderFillRect(renderer,&ballrect);
+            }
+        }
+    }
+
+
+    SDL_RenderPresent(renderer);
+
+
+
+}
+
+
 
 void printAIwolrd(int dim,int AIworld[dim][dim]){
     for(int i=0;i<dim;i++){
@@ -32,28 +109,19 @@ void printhistory(int dim,int history[][7]){
 }
 
 
-void printworld(int dim,char array[dim+2][dim+2]){
-    for(int i=0;i<dim+2;i++){
-        for(int j=0;j<dim+2;j++){
+void printworld(int dim,char array[dim][dim]){
+    for(int i=0;i<dim;i++){
+        for(int j=0;j<dim;j++){
             printf("%c  ",array[i][j]);
         }
         printf("\n");
     }
 }
-void createworld(int dim,char array[dim+2][dim+2]){
-    char q[6]={'1','2','3','4','5','6'};
-    for(int i=0;i<dim+2;i++){
-        for(int j=0;j<dim+2;j++){
-            if((i==dim+1)&&j==0)
-                w=0;
-            if((!(j%2 || i%2))&&(i<dim)&&(j<dim))
+void createworld(int dim,char array[dim][dim]){
+    for(int i=0;i<dim;i++){
+        for(int j=0;j<dim;j++){
+            if(!(j%2 || i%2))
                 array[i][j]='0';
-            //else if((i==dim||j==dim)&&(i<dim+1&&j<dim+1))
-              //  array[i][j]='+';
-            else if((((i==dim+1)&&j%2==0)||((j==dim+1)&&i%2==0))&&(!(i==dim+1&&j==dim+1))){
-                array[i][j]=q[w];
-                w++;
-            }
             else
                 array[i][j]=' ';
         }
@@ -67,7 +135,7 @@ void createhistory(int dim,int history[2 * (dim/2) * ((dim/2) + 1)][7]){
     }
 }
 
-int checkforotherlines(int dim,int history[][7],char array[dim+2][dim+2],int n1,int m1){
+int checkforotherlines(int dim,int history[][7],char array[][dim],int n1,int m1){
     int f=0;
     if(array[n1][m1+1] == '1')
         f++;
@@ -83,7 +151,7 @@ int checkforotherlines(int dim,int history[][7],char array[dim+2][dim+2],int n1,
 
 
 
-int upperright(int n1,int m1,int dim,char array[dim+2][dim+2]){
+int upperright(int n1,int m1,int dim,char array[dim][dim]){
     if((m1 == dim -1) || (n1 == 0) || array[n1-1][m1+1] == 'X' || array[n1-1][m1+1] == 'O')
         return 0;
     if(array[n1][m1+1]=='1'){
@@ -107,7 +175,7 @@ int upperright(int n1,int m1,int dim,char array[dim+2][dim+2]){
     }
    return 0;
 }
-int upperleft(int n1,int m1,int dim,char array[dim+2][dim+2]){
+int upperleft(int n1,int m1,int dim,char array[dim][dim]){
     if((m1 == 0) || (n1 == 0) || array[n1-1][m1-1] == 'X' || array[n1-1][m1-1] == 'O')
         return 0;
     if(array[n1][m1-1]=='1'){
@@ -131,7 +199,7 @@ int upperleft(int n1,int m1,int dim,char array[dim+2][dim+2]){
     }
     return 0;
 }
-int downright(int n1,int m1,int dim,char array[dim+2][dim+2]){
+int downright(int n1,int m1,int dim,char array[dim][dim]){
     if((m1 == dim -1) || (n1 == dim -1) || array[n1+1][m1+1] == 'X' || array[n1+1][m1+1] == 'O')
         return 0;
     if(array[n1][m1+1]=='1'){
@@ -155,7 +223,7 @@ int downright(int n1,int m1,int dim,char array[dim+2][dim+2]){
     }
     return 0;
 }
-int downleft(int n1,int m1,int dim,char array[dim+2][dim+2]){
+int downleft(int n1,int m1,int dim,char array[dim][dim]){
     if((m1 == 0) || (n1 == dim-1) || array[n1+1][m1-1] == 'X' || array[n1+1][m1-1] == 'O')
         return 0;
     if(array[n1][m1-1]=='1'){
@@ -179,7 +247,7 @@ int downleft(int n1,int m1,int dim,char array[dim+2][dim+2]){
     }
     return 0;
 }
-void checkforsquares(int n1,int m1,int dim,char array[dim+2][dim+2],int history[][7],int points[]){
+void checkforsquares(int n1,int m1,int dim,char array[dim][dim],int history[][7],int points[]){
     int sum=0;
     sum = upperright(n1,m1,dim,array) + upperleft(n1,m1,dim,array) + downright(n1,m1,dim,array) + downleft(n1,m1,dim,array);
     if(playerturn % 2)
@@ -203,7 +271,7 @@ void checkforsquares(int n1,int m1,int dim,char array[dim+2][dim+2],int history[
 
 }
 
-void undo(int dim,int history[][7],char array[dim+2][dim+2]){
+void undo(int dim,int history[][7],char array[dim][dim]){
     if(totalmoves > 0){
         totalmoves--;
         int n1 = history[totalmoves][0] , m1 = history[totalmoves][1] ,  n2 = history[totalmoves][2] ,  m2 = history[totalmoves][3];
@@ -260,7 +328,7 @@ void undo(int dim,int history[][7],char array[dim+2][dim+2]){
     }
 }
 
-void redo(int dim,int history[][7],char array[dim+2][dim+2]){
+void redo(int dim,int history[][7],char array[dim][dim]){
     if(totalmoves < maxmoves && maxmoves > 0){
         int n1 = history[totalmoves][0];int m1 = history[totalmoves][1];
         array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='1';
@@ -281,53 +349,18 @@ void redo(int dim,int history[][7],char array[dim+2][dim+2]){
 
 
 
-void makeamove(int dim,char array[dim+2][dim+2],int n1,int m1,int n2,int m2,int points[],int history[][7],int AIworld[dim][dim]){
+void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int points[],int history[][7],int AIworld[dim][dim]){
 
-    if((!computer && player==2) || player == 1){
+    if(!computer && player == 2 || player == 1){
 
-    char term,a1[1],A1[1],a2[1],A2[1];
-    int N1,M1,N2,M2,f=0;
-    printf("\nEnter the row: ");
-    gets(a1);
-    N1=a1[0]-48;
-    if(N1 == 0){
-        undo(dim,history,array);
-        if(computer){
-            while(history[totalmoves][6] != 1)
-                undo(dim,history,array);
+        if((array[((n1+n2)/2)][((m1+m2)/2)] =='1') || (n1 > dim - 1) || (m1 > dim - 1) || (n2 > dim - 1) || (m2 > dim - 1) || (n1 < 0) || (m1 < 0) || (n2 < 0) || (m2 < 0) || !(((abs(n1-n2) == 2) && (m1==m2)) ^ ((abs(m1-m2) == 2) && (n1==n2)))){
+            printf("enter a valid move\n");
+            return;
         }
-        return;
-    }
-    else if(N1 == -2){
-        redo(dim,history,array);
-        return;
-    }else{
-        printf("\nEnter the col: ");
-        gets(A1);
-        M1=A1[0]-48;
-        printf("\nEnter the row: ");
-        gets(a2);
-        N2=a2[0]-48;
-        printf("\nEnter the col: ");
-        gets(A2);
-        M2=A2[0]-48;
-        }
-
-
-
-
-
-    if((array[((N1+N2)-2)][((M1+M2)-2)] =='1') || (N1 > (dim/2) + 1) || (M1 > (dim/2) + 1) || (N2 > (dim/2) + 1) || (M2 > (dim/2) + 1) || (N1 < 1) || (M1 < 1) || (N2 < 1) || (M2 < 1) || !(((abs(N1-N2) == 1) && (M1==M2)) ^ ((abs(M1-M2) == 1) && (N1==N2)))){
-        printf("Enter a valid move\n");
-        return;
-    }
-
-
-    history[totalmoves][0] = 2*N1-2 ; history[totalmoves][1] = 2*M1-2 ;history[totalmoves][2] = 2*N2-2 ; history[totalmoves][3] = 2*M2-2;
+        history[totalmoves][0] = n1 ; history[totalmoves][1] = m1 ;history[totalmoves][2] = n2 ; history[totalmoves][3] = m2;
 
     }else{
         AI(dim,array,AIworld,history);
-
     }
 
     history[totalmoves][6] = player;
@@ -339,22 +372,21 @@ void makeamove(int dim,char array[dim+2][dim+2],int n1,int m1,int n2,int m2,int 
         array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='1';
     }
     else{
-        printf("Enter a valid thing\n");
+        printf("enter a valid thing");
     }
 
     checkforsquares(history[totalmoves][0],history[totalmoves][1],dim,array,history,points);
     history[totalmoves][4] = points[0];
     history[totalmoves][5] = points[1];
 
-    if((totalmoves < maxmoves) && !computer)
+    if((totalmoves < maxmoves) && (!computer && player == 2))
         maxmoves = totalmoves;
-    if((totalmoves < maxmoves) && computer)
-        maxmoves--;
-    maxmoves++;
-    totalmoves++;
+
+        maxmoves++;
+        totalmoves++;
 }
 
-void AI(int dim,char world[dim+2][dim+2],int AIworld[dim][dim],int history[][7]){
+void AI(int dim,char world[dim][dim],int AIworld[dim][dim],int history[][7]){
     int numberoflines1,numberoflines2;
     // checks horizontal lines
     for(int i=0;i<dim;i=i+2){
@@ -463,17 +495,6 @@ void AI(int dim,char world[dim+2][dim+2],int AIworld[dim][dim],int history[][7])
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
 }
 
 
@@ -490,26 +511,23 @@ void oneNewGame(){
         case '0':
             return newGame();
             break;
+
         case '1':
-            printf("\nEnter player's name: ");
-            gets(name1);
             dim = 7;
             break;
+
         case '2':
-            printf("\nEnter player's name: ");
-            gets(name1);
             dim = 11;
             break;
+
         case '3':
-            printf("\nEnter player's name: ");
-            gets(name1);
             dim = 11;
             break;
+
         case '4':
-            printf("\nEnter player's name: ");
-            gets(name1);
             dim = 15;
             break;
+
         default:
             oneNewGame();
     }
@@ -524,24 +542,12 @@ void twoNewGame(){
             return newGame();
             break;
         case '1':
-            printf("\nEnter first player's name: ");
-            gets(name1);
-            printf("\nEnter second player's name: ");
-            gets(name2);
             dim = 7;
             break;
         case '2':
-            printf("\nEnter first player's name: ");
-            gets(name1);
-            printf("\nEnter second player's name: ");
-            gets(name2);
             dim = 11;
             break;
         case '3':
-            printf("\nEnter first player's name: ");
-            gets(name1);
-            printf("\nEnter second player's name: ");
-            gets(name2);
             dim = 15;
             break;
         default:
@@ -556,7 +562,7 @@ void newGame(){
     game = _getch();
     switch(game){
     case '0':
-        return main();
+        main(NULL,NULL);
         break;
     case '1':
         oneNewGame();
@@ -575,7 +581,7 @@ void newGame(){
 
 
 
-int main(){
+int main(int argc,char* argv[]){
     computer = 0;
     int p=0;
     do{
@@ -594,7 +600,7 @@ int main(){
         while(dim == 0);
 
         int history[2 * (dim/2) * ((dim/2) + 1)][7];
-        char world[dim+2][dim+2];
+        char world[dim][dim];
 
         system("color f4");
         createworld(dim,world);
@@ -604,50 +610,74 @@ int main(){
 
         createAIwolrd(dim,AIworld);
 
-
         createhistory(dim,history);
 
+        initSDL();
 
-        while(totalmoves<2*((dim/2)+1)*(dim/2)){
+
+        SDL_MouseButtonEvent event;
+
+        bool quit = false;
+
+        int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
+
+
+        while(totalmoves<2*((dim/2)+1)*(dim/2) && !quit){
             if(totalmoves!=0)
                 p = totalmoves;
             else
                 p=1;
-            printhistory(dim,history);
-            printf("\n\n\n\n");
-            printf("Total moves:%d\t\t Maximum moves:%d\n\n",totalmoves,maxmoves);
-            if(computer)
-                printAIwolrd(dim,AIworld);
 
-            printf("\n\n\n\n");
 
-            printworld(dim,world);
-            printf("\n%s: %d\n\n%s: %d\n\nFirst player moves: %i\n\nSecond player moves: %i\n\nTurn player no.: %d\n\n",name1,history[p-1][4],name2,history[p-1][5],moves[0],moves[1],player);
-            printf("\n Enter -1 to redo\n\n");
-            printf("\n Enter 0 to undo\n\n");
-            if(!computer)
-                makeamove(dim,world,NULL,NULL,NULL,NULL,points,history,NULL);
-            else
-                makeamove(dim,world,NULL,NULL,NULL,NULL,points,history,AIworld);
-        }
+
+
+            update(world);
+
+
+
+            while(SDL_PollEvent(&event)){
+                    int f = 0;
+                    switch(event.type){
+                    case SDL_QUIT:
+                        quit = true;
+                        break;
+                    case SDL_MOUSEBUTTONDOWN:
+                        if(event.button == SDL_BUTTON_LEFT)
+                            SDL_GetMouseState(&mx1,&my1);
+                            break;
+                    case SDL_MOUSEBUTTONUP:
+                        if(event.button == SDL_BUTTON_LEFT){
+                            SDL_GetMouseState(&mx2,&my2);
+                        }
+                        if(!((mx1/100)%2 || (my1/100)%2 || (mx2/100)%2 || (my2/100)%2)){
+                            printf("%d %d %d %d  %d\n\n\n",mx1,my1,mx2,my2,player);
+                            makeamove(dim,world,mx1/100,my1/100,mx2/100,my2/100,points,history,AIworld);
+                            if(computer && (player == 2)){
+                                printf("AAAAAAA\n");
+                                makeamove(dim,world,NULL,NULL,NULL,NULL,points,history,AIworld);
+
+                            }
+                        }
+                        break;
+
+                    }
+                }
+            }
+
+
+        killSDL();
 
         system("cls");
         system("color 04");
         printworld(dim,world);
 
         system("color 0e");
-        if(points[1]>points[0]){
-            if(!computer)
-                printf("Congratulation for %s and hard luck for %s",name2,name1);
-            else
-                printf("Hard luck %s",name1);
-        }else{
-            if(!computer)
-                printf("Congratulations for %s and hard luck for %s",name1,name2);
-            else
-                printf("Congratulations %s",name1);
-        }
-        return 0;
+        if(points[1]>points[0])
+            printf("Congratulation for player no. 2 and hard luck for player no. 1");
+        else
+            printf("Congratulation for player no. 1 and hard luck for player no. 2");
+        break;
+        scanf("%c",&argv);
     }
     case '2':
     case '3':
@@ -657,9 +687,10 @@ int main(){
         break;
     default:
         printf("Enter a valid input\n");
-        return main();
+        main(NULL,NULL);
     }
     }while(game < 1 || game >5);
+
 
 
     return 0;
