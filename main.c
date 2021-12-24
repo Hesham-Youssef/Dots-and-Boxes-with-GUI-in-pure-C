@@ -4,6 +4,7 @@
 #include <math.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 #define BLACK "\033[1;30m"
 #define RED "\033[1;31m"
@@ -14,6 +15,7 @@
 #define height 700
 //#include "undo and redo.h"
 int playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0},dim=0,computer;char game=0,name1[25],name2[25]="Computer",ss[1];
+bool mouse = false;
 SDL_Window *window;
 SDL_Renderer *renderer;
 
@@ -37,8 +39,8 @@ void killSDL(){
     SDL_Quit();
 }
 
-void update(char world[dim][dim]){
-    int shift,L,wz,hv,e,f;
+void update(char world[dim][dim],int mx1,int my1){
+    int shift,L,wz,hv,e,f,linex,liney;
     float a,b,c,d;
     switch(dim){
     case 7:
@@ -119,6 +121,11 @@ void update(char world[dim][dim]){
 
     SDL_RenderCopy(renderer,undoicon,NULL,&undopos);
 
+    if(mouse){
+        SDL_SetRenderDrawColor(renderer,255,255,255,255);
+        SDL_GetMouseState(&linex,&liney);
+        SDL_RenderDrawLine(renderer,mx1,my1,linex,liney);
+    }
     for(int i=0;i<dim;i++){
         for(int j=0;j<dim;j++){
             if(world[i][j] == '0' || world[i][j] == '1'){
@@ -732,7 +739,7 @@ int main(int argc,char* argv[]){
 
 
 
-            update(world);
+            update(world,mx1,my1);
 
             if(computer && (player == 2)){
                 makeamove(dim,world,NULL,NULL,NULL,NULL,points,history,AIworld);
@@ -746,6 +753,7 @@ int main(int argc,char* argv[]){
                         break;
                     case SDL_MOUSEBUTTONDOWN:
                         if(event.button == SDL_BUTTON_LEFT)
+                            mouse = true;
                             SDL_GetMouseState(&mx1,&my1);
                             if(mx1/100 == 7){
                                 undo(dim,history,world);
@@ -759,6 +767,7 @@ int main(int argc,char* argv[]){
                             }
                             break;
                     case SDL_MOUSEBUTTONUP:
+                        mouse = false;
                         if(event.button == SDL_BUTTON_LEFT){
                             SDL_GetMouseState(&mx2,&my2);
                         }
