@@ -662,9 +662,11 @@ void newGame(){
         main(NULL,NULL);
         break;
     case '1':
+        computer = 1;
         oneNewGame();
         break;
     case '2':
+        computer = 0;
         twoNewGame();
         break;
     default:
@@ -679,7 +681,6 @@ void newGame(){
 
 
 int main(int argc,char* argv[]){
-    computer = 0;
     int p=0;
     do{
     system("cls");
@@ -746,8 +747,11 @@ int main(int argc,char* argv[]){
                     case SDL_MOUSEBUTTONDOWN:
                         if(event.button == SDL_BUTTON_LEFT)
                             SDL_GetMouseState(&mx1,&my1);
-                            if(mx1/100 == 7)
+                            if(mx1/100 == 7){
                                 undo(dim,history,world);
+                                while(computer && history[totalmoves][6] == 2)
+                                    undo(dim,history,world);
+                            }
                             else if(mx1/100 == 9)
                                 redo(dim,history,world);
                             break;
