@@ -21,11 +21,7 @@ SDL_Renderer *renderer;
 void initSDL(){
     SDL_Init(SDL_INIT_VIDEO);
 
-    IMG_Init(IMG_INIT_PNG);
-
-    SDL_Surface *imagedots = IMG_Load("dots.png");
-
-    SDL_Texture *dots = SDL_CreateTextureFromSurface(renderer,imagedots);
+    IMG_Init(IMG_INIT_PNG | IMG_INIT_PNG);
 
     window = SDL_CreateWindow("dots and boxes",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,WIDTH,HEIGHT,SDL_WINDOW_SHOWN);
 
@@ -41,12 +37,16 @@ void killSDL(){
 }
 
 void update(char world[dim][dim]){
-    int shift,L,wz,hv;
-    float a,b;
+    int shift,L,wz,hv,e,f;
+    float a,b,c,d;
     switch(dim){
     case 7:
         a = 0.8;
         b = 0.8;
+        c = 0.3;
+        d = 0.3;
+        e = 20;
+        f = 20;
         shift = 30;
         L = 50;
         wz = 200;
@@ -55,6 +55,10 @@ void update(char world[dim][dim]){
     case 11:
         a = 0.65;
         b = 0.6;
+        c = 0.38;
+        d = 0.35;
+        e = 15;
+        f = 15;
         shift = 8;
         L = 50;
         wz = 130;
@@ -62,7 +66,11 @@ void update(char world[dim][dim]){
         break;
     case 15:
         a = 0.65;
-        b = 0.6;
+        b = 0.65;
+        c = 0.29;
+        d = 0.24;
+        e = 15;
+        f = 15;
         shift = 8;
         L = 30;
         wz = 90;
@@ -70,6 +78,13 @@ void update(char world[dim][dim]){
         break;
 
     }
+
+    SDL_Surface *imgwallpaper = IMG_Load("wallpaper.jpg");
+
+    SDL_Texture *wallpaper = SDL_CreateTextureFromSurface(renderer,imgwallpaper);
+
+    SDL_FreeSurface(imgwallpaper);
+
     SDL_Surface *imagedots = IMG_Load("dots.png");
 
     SDL_Texture *dots = SDL_CreateTextureFromSurface(renderer,imagedots);
@@ -80,12 +95,16 @@ void update(char world[dim][dim]){
 
     SDL_RenderClear(renderer);
 
+    SDL_Rect wallpaperpos = {.x = 0,.y = 0,WIDTH,HEIGHT};
+
+    SDL_RenderCopy(renderer,wallpaper,NULL,&wallpaperpos);
+
 
     for(int i=0;i<dim;i++){
         for(int j=0;j<dim;j++){
             if(world[i][j] == '0' || world[i][j] == '1'){
 
-                SDL_SetRenderDrawColor(renderer,255,255,255,255);
+                SDL_SetRenderDrawColor(renderer,180,180,180,180);
 
                 if((i%2 && !(j%2)) && world[i][j] == '1'){ // HORIZONTAL
                     SDL_Rect ballrect = {.x = (i-a) * WIDTH/dim + shift , .y = (j) * HEIGHT/dim + shift , .w = wz , .h = L};
@@ -99,14 +118,14 @@ void update(char world[dim][dim]){
             else if(world[i][j] == 'X'){
 
                 SDL_SetRenderDrawColor(renderer,255,0,0,255);
-                SDL_Rect ballrect = {.x = i * WIDTH/dim + shift , .y = j * HEIGHT/dim + shift , .w = L , .h = L};
+                SDL_Rect ballrect = {.x = (i-a+c) * WIDTH/dim + shift , .y = (j-b+d) * HEIGHT/dim + shift , .w = wz - e , .h = hv - f};
 
                 SDL_RenderFillRect(renderer,&ballrect);
             }
             else if(world[i][j] == 'O'){
 
                 SDL_SetRenderDrawColor(renderer,0,0,255,255);
-                SDL_Rect ballrect = {.x = i * WIDTH/dim + shift , .y = j * HEIGHT/dim + shift , .w = L , .h = L};
+                SDL_Rect ballrect = {.x = (i-a+c) * WIDTH/dim + shift , .y = (j-b+d) * HEIGHT/dim + shift , .w = wz - e , .h = hv - f};
 
                 SDL_RenderFillRect(renderer,&ballrect);
             }
@@ -118,7 +137,7 @@ void update(char world[dim][dim]){
             SDL_RenderCopy(renderer,dots,NULL,&dotspos);
         }
     }
-
+    SDL_DestroyTexture(wallpaper);
     SDL_DestroyTexture(dots);
     SDL_RenderPresent(renderer);
 
@@ -206,7 +225,6 @@ int upperright(int n1,int m1,int dim,char array[dim][dim]){
                     if(array[n1-2][m1+1]=='1'){
                         switch(player){
                             case 1:
-
                                 array[n1-1][m1+1] = 'RED X';
                                 break;
                             case 2:
@@ -230,7 +248,6 @@ int upperleft(int n1,int m1,int dim,char array[dim][dim]){
                     if(array[n1-2][m1-1]=='1'){
                         switch(player){
                             case 1:
-
                                 array[n1-1][m1-1] = 'RED X';
                                 break;
                             case 2:
