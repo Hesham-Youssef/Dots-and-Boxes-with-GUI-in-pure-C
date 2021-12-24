@@ -3,6 +3,7 @@
 #include <conio.h>
 #include <math.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <stdbool.h>
 #define BLACK "\033[1;30m"
 #define RED "\033[1;31m"
@@ -20,19 +21,60 @@ SDL_Renderer *renderer;
 void initSDL(){
     SDL_Init(SDL_INIT_VIDEO);
 
-        window = SDL_CreateWindow("dots and boxes",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,WIDTH,HEIGHT,SDL_WINDOW_SHOWN);
+    IMG_Init(IMG_INIT_PNG);
 
-        renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    SDL_Surface *imagedots = IMG_Load("dots.png");
+
+    SDL_Texture *dots = SDL_CreateTextureFromSurface(renderer,imagedots);
+
+    window = SDL_CreateWindow("dots and boxes",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,WIDTH,HEIGHT,SDL_WINDOW_SHOWN);
+
+    renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 }
 
 void killSDL(){
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    IMG_Quit();
     SDL_Quit();
 }
 
 void update(char world[dim][dim]){
+    int shift,L,wz,hv;
+    float a,b;
+    switch(dim){
+    case 7:
+        a = 0.8;
+        b = 0.8;
+        shift = 30;
+        L = 50;
+        wz = 200;
+        hv = 200;
+        break;
+    case 11:
+        a = 0.65;
+        b = 0.6;
+        shift = 8;
+        L = 50;
+        wz = 130;
+        hv = 125;
+        break;
+    case 15:
+        a = 0.65;
+        b = 0.6;
+        shift = 8;
+        L = 30;
+        wz = 90;
+        hv = 90;
+        break;
+
+    }
+    SDL_Surface *imagedots = IMG_Load("dots.png");
+
+    SDL_Texture *dots = SDL_CreateTextureFromSurface(renderer,imagedots);
+
+    SDL_FreeSurface(imagedots);
 
     SDL_SetRenderDrawColor(renderer,0,0,0,255);
 
@@ -43,31 +85,41 @@ void update(char world[dim][dim]){
         for(int j=0;j<dim;j++){
             if(world[i][j] == '0' || world[i][j] == '1'){
 
-
-
                 SDL_SetRenderDrawColor(renderer,255,255,255,255);
-                SDL_Rect ballrect = {.x = i * WIDTH/dim + 30 , .y = j * HEIGHT/dim + 30 , .w = 50 , .h = 50};
 
-                SDL_RenderFillRect(renderer,&ballrect);
+                if((i%2 && !(j%2)) && world[i][j] == '1'){ // HORIZONTAL
+                    SDL_Rect ballrect = {.x = (i-a) * WIDTH/dim + shift , .y = (j) * HEIGHT/dim + shift , .w = wz , .h = L};
+                    SDL_RenderFillRect(renderer,&ballrect); // VERTICAL
+                }else if((!(i%2) && (j%2) )&& world[i][j] == '1'){
+                    SDL_Rect ballrect = {.x = (i) * WIDTH/dim + shift , .y = (j-b) * HEIGHT/dim + shift , .w = L , .h = hv};
+                    SDL_RenderFillRect(renderer,&ballrect);
+                }
+
             }
             else if(world[i][j] == 'X'){
 
                 SDL_SetRenderDrawColor(renderer,255,0,0,255);
-                SDL_Rect ballrect = {.x = i * WIDTH/dim + 30 , .y = j * HEIGHT/dim + 30 , .w = 50 , .h = 50};
+                SDL_Rect ballrect = {.x = i * WIDTH/dim + shift , .y = j * HEIGHT/dim + shift , .w = L , .h = L};
 
                 SDL_RenderFillRect(renderer,&ballrect);
             }
             else if(world[i][j] == 'O'){
 
                 SDL_SetRenderDrawColor(renderer,0,0,255,255);
-                SDL_Rect ballrect = {.x = i * WIDTH/dim + 30 , .y = j * HEIGHT/dim + 30 , .w = 50 , .h = 50};
+                SDL_Rect ballrect = {.x = i * WIDTH/dim + shift , .y = j * HEIGHT/dim + shift , .w = L , .h = L};
 
                 SDL_RenderFillRect(renderer,&ballrect);
             }
         }
     }
+    for(int i=0;i<dim;i=i+2){
+        for(int j=0;j<dim;j=j+2){
+            SDL_Rect dotspos = {.x = i * WIDTH/dim + shift , .y = j * HEIGHT/dim + shift , .w = L , .h = L};
+            SDL_RenderCopy(renderer,dots,NULL,&dotspos);
+        }
+    }
 
-
+    SDL_DestroyTexture(dots);
     SDL_RenderPresent(renderer);
 
 
@@ -472,9 +524,7 @@ void AI(int dim,char world[dim][dim],int AIworld[dim][dim],int history[][7]){
                 maxj = j;
             }
         }
-        printf("%d\n\n\n",i);
     }
-    printf("%d %d %d \n\n\n",max,maxi,maxj);
     if(!(maxi%2)){
         history[totalmoves][0] = maxi;
         history[totalmoves][1] = maxj-1;
@@ -618,7 +668,7 @@ int main(int argc,char* argv[]){
 
         int AIworld[dim][dim];
 
-        int tempAI[dim][dim];
+        int temp[dim][dim];
 
         createAIwolrd(dim,AIworld);
 
@@ -645,7 +695,6 @@ int main(int argc,char* argv[]){
             update(world);
 
             if(computer && (player == 2)){
-                printf("AAAAAAA\n");
                 makeamove(dim,world,NULL,NULL,NULL,NULL,points,history,AIworld);
 
             }else{
@@ -663,14 +712,10 @@ int main(int argc,char* argv[]){
                         if(event.button == SDL_BUTTON_LEFT){
                             SDL_GetMouseState(&mx2,&my2);
                         }
-                        if(!((mx1/100)%2 || (my1/100)%2 || (mx2/100)%2 || (my2/100)%2)){
-                            printf("%d %d %d %d  %d\n\n\n",mx1,my1,mx2,my2,player);
-                            makeamove(dim,world,mx1/100,my1/100,mx2/100,my2/100,points,history,AIworld);
-                            if(computer && (player == 2)){
-                                printf("AAAAAAA\n");
-                                makeamove(dim,world,NULL,NULL,NULL,NULL,points,history,AIworld);
-
-                            }
+                        printf("%d %d %d %d  %d\n\n\n",mx1,my1,mx2,my2,player);
+                        if(!((mx1/(HEIGHT/dim))%2 || (my1/(WIDTH/dim))%2 || (mx2/(HEIGHT/dim)%2 || (my2/(WIDTH/dim))%2))){
+                            makeamove(dim,world,mx1/(HEIGHT/dim),my1/(WIDTH/dim),mx2/(HEIGHT/dim),my2/(WIDTH/dim),points,history,AIworld);
+                            printf("%d %d %d %d  %d\n\n\n",mx1/(HEIGHT/dim),my1/(WIDTH/dim),mx2/(HEIGHT/dim),my2/(WIDTH/dim),player);
                         }
                         break;
 
