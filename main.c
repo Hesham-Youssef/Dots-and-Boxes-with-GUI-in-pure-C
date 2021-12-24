@@ -4,12 +4,14 @@
 #include <math.h>
 #include <SDL2/SDL.h>
 #include <stdbool.h>
-
-
+#define BLACK "\033[1;30m"
+#define RED "\033[1;31m"
+#define BLUE "\033[1;34m"
+#define RESET "\033[1;0m"
 #define WIDTH 700
 #define HEIGHT 700
 //#include "undo and redo.h"
-int playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0},dim=0,computer;char game=0;
+int playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0},dim=0,computer;char game=0,name1[25],name2[25]="Computer",ss[1];
 SDL_Window *window;
 SDL_Renderer *renderer;
 
@@ -153,7 +155,7 @@ int upperright(int n1,int m1,int dim,char array[dim][dim]){
                         switch(player){
                             case 1:
 
-                                array[n1-1][m1+1] = 'X';
+                                array[n1-1][m1+1] = 'RED X';
                                 break;
                             case 2:
 
@@ -177,7 +179,7 @@ int upperleft(int n1,int m1,int dim,char array[dim][dim]){
                         switch(player){
                             case 1:
 
-                                array[n1-1][m1-1] = 'X';
+                                array[n1-1][m1-1] = 'RED X';
                                 break;
                             case 2:
 
@@ -201,7 +203,7 @@ int downright(int n1,int m1,int dim,char array[dim][dim]){
                         switch(player){
                             case 1:
 
-                                array[n1+1][m1+1] = 'X';
+                                array[n1+1][m1+1] = 'RED X';
                                 break;
                             case 2:
 
@@ -225,7 +227,7 @@ int downleft(int n1,int m1,int dim,char array[dim][dim]){
                         switch(player){
                             case 1:
 
-                                array[n1+1][m1-1] = 'X';
+                                array[n1+1][m1-1] = 'RED X';
                                 break;
                             case 2:
 
@@ -503,23 +505,26 @@ void oneNewGame(){
         case '0':
             return newGame();
             break;
-
         case '1':
+            printf("\nEnter player's name: ");
+            gets(name1);
             dim = 7;
             break;
-
         case '2':
+            printf("\nEnter player's name: ");
+            gets(name1);
             dim = 11;
             break;
-
         case '3':
+            printf("\nEnter player's name: ");
+            gets(name1);
             dim = 11;
             break;
-
         case '4':
+            printf("\nEnter player's name: ");
+            gets(name1);
             dim = 15;
             break;
-
         default:
             oneNewGame();
     }
@@ -534,12 +539,24 @@ void twoNewGame(){
             return newGame();
             break;
         case '1':
+            printf("\nEnter first player's name: ");
+            gets(name1);
+            printf("\nEnter second player's name: ");
+            gets(name2);
             dim = 7;
             break;
         case '2':
+            printf("\nEnter first player's name: ");
+            gets(name1);
+            printf("\nEnter second player's name: ");
+            gets(name2);
             dim = 11;
             break;
         case '3':
+            printf("\nEnter first player's name: ");
+            gets(name1);
+            printf("\nEnter second player's name: ");
+            gets(name2);
             dim = 15;
             break;
         default:
@@ -582,6 +599,7 @@ int main(int argc,char* argv[]){
     printf("Welcome to dots and boxes by RABSOOO team\nNew game(1)\nLoad game(2)\nLeader board(3)\nSettings(4)\nExit(0)\n");
     game = _getch();
     system("cls");
+    bool quit = false;
     switch(game){
     case '1':{
         system("color f0");
@@ -611,7 +629,6 @@ int main(int argc,char* argv[]){
 
         SDL_MouseButtonEvent event;
 
-        bool quit = false;
 
         int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
 
@@ -666,14 +683,21 @@ int main(int argc,char* argv[]){
         killSDL();
 
         system("cls");
-        system("color 04");
         printworld(dim,world);
 
-        system("color 0e");
-        if(points[1]>points[0])
-            printf("Congratulation for player no. 2 and hard luck for player no. 1");
-        else
-            printf("Congratulation for player no. 1 and hard luck for player no. 2");
+        if(points[1]>points[0]){
+            if(!computer)
+                printf("Congratulation for %s and hard luck for %s\n",name2,name1);
+            else
+                printf("Hard luck %s\n",name1);
+        }else{
+            if(!computer)
+                printf("Congratulations for %s and hard luck for %s\n",name1,name2);
+            else
+                printf("Congratulations %s\n",name1);
+        }
+        printf("Press any key to proceed\n");
+        ss[0]=_getch();
         break;
         scanf("%c",&argv);
     }
