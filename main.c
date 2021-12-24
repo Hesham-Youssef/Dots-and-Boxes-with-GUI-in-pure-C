@@ -9,8 +9,9 @@
 #define RED "\033[1;31m"
 #define BLUE "\033[1;34m"
 #define RESET "\033[1;0m"
-#define WIDTH 700
-#define HEIGHT 700
+#define realwidth 1000
+#define width 700
+#define height 700
 //#include "undo and redo.h"
 int playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0},dim=0,computer;char game=0,name1[25],name2[25]="Computer",ss[1];
 SDL_Window *window;
@@ -23,7 +24,7 @@ void initSDL(){
 
     IMG_Init(IMG_INIT_PNG | IMG_INIT_PNG);
 
-    window = SDL_CreateWindow("dots and boxes",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,WIDTH,HEIGHT,SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("dots and boxes",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,realwidth,height,SDL_WINDOW_SHOWN);
 
     renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
@@ -78,6 +79,21 @@ void update(char world[dim][dim]){
         break;
 
     }
+    SDL_Surface *imgredo = IMG_Load("redo.png");
+
+    SDL_Texture *redoicon = SDL_CreateTextureFromSurface(renderer,imgredo);
+
+    SDL_FreeSurface(imgredo);
+
+    SDL_Rect redopos = {.x = 900,.y = 20,.w = 80,.h = 80};
+
+    SDL_Surface *imgundo = IMG_Load("undo.png");
+
+    SDL_Texture *undoicon = SDL_CreateTextureFromSurface(renderer,imgundo);
+
+    SDL_FreeSurface(imgundo);
+
+    SDL_Rect undopos = {.x = 720,.y = 20,.w = 80,.h = 80};
 
     SDL_Surface *imgwallpaper = IMG_Load("wallpaper.jpg");
 
@@ -95,10 +111,13 @@ void update(char world[dim][dim]){
 
     SDL_RenderClear(renderer);
 
-    SDL_Rect wallpaperpos = {.x = 0,.y = 0,WIDTH,HEIGHT};
+    SDL_Rect wallpaperpos = {.x = 0,.y = 0,realwidth,height};
 
     SDL_RenderCopy(renderer,wallpaper,NULL,&wallpaperpos);
 
+    SDL_RenderCopy(renderer,redoicon,NULL,&redopos);
+
+    SDL_RenderCopy(renderer,undoicon,NULL,&undopos);
 
     for(int i=0;i<dim;i++){
         for(int j=0;j<dim;j++){
@@ -107,10 +126,10 @@ void update(char world[dim][dim]){
                 SDL_SetRenderDrawColor(renderer,180,180,180,180);
 
                 if((i%2 && !(j%2)) && world[i][j] == '1'){ // HORIZONTAL
-                    SDL_Rect ballrect = {.x = (i-a) * WIDTH/dim + shift , .y = (j) * HEIGHT/dim + shift , .w = wz , .h = L};
+                    SDL_Rect ballrect = {.x = (i-a) * width/dim + shift , .y = (j) * height/dim + shift , .w = wz , .h = L};
                     SDL_RenderFillRect(renderer,&ballrect); // VERTICAL
                 }else if((!(i%2) && (j%2) )&& world[i][j] == '1'){
-                    SDL_Rect ballrect = {.x = (i) * WIDTH/dim + shift , .y = (j-b) * HEIGHT/dim + shift , .w = L , .h = hv};
+                    SDL_Rect ballrect = {.x = (i) * width/dim + shift , .y = (j-b) * height/dim + shift , .w = L , .h = hv};
                     SDL_RenderFillRect(renderer,&ballrect);
                 }
 
@@ -118,14 +137,14 @@ void update(char world[dim][dim]){
             else if(world[i][j] == 'X'){
 
                 SDL_SetRenderDrawColor(renderer,255,0,0,255);
-                SDL_Rect ballrect = {.x = (i-a+c) * WIDTH/dim + shift , .y = (j-b+d) * HEIGHT/dim + shift , .w = wz - e , .h = hv - f};
+                SDL_Rect ballrect = {.x = (i-a+c) * width/dim + shift , .y = (j-b+d) * height/dim + shift , .w = wz - e , .h = hv - f};
 
                 SDL_RenderFillRect(renderer,&ballrect);
             }
             else if(world[i][j] == 'O'){
 
                 SDL_SetRenderDrawColor(renderer,0,0,255,255);
-                SDL_Rect ballrect = {.x = (i-a+c) * WIDTH/dim + shift , .y = (j-b+d) * HEIGHT/dim + shift , .w = wz - e , .h = hv - f};
+                SDL_Rect ballrect = {.x = (i-a+c) * width/dim + shift , .y = (j-b+d) * height/dim + shift , .w = wz - e , .h = hv - f};
 
                 SDL_RenderFillRect(renderer,&ballrect);
             }
@@ -133,10 +152,12 @@ void update(char world[dim][dim]){
     }
     for(int i=0;i<dim;i=i+2){
         for(int j=0;j<dim;j=j+2){
-            SDL_Rect dotspos = {.x = i * WIDTH/dim + shift , .y = j * HEIGHT/dim + shift , .w = L , .h = L};
+            SDL_Rect dotspos = {.x = i * width/dim + shift , .y = j * height/dim + shift , .w = L , .h = L};
             SDL_RenderCopy(renderer,dots,NULL,&dotspos);
         }
     }
+    SDL_DestroyTexture(undoicon);
+    SDL_DestroyTexture(redoicon);
     SDL_DestroyTexture(wallpaper);
     SDL_DestroyTexture(dots);
     SDL_RenderPresent(renderer);
@@ -699,7 +720,8 @@ int main(int argc,char* argv[]){
 
         int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
 
-
+        totalmoves = 0;
+        player = 1;
         while(totalmoves<2*((dim/2)+1)*(dim/2) && !quit){
             if(totalmoves!=0)
                 p = totalmoves;
@@ -724,15 +746,19 @@ int main(int argc,char* argv[]){
                     case SDL_MOUSEBUTTONDOWN:
                         if(event.button == SDL_BUTTON_LEFT)
                             SDL_GetMouseState(&mx1,&my1);
+                            if(mx1/100 == 7)
+                                undo(dim,history,world);
+                            else if(mx1/100 == 9)
+                                redo(dim,history,world);
                             break;
                     case SDL_MOUSEBUTTONUP:
                         if(event.button == SDL_BUTTON_LEFT){
                             SDL_GetMouseState(&mx2,&my2);
                         }
                         printf("%d %d %d %d  %d\n\n\n",mx1,my1,mx2,my2,player);
-                        if(!((mx1/(HEIGHT/dim))%2 || (my1/(WIDTH/dim))%2 || (mx2/(HEIGHT/dim)%2 || (my2/(WIDTH/dim))%2))){
-                            makeamove(dim,world,mx1/(HEIGHT/dim),my1/(WIDTH/dim),mx2/(HEIGHT/dim),my2/(WIDTH/dim),points,history,AIworld);
-                            printf("%d %d %d %d  %d\n\n\n",mx1/(HEIGHT/dim),my1/(WIDTH/dim),mx2/(HEIGHT/dim),my2/(WIDTH/dim),player);
+                        if(!((mx1/(height/dim))%2 || (my1/(width/dim))%2 || (mx2/(height/dim)%2 || (my2/(width/dim))%2))){
+                            makeamove(dim,world,mx1/(height/dim),my1/(width/dim),mx2/(height/dim),my2/(width/dim),points,history,AIworld);
+                            printf("%d %d %d %d  %d\n\n\n",mx1/(height/dim),my1/(width/dim),mx2/(height/dim),my2/(width/dim),player);
                         }
                         break;
 
