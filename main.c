@@ -752,8 +752,11 @@ int main(int argc,char* argv[]){
                                 while(computer && history[totalmoves][6] == 2)
                                     undo(dim,history,world);
                             }
-                            else if(mx1/100 == 9)
+                            else if(mx1/100 == 9){
                                 redo(dim,history,world);
+                                while(computer && history[totalmoves][6] == 2)
+                                    redo(dim,history,world);
+                            }
                             break;
                     case SDL_MOUSEBUTTONUP:
                         if(event.button == SDL_BUTTON_LEFT){
