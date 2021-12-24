@@ -783,11 +783,17 @@ int main(int argc,char* argv[]){
             }
         }
 
-
-        killSDL();
-
         system("cls");
-        printworld(dim,world);
+        update(world,mx1,my1);
+        while(SDL_WaitEvent(&event)){
+            if(event.type == SDL_MOUSEBUTTONDOWN)
+                killSDL();
+        }
+
+
+
+
+
 
         if(points[1]>points[0]){
             if(!computer)
