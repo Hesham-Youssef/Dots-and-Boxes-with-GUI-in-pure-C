@@ -179,15 +179,45 @@ void update(char world[dim][dim],int mx1,int my1){
 }
 
 void updatesave(){
-    SDL_Surface *save1iconimg = IMG_Load("SAVE1ICON.png");
+    SDL_Surface *save1iconimg = IMG_Load("1saveimg.png");
     SDL_Texture *save1icon = SDL_CreateTextureFromSurface(renderer,save1iconimg);
     SDL_FreeSurface(save1iconimg);
-    SDL_Rect save1pos = {.x = 900,.y = 20,.w = 50,.h = 50};
+    SDL_Rect save1pos = {.x = 800,.y = 120,.w = 120,.h = 80};
     SDL_RenderCopy(renderer,save1icon,NULL,&save1pos);
+
+
+    SDL_Surface *save2iconimg = IMG_Load("2saveimg.png");
+    SDL_Texture *save2icon = SDL_CreateTextureFromSurface(renderer,save2iconimg);
+    SDL_FreeSurface(save2iconimg);
+    SDL_Rect save2pos = {.x = 900,.y = 120,.w = 120,.h = 80};
+    SDL_RenderCopy(renderer,save2icon,NULL,&save2pos);
+
+    SDL_Surface *save3iconimg = IMG_Load("3saveimg.png");
+    SDL_Texture *save3icon = SDL_CreateTextureFromSurface(renderer,save3iconimg);
+    SDL_FreeSurface(save3iconimg);
+    SDL_Rect save3pos = {.x = 800,.y = 180,.w = 120,.h = 80};
+    SDL_RenderCopy(renderer,save3icon,NULL,&save3pos);
+
+    SDL_Surface *save4iconimg = IMG_Load("4saveimg.png");
+    SDL_Texture *save4icon = SDL_CreateTextureFromSurface(renderer,save4iconimg);
+    SDL_FreeSurface(save4iconimg);
+    SDL_Rect save4pos = {.x = 900,.y = 180,.w = 120,.h = 80};
+    SDL_RenderCopy(renderer,save4icon,NULL,&save4pos);
+
+    SDL_Surface *save5iconimg = IMG_Load("5saveimg.png");
+    SDL_Texture *save5icon = SDL_CreateTextureFromSurface(renderer,save5iconimg);
+    SDL_FreeSurface(save5iconimg);
+    SDL_Rect save5pos = {.x = 800,.y = 230,.w = 120,.h = 80};
+    SDL_RenderCopy(renderer,save5icon,NULL,&save5pos);
+
+
+
+
+    SDL_DestroyTexture(save4icon);
+    SDL_DestroyTexture(save3icon);
+    SDL_DestroyTexture(save2icon);
     SDL_DestroyTexture(save1icon);
-
-
-
+    SDL_RenderPresent(renderer);
 }
 
 
@@ -457,12 +487,50 @@ void redo(int dim,int history[][7],char array[dim][dim]){
 }
 
 void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],int history[][7]){
-
+    SDL_MouseButtonEvent event;
+    int mx,my;
+    bool done = false;
     if(x==0){
+        updatesave();
+        done = false;
+        while(!done){
+        SDL_PollEvent(&event);
+        switch(event.type){
+            case SDL_QUIT:
+                killSDL();
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if(event.button == SDL_BUTTON_LEFT){
+                    printf("\nasdasds");
+                    SDL_GetMouseState(&mx,&my);
+                    printf("\n%d  %d",mx,my);
+                    if(mx/100 == 8 && my/100 == 1){
+                        sG = '1';
+                        done = true;
+                    }
+                    else if(mx/100 == 9 && my/100 == 1){
+                        sG = '2';
+                        done = true;
+                    }
+                    else if(mx/100 == 8 && my/100 == 2 && my%100 < 50){
+                        sG = '3';
+                        done = true;
+                    }
+                    else if(mx/100 == 9 && my/100 == 2){
+                        sG = '4';
+                        done = true;
+                    }
+                    else if(mx/100 == 8 && my/100 == 2 && my%100 > 50){
+                        sG = '5';
+                        done = true;
+                    }
+                    else if(mx/100 == 7 && my/100 == 1)
+                        return;
+                    }
+                    break;
+            }
+        }
         printf("\nChoose a file to save(1,2,3,4,5) or press any key to return:");
-        SDL_MouseButtonEvent event;
-        sG = _getche();
-
         if(sG=='5'){
             saved = fopen("saved5.bin","w");
             x=5;
@@ -483,8 +551,10 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
             saved = fopen("saved4.bin","w");
             x=4;
         }
-        else
+        else{
+            printf("\nenter a valid thing");
             return;
+        }
     }else{
         if(sG=='5')
             saved = fopen("saved5.bin","w");
@@ -527,7 +597,7 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
         fwrite(strlen(name2),sizeof(int),1,saved);fwrite(&name2,sizeof(char),strlen(name2),saved);
 
     fclose(saved);
-    printf("Game saved in %d",x);
+    printf("\nGame saved in %d",x);
 }
 
 
