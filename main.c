@@ -14,8 +14,8 @@
 #define width 700
 #define height 700
 //#include "undo and redo.h"
-int playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0},dim=0,computer;char game=0,name1[25],name2[25]="Computer",ss[1];
-bool mouse = false;
+int e=0,f=0,p,x=0,playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0},dim=0,computer;char game=0,name1[25],name2[25]="Computer",ss[1],sG;
+bool mouse = false;FILE *saved;
 SDL_Window *window;
 SDL_Renderer *renderer;
 
@@ -435,7 +435,206 @@ void redo(int dim,int history[][7],char array[dim][dim]){
     }
 }
 
+/*void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim+2][dim+2],int history[][7]){
+    if(x==0){
+        printf("\nChoose a file to save(1,2,3,4,5) or press any key to return:");
+        sG = _getch();
+        if(sG=='5'){
+            saved = fopen("saved5.bin","w");
+            x=5;
+        }
+        else if(sG=='1'){
+            saved = fopen("saved1.bin","w");
+            x=1;
+        }
+        else if(sG=='2'){
+            saved = fopen("saved2.bin","w");
+            x=2;
+        }
+        else if(sG=='3'){
+            saved = fopen("saved3.bin","w");
+            x=3;
+        }
+        else if(sG=='4'){
+            saved = fopen("saved4.bin","w");
+            x=4;
+        }
+        else
+            return;
+    }else{
+        if(sG=='5')
+            saved = fopen("saved5.bin","w");
+        else if(sG=='1')
+            saved = fopen("saved1.bin","w");
+        else if(sG=='2')
+            saved = fopen("saved2.bin","w");
+        else if(sG=='3')
+            saved = fopen("saved3.bin","w");
+        else if(sG=='4')
+            saved = fopen("saved4.bin","w");
+    }
+    fwrite(&computer,sizeof(int),1,saved);
+    fwrite(&dim,sizeof(int),1,saved);
+    fwrite(&totalmoves,sizeof(int),1,saved);
+    for(int i=0;i<totalmoves;i++){
+        for(int j=0;j<7;j++)
+            fwrite(&history[i][j],1,(dim+2)*(dim+2),saved);
 
+    }
+    for(int i=0;i<dim+2;i++){
+        for(int j=0;j<dim+2;j++)
+            fwrite(&array[i][j],1,(dim+2)*(dim+2),saved);
+
+    }
+    for(int i=0;i<2;i++)
+        fwrite(&moves[i],sizeof(int),2,saved);
+    fwrite(&playerturn,sizeof(int),1,saved);
+    fwrite(&maxmoves,sizeof(int),1,saved);
+    if(computer){
+        for(int i=0;i<dim;i++){
+            for(int j=0;j<dim;j++)
+                fwrite(&AIworld[i][j],1,(dim+2)*(dim+2),saved);
+        }
+    }
+    for(int i=0;name1[i]!='\0';i++)
+        e++;
+    for(int i=0;name2[i]!='\0';i++)
+        f++;
+    fwrite(&e,sizeof(int),1,saved);fwrite(&name1,sizeof(char),e,saved);
+    fwrite(&f,sizeof(int),1,saved);fwrite(&name2,sizeof(char),f,saved);
+    fclose(saved);
+    printf("Game saved in %d",x);
+}
+
+void loadGame(){
+    FILE *load;
+    printf("Choose a file (1,2,3,4,5) or press any key to return");
+    sG = _getch();
+    system("cls");
+    if(sG=='5'){
+        load = fopen("saved5.bin","r");
+        x=5;
+    }
+    else if(sG=='1'){
+        load = fopen("saved1.bin","r");
+        x=1;
+    }
+    else if(sG=='2'){
+        load = fopen("saved2.bin","r");
+        x=2;
+    }
+    else if(sG=='3'){
+        load = fopen("saved3.bin","r");
+        x=3;
+    }
+    else if(sG=='4'){
+        load = fopen("saved4.bin","r");
+        x=4;
+    }
+    else
+        return main();
+    fread(&computer,sizeof(int),1,load);
+    fread(&dim,sizeof(int),1,load);
+    fread(&totalmoves,sizeof(int),1,load);
+    int history[2 * (dim/2) * ((dim/2) + 1)][7];
+    initSDL();
+    SDL_MouseButtonEvent event;
+    char world[dim+2][dim+2];
+    int AIworld[dim][dim];
+    for(int i=0;i<totalmoves;i++){
+        for(int j=0;j<7;j++)
+            fread(&history[i][j],1,(dim+2)*(dim+2),load);
+
+    }
+    for(int i=0;i<dim+2;i++){
+        for(int j=0;j<dim+2;j++)
+            fread(&world[i][j],1,(dim+2)*(dim+2),load);
+
+    }
+    for(int i=0;i<2;i++)
+        fread(&moves[i],sizeof(int),2,load);
+    fread(&playerturn,sizeof(int),1,load);
+    fread(&maxmoves,sizeof(int),1,load);
+    if(computer){
+        for(int i=0;i<dim;i++){
+            for(int j=0;j<dim;j++)
+                fread(&AIworld[i][j],1,(dim+2)*(dim+2),load);
+        }
+    }
+    fread(&e,sizeof(int),1,load);fread(&name1,sizeof(char),e,load);
+    fread(&f,sizeof(int),1,load);fread(&name2,sizeof(char),f,load);
+    fclose(load);
+    while(totalmoves<2*((dim/2)+1)*(dim/2) && !quit){
+        if(totalmoves!=0)
+            p = totalmoves;
+        else
+            p=1;
+        update(world,mx1,my1);
+        if(computer && (player == 2)){
+            makeamove(dim,world,NULL,NULL,NULL,NULL,points,history,AIworld);
+        }else{
+        while(SDL_PollEvent(&event)){
+                int f = 0;
+                switch(event.type){
+                case SDL_QUIT:
+                    quit = true;
+                    break;
+                case SDL_MOUSEBUTTONDOWN:
+                    if(event.button == SDL_BUTTON_LEFT)
+                        mouse = true;
+                        SDL_GetMouseState(&mx1,&my1);
+                        if(mx1/100 == 7){
+                            undo(dim,history,world);
+                            while(computer && history[totalmoves][6] == 2)
+                                undo(dim,history,world);
+                        }
+                        else if(mx1/100 == 9){
+                            redo(dim,history,world);
+                            while(computer && history[totalmoves][6] == 2)
+                                redo(dim,history,world);
+                        }
+                        else if()
+                                saveGame(totalmoves,dim,AIworld,array,history);
+                        break;
+                case SDL_MOUSEBUTTONUP:
+                    mouse = false;
+                    if(event.button == SDL_BUTTON_LEFT){
+                        SDL_GetMouseState(&mx2,&my2);
+                    }
+                    printf("%d %d %d %d  %d\n\n\n",mx1,my1,mx2,my2,player);
+                    if(!((mx1/(height/dim))%2 || (my1/(width/dim))%2 || (mx2/(height/dim)%2 || (my2/(width/dim))%2))){
+                        makeamove(dim,world,mx1/(height/dim),my1/(width/dim),mx2/(height/dim),my2/(width/dim),points,history,AIworld);
+                        printf("%d %d %d %d  %d\n\n\n",mx1/(height/dim),my1/(width/dim),mx2/(height/dim),my2/(width/dim),player);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    system("cls");
+    update(world,mx1,my1);
+    while(SDL_WaitEvent(&event)){
+        if(event.type == SDL_MOUSEBUTTONDOWN)
+            killSDL();
+    }
+    x=0;
+    if(points[1]>points[0]){
+        if(!computer)
+            printf("Congratulation for %s and hard luck for %s\n",name2,name1);
+        else
+            printf("Hard luck %s\n",name1);
+    }else{
+        if(!computer)
+            printf("Congratulations for %s and hard luck for %s\n",name1,name2);
+        else
+            printf("Congratulations %s\n",name1);
+    }
+    printf("Press any key to proceed\n");
+    ss[0]=_getch();
+    break;
+    scanf("%c",&argv);
+}
+*/
 
 
 void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int points[],int history[][7],int AIworld[dim][dim]){
@@ -664,6 +863,7 @@ void newGame(){
     game = _getch();
     switch(game){
     case '0':
+        system("cls");
         main(NULL,NULL);
         break;
     case '1':
@@ -682,13 +882,8 @@ void newGame(){
 
 
 
-
-
-
 int main(int argc,char* argv[]){
-    int p=0;
     do{
-    system("cls");
     system("color f1");
     printf("Welcome to dots and boxes by RABSOOO team\nNew game(1)\nLoad game(2)\nLeader board(3)\nSettings(4)\nExit(0)\n");
     game = _getch();
@@ -763,6 +958,8 @@ int main(int argc,char* argv[]){
                                 while(computer && history[totalmoves][6] == 2)
                                     redo(dim,history,world);
                             }
+                            //else if()
+                                //saveGame(totalmoves,dim,AIworld,array,history);
                             break;
                     case SDL_MOUSEBUTTONUP:
                         mouse = false;
@@ -792,7 +989,7 @@ int main(int argc,char* argv[]){
 
 
 
-
+        x=0;
         if(points[1]>points[0]){
             if(!computer)
                 printf("Congratulation for %s and hard luck for %s\n",name2,name1);
@@ -810,12 +1007,16 @@ int main(int argc,char* argv[]){
         scanf("%c",&argv);
     }
     case '2':
+        system("cls");
+        //loadGame();
     case '3':
     case '4':
     case '0':
+        system("cls");
         printf("thanks for playing :)\n");
         break;
     default:
+        system("cls");
         printf("Enter a valid input\n");
         main(NULL,NULL);
     }
