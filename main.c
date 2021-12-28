@@ -212,7 +212,7 @@ void updatesave(){
 
 
 
-
+    SDL_DestroyTexture(save5icon);
     SDL_DestroyTexture(save4icon);
     SDL_DestroyTexture(save3icon);
     SDL_DestroyTexture(save2icon);
@@ -469,7 +469,7 @@ void undo(int dim,int history[][7],char array[dim][dim]){
 }
 
 void redo(int dim,int history[][7],char array[dim][dim]){
-    if(totalmoves < maxmoves && maxmoves > 0){
+    if(totalmoves < maxmoves && (maxmoves > 1)){
         int n1 = history[totalmoves][0];int m1 = history[totalmoves][1];
         array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='1';
 
@@ -501,9 +501,7 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if(event.button == SDL_BUTTON_LEFT){
-                    printf("\nasdasds");
                     SDL_GetMouseState(&mx,&my);
-                    printf("\n%d  %d",mx,my);
                     if(mx/100 == 8 && my/100 == 1){
                         sG = '1';
                         done = true;
@@ -661,8 +659,9 @@ void loadGame(){
                 fread(&AIworld[i][j],1,(dim)*(dim),load);
         }
     }
-    fread(&e,sizeof(int),1,load);fread(&name1,sizeof(char),e,load);
-    fread(&f,sizeof(int),1,load);fread(&name2,sizeof(char),f,load);
+    fread(strlen(name1),sizeof(int),1,load);fread(&name1,sizeof(char),strlen(name1),load);
+    if(!computer)
+        fread(strlen(name2),sizeof(int),1,load);fread(&name2,sizeof(char),strlen(name2),load);
     fclose(load);
     int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
     bool quit = false;
@@ -676,7 +675,6 @@ void loadGame(){
             makeamove(dim,world,NULL,NULL,NULL,NULL,points,history,AIworld);
         }else{
         while(SDL_PollEvent(&event)){
-                int f = 0;
                 switch(event.type){
                 case SDL_QUIT:
                     quit = true;
@@ -703,10 +701,8 @@ void loadGame(){
                     if(event.button == SDL_BUTTON_LEFT){
                         SDL_GetMouseState(&mx2,&my2);
                     }
-                    printf("%d %d %d %d  %d\n\n\n",mx1,my1,mx2,my2,player);
                     if(!((mx1/(height/dim))%2 || (my1/(width/dim))%2 || (mx2/(height/dim)%2 || (my2/(width/dim))%2))){
                         makeamove(dim,world,mx1/(height/dim),my1/(width/dim),mx2/(height/dim),my2/(width/dim),points,history,AIworld);
-                        printf("%d %d %d %d  %d\n\n\n",mx1/(height/dim),my1/(width/dim),mx2/(height/dim),my2/(width/dim),player);
                     }
                     break;
                 }
