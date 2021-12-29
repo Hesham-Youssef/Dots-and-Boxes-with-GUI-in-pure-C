@@ -716,16 +716,21 @@ void loadGame(){
             killSDL();
     }
     x=0;
-    if(points[1]>points[0]){
-        if(!computer)
-            printf("Congratulation for %s and hard luck for %s\n",name2,name1);
-        else
-            printf("Hard luck %s\n",name1);
-    }else{
-        if(!computer)
-            printf("Congratulations for %s and hard luck for %s\n",name1,name2);
-        else
-            printf("Congratulations %s\n",name1);
+    if(totalmoves==2*((dim/2)+1)*(dim/2)){
+        if(points[1]>points[0]){
+            if(!computer){
+                printf("Congratulation for %s and hard luck for %s\n",name2,name1);
+                scores(points[1],f,name2);
+            }
+            else
+                printf("Hard luck %s\n",name1);
+        }else{
+            if(!computer)
+                printf("Congratulations for %s and hard luck for %s\n",name1,name2);
+            else
+                printf("Congratulations %s\n",name1);
+            scores(points[0],e,name1);
+        }
     }
     printf("Press any key to proceed\n");
     ss[0]=_getch();
@@ -879,7 +884,52 @@ void AI(int dim,char world[dim][dim],int AIworld[dim][dim],int history[][7]){
 
 }
 
-
+int scores(int point,int l,char name[l]){
+    int j,y[10],u=0,t;char names[10][25],v[10],i=0,score[10]={0};
+    FILE *lB;
+    if(computer)
+        lB = fopen("Ranks1.bin","r");
+    else
+        lB = fopen("Ranks2.bin","r");
+    fread(&i,sizeof(char),1,lB);
+    if(i!=0){
+        for(j=0;j<i;j++){
+            fread(&v[j],sizeof(char),1,lB);
+            fread(names+j,sizeof(char),v[j],lB);
+            fread(&score[j],sizeof(char),1,lB);
+            if(point<=score[j])
+                u++;
+        }
+        fclose(lB);
+    }
+    if(i!=9)
+        i++;
+    if(u!=9){
+        if(computer)
+            lB = fopen("Ranks1.bin","w");
+        else
+            lB = fopen("Ranks2.bin","w");
+        fwrite(&i,sizeof(char),1,lB);
+        for(j=0;j<u;j++){
+            fwrite(&v[j],sizeof(char),1,lB);
+            fwrite(names+j,sizeof(char),v[j],lB);
+            fwrite(&score[j],sizeof(char),1,lB);
+        }
+        fwrite(&l,sizeof(char),1,lB);
+        fwrite(name,sizeof(char),l,lB);
+        fwrite(&point,sizeof(char),1,lB);
+        for(j=u;j<i-1;j++){
+            fwrite(&v[j],sizeof(char),1,lB);
+            fwrite(names+j,sizeof(char),v[j],lB);
+            fwrite(&score[j],sizeof(char),1,lB);
+        }
+    }
+    fclose(lB);
+    printf("Press any key to return to menu\n");
+    ss[0]=_getch();
+    system("cls");
+    return main(NULL,NULL);
+}
 
 
 
@@ -1081,16 +1131,21 @@ int main(int argc,char* argv[]){
                 killSDL();
         }
         x=0;
-        if(points[1]>points[0]){
-            if(!computer)
-                printf("Congratulation for %s and hard luck for %s\n",name2,name1);
-            else
-                printf("Hard luck %s\n",name1);
-        }else{
-            if(!computer)
-                printf("Congratulations for %s and hard luck for %s\n",name1,name2);
-            else
-                printf("Congratulations %s\n",name1);
+        if(totalmoves==2*((dim/2)+1)*(dim/2)){
+            if(points[1]>points[0]){
+                if(!computer){
+                    printf("Congratulation for %s and hard luck for %s\n",name2,name1);
+                    scores(points[1],f,name2);
+                }
+                else
+                    printf("Hard luck %s\n",name1);
+            }else{
+                if(!computer)
+                    printf("Congratulations for %s and hard luck for %s\n",name1,name2);
+                else
+                    printf("Congratulations %s\n",name1);
+                scores(points[0],e,name1);
+            }
         }
         printf("Press any key to proceed\n");
         ss[0]=_getch();
@@ -1102,6 +1157,32 @@ int main(int argc,char* argv[]){
         loadGame();
         break;
     case '3':
+        int j,y,u=0;char names[10][25],v[10],i=0,score[10];
+        FILE *bS;
+        for(u=0;u<2;u++){
+            if(u==0){
+                bS=fopen("Ranks1.bin","r");
+                printf("Press any key to return\n\nOne player mode\n\n");
+            }else{
+                bS=fopen("Ranks2.bin","r");
+                printf("\nTwo player mode\n\n");
+                i=0;
+            }
+            fread(&i,sizeof(char),1,bS);
+            for(j=0;j<i;j++){
+                fread(&v[j],sizeof(char),1,bS);
+                fread(names+j,sizeof(char),v[j],bS);
+                fread(&score[j],sizeof(char),1,bS);
+                printf("%d) ",j+1);
+                for(y=0;y<v[j];y++)
+                    printf("%c",names[j][y]);
+                printf(": %d\n",score[j]);
+            }
+            fclose(bS);
+        }
+        ss[0]=_getch();
+        system("cls");
+        break;
     case '4':
     case '0':
         system("cls");

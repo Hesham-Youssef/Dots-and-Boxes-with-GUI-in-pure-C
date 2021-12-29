@@ -16,7 +16,7 @@
 	<stdbool.h>
 	<string.h>
 
-1640514470 source:c:\users\yahya\onedrive\desktop\rabsooodotsandboxes\main.c
+1640776516 source:c:\users\yahya\onedrive\desktop\rabsooodotsandboxes\main.c
 	<stdio.h>
 	<stdlib.h>
 	<conio.h>
@@ -25,9 +25,7 @@
 	<SDL2/SDL_image.h>
 	<SDL2/SDL_ttf.h>
 	<stdbool.h>
-	<stdlib.h>
-	<conio.h>
-	<math.h>
+	<string.h>
 
 1638567155 c:\msys64\mingw64\include\sdl2\sdl.h
 	"SDL_main.h"
