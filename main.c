@@ -15,22 +15,25 @@ int e=0,f=0,p,x=0,playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmove
 bool mouse = false;FILE *saved;
 SDL_Window *window;
 SDL_Renderer *renderer;
-
+TTF_Font *font;
 void initSDL(){
     SDL_Init(SDL_INIT_VIDEO);
-
+    TTF_Init();
     IMG_Init(IMG_INIT_PNG | IMG_INIT_PNG);
 
     window = SDL_CreateWindow("dots and boxes",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,realwidth,height,SDL_WINDOW_SHOWN);
 
     renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
+    font = TTF_OpenFont("Roman SD.ttf",20);
 }
 
 void killSDL(){
+    TTF_CloseFont(font);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     IMG_Quit();
+    TTF_Quit();
     SDL_Quit();
 }
 
@@ -77,6 +80,120 @@ void update(char world[dim][dim],int mx1,int my1){
         break;
 
     }
+    char scoreline[30] = "";
+    char scorenum[5] = "";
+    strcat(scoreline,name1);
+    strcat(scoreline," (1): ");
+    itoa(points[0],scorenum,10);
+    strcat(scoreline,scorenum);
+
+
+    SDL_Color color = {180,180,180,255};
+
+    SDL_Surface *scoretextimg1 = TTF_RenderText_Solid(font,scoreline,color);
+
+    SDL_Texture *scoretext1 = SDL_CreateTextureFromSurface(renderer,scoretextimg1);
+
+    SDL_FreeSurface(scoretextimg1);
+
+    SDL_Rect scoretext1pos = {.x = 710,.y = 300};
+
+    SDL_QueryTexture(scoretext1,NULL,NULL,&scoretext1pos.w,&scoretext1pos.h);
+    scoreline[30] = '\0';
+    scorenum[5] = '\0';
+    if(!computer){
+        strcat(scoreline,name2);
+        strcat(scoreline," (2): ");
+        itoa(points[1],scorenum,10);
+        strcat(scoreline,scorenum);
+    }else{
+        strcat(scoreline,"Computer (2): ");
+        itoa(points[1],scorenum,10);
+        strcat(scoreline,scorenum);
+    }
+    SDL_Surface *scoretextimg2 = TTF_RenderText_Solid(font,scoreline,color);
+
+    SDL_Texture *scoretext2 = SDL_CreateTextureFromSurface(renderer,scoretextimg2);
+
+    SDL_FreeSurface(scoretextimg2);
+
+    SDL_Rect scoretext2pos = {.x = 710,.y = 320};
+
+    SDL_QueryTexture(scoretext2,NULL,NULL,&scoretext2pos.w,&scoretext2pos.h);
+
+    scoreline[30] = '\0';
+    scorenum[5] = '\0';
+    strcat(scoreline,"PLAYER TURN : ");
+    itoa(player,scorenum,10);
+    strcat(scoreline,scorenum);
+
+    SDL_Surface *playerturntextimg = TTF_RenderText_Solid(font,scoreline,color);
+
+    SDL_Texture *playerturntext = SDL_CreateTextureFromSurface(renderer,playerturntextimg);
+
+    SDL_FreeSurface(playerturntextimg);
+
+    SDL_Rect playerturntextpos = {.x = 710,.y = 350};
+
+    SDL_QueryTexture(playerturntext,NULL,NULL,&playerturntextpos.w,&playerturntextpos.h);
+
+
+
+
+    scoreline[30] = '\0';
+    scorenum[5] = '\0';
+    strcat(scoreline,"PLAYER ONE MOVES: ");
+    itoa(moves[0],scorenum,10);
+    strcat(scoreline,scorenum);
+
+    SDL_Surface *player1movesimg = TTF_RenderText_Solid(font,scoreline,color);
+
+    SDL_Texture *player1moves = SDL_CreateTextureFromSurface(renderer,player1movesimg);
+
+    SDL_FreeSurface(player1movesimg);
+
+    SDL_Rect player1movespos = {.x = 710,.y = 380};
+
+    SDL_QueryTexture(player1moves,NULL,NULL,&player1movespos.w,&player1movespos.h);
+
+
+    scoreline[30] = '\0';
+    scorenum[5] = '\0';
+    strcat(scoreline,"PLAYER TWO MOVES: ");
+    itoa(moves[1],scorenum,10);
+    strcat(scoreline,scorenum);
+
+    SDL_Surface *player2movesimg = TTF_RenderText_Solid(font,scoreline,color);
+
+    SDL_Texture *player2moves = SDL_CreateTextureFromSurface(renderer,player2movesimg);
+
+    SDL_FreeSurface(player2movesimg);
+
+    SDL_Rect player2movespos = {.x = 710,.y = 400};
+
+    SDL_QueryTexture(player2moves,NULL,NULL,&player2movespos.w,&player2movespos.h);
+
+
+
+    scoreline[30] = '\0';
+    scorenum[5] = '\0';
+    strcat(scoreline,"REMAINED MOVES: ");
+    itoa((2 * (dim/2) * (dim/2 + 1)) - (moves[0] + moves[1]),scorenum,10);
+
+    strcat(scoreline,scorenum);
+
+    SDL_Surface *remainedmovesimg = TTF_RenderText_Solid(font,scoreline,color);
+
+    SDL_Texture *remainedmove = SDL_CreateTextureFromSurface(renderer,remainedmovesimg);
+
+    SDL_FreeSurface(remainedmovesimg);
+
+    SDL_Rect remainedmovespos = {.x = 710,.y = 430};
+
+    SDL_QueryTexture(remainedmove,NULL,NULL,&remainedmovespos.w,&remainedmovespos.h);
+
+
+
     SDL_Surface *saveimg = IMG_Load("saveicon.png");
 
     SDL_Texture *saveicon = SDL_CreateTextureFromSurface(renderer,saveimg);
@@ -127,6 +244,17 @@ void update(char world[dim][dim],int mx1,int my1){
 
     SDL_RenderCopy(renderer,saveicon,NULL,&savepos);
 
+    SDL_RenderCopy(renderer,scoretext1,NULL,&scoretext1pos);
+
+    SDL_RenderCopy(renderer,scoretext2,NULL,&scoretext2pos);
+
+    SDL_RenderCopy(renderer,playerturntext,NULL,&playerturntextpos);
+
+    SDL_RenderCopy(renderer,player1moves,NULL,&player1movespos);
+
+    SDL_RenderCopy(renderer,player2moves,NULL,&player2movespos);
+
+    SDL_RenderCopy(renderer,remainedmove,NULL,&remainedmovespos);
     if(mouse){
         SDL_SetRenderDrawColor(renderer,255,255,255,255);
         SDL_GetMouseState(&linex,&liney);
@@ -169,6 +297,12 @@ void update(char world[dim][dim],int mx1,int my1){
             SDL_RenderCopy(renderer,dots,NULL,&dotspos);
         }
     }
+    SDL_DestroyTexture(remainedmove);
+    SDL_DestroyTexture(player2moves);
+    SDL_DestroyTexture(player1moves);
+    SDL_DestroyTexture(playerturntext);
+    SDL_DestroyTexture(scoretext2);
+    SDL_DestroyTexture(scoretext1);
     SDL_DestroyTexture(undoicon);
     SDL_DestroyTexture(redoicon);
     SDL_DestroyTexture(wallpaper);
@@ -275,6 +409,10 @@ void createhistory(int dim,int history[2 * (dim/2) * ((dim/2) + 1)][7]){
             history[i][j] = 0;
         }
     }
+}
+void resetarray(int array[]){
+    for(int i=0;i<2;i++)
+        array[i] = 0;
 }
 
 int checkforotherlines(int dim,int history[][7],char array[][dim],int n1,int m1){
@@ -588,10 +726,11 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
                 fwrite(&AIworld[i][j],1,(dim)*(dim),saved);
         }
     }
-
-    fwrite(strlen(name1),sizeof(int),1,saved);fwrite(&name1,sizeof(char),strlen(name1),saved);
+    int e = strlen(name1);
+    int f = strlen(name2);
+    fwrite(&e,sizeof(int),1,saved);fwrite(&name1,sizeof(char),e,saved);
     if(!computer)
-        fwrite(strlen(name2),sizeof(int),1,saved);fwrite(&name2,sizeof(char),strlen(name2),saved);
+        fwrite(&f,sizeof(int),1,saved);fwrite(&name2,sizeof(char),f,saved);
 
     fclose(saved);
     printf("\nGame saved in %d",x);
@@ -850,9 +989,9 @@ void loadGame(){
                 fread(&AIworld[i][j],1,(dim)*(dim),load);
         }
     }
-    fread(strlen(name1),sizeof(int),1,load);fread(&name1,sizeof(char),strlen(name1),load);
+    fread(&e,sizeof(int),1,load);fread(&name1,sizeof(char),e,load);
     if(!computer)
-        fread(strlen(name2),sizeof(int),1,load);fread(&name2,sizeof(char),strlen(name2),load);
+        fread(&f,sizeof(int),1,load);fread(&name2,sizeof(char),f,load);
     fclose(load);
     int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
     bool quit = false;
@@ -933,30 +1072,34 @@ void loadGame(){
 void oneNewGame(){
     computer = 1;
     system("cls");
-    printf("Back(0)\n\nEnter difficulty:\nEasy(1)\nNormal(2)\nHard(3)\nVery hard(4)\n");
+    printf("Back(0)\n\nEnter difficulty:\nEasy(1)\nNormal(2)\nHard(3)\n");
     game = _getch();
     switch(game){
         case '0':
             return newGame();
             break;
         case '1':
-            printf("\nEnter player's name: ");
+            do{
+            printf("\nless than 12 chars");
+            printf("\nEnter first player's name: ");
             gets(name1);
+            }while(strlen(name1) > 12 || strlen(name1) == 0);
             dim = 7;
             break;
         case '2':
-            printf("\nEnter player's name: ");
+            do{
+            printf("\nless than 12 chars");
+            printf("\nEnter first player's name: ");
             gets(name1);
+            }while(strlen(name1) > 12 || strlen(name1) == 0);
             dim = 11;
             break;
         case '3':
-            printf("\nEnter player's name: ");
+            do{
+            printf("\nless than 12 chars");
+            printf("\nEnter first player's name: ");
             gets(name1);
-            dim = 11;
-            break;
-        case '4':
-            printf("\nEnter player's name: ");
-            gets(name1);
+            }while(strlen(name1) > 12 || strlen(name1) == 0);
             dim = 15;
             break;
         default:
@@ -973,24 +1116,33 @@ void twoNewGame(){
             return newGame();
             break;
         case '1':
+            do{
+            printf("\nless than 12 chars");
             printf("\nEnter first player's name: ");
             gets(name1);
             printf("\nEnter second player's name: ");
             gets(name2);
+            }while(strlen(name1) > 12 || strlen(name2) > 12 || strlen(name1) == 0 || strlen(name2) == 0);
             dim = 7;
             break;
         case '2':
+            do{
+            printf("\nless than 12 chars");
             printf("\nEnter first player's name: ");
             gets(name1);
             printf("\nEnter second player's name: ");
             gets(name2);
+            }while(strlen(name1) > 12 || strlen(name2) > 12 || strlen(name1) == 0 || strlen(name2) == 0);
             dim = 11;
             break;
         case '3':
+            do{
+            printf("\nless than 12 chars");
             printf("\nEnter first player's name: ");
             gets(name1);
             printf("\nEnter second player's name: ");
             gets(name2);
+            }while(strlen(name1) > 12 || strlen(name2) > 12 || strlen(name1) == 0 || strlen(name2) == 0);
             dim = 15;
             break;
         default:
@@ -1055,6 +1207,12 @@ int main(int argc,char* argv[]){
 
         createhistory(dim,history);
 
+        resetarray(points);
+
+        resetarray(moves);
+
+        playerturn = 0;
+
         initSDL();
 
 
@@ -1098,7 +1256,7 @@ int main(int argc,char* argv[]){
                             }
                             else if(mx1/100 == 9 && my1/100 == 0){
                                 redo(dim,history,world);
-                                while(computer && history[totalmoves][6] == 2)
+                                while(computer && history[totalmoves][6] == 2 && totalmoves < maxmoves)
                                     redo(dim,history,world);
                             }
                             else if(mx1/100 == 7 && my1/100 == 1){
@@ -1122,7 +1280,7 @@ int main(int argc,char* argv[]){
 
         system("cls");
         update(world,mx1,my1);
-        while(SDL_WaitEvent(&event)){
+        while(SDL_WaitEvent(&event) && !quit){
             if(event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_QUIT)
                 killSDL();
         }
