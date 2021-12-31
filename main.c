@@ -631,7 +631,7 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
     history[totalmoves][4] = points[0];
     history[totalmoves][5] = points[1];
 
-    if((totalmoves < maxmoves) && (!computer && player == 2))
+    if((totalmoves < maxmoves))
         maxmoves = totalmoves;
 
         maxmoves++;
