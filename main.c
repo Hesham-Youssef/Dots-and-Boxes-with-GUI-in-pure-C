@@ -1113,7 +1113,7 @@ void loadGame(){
         if(points[1]>points[0]){
             if(!computer){
                 printf("Congratulation for %s and hard luck for %s\n",name2,name1);
-                scores(points[1],f,name2);
+                scores(points[1],strlen(name2),name2);
             }
             else
                 printf("Hard luck %s\n",name1);
@@ -1122,7 +1122,7 @@ void loadGame(){
                 printf("Congratulations for %s and hard luck for %s\n",name1,name2);
             else
                 printf("Congratulations %s\n",name1);
-            scores(points[0],e,name1);
+            scores(points[0],strlen(name1),name1);
         }
     }
     printf("Press any key to proceed\n");
@@ -1380,7 +1380,7 @@ int main(int argc,char* argv[]){
             if(points[1]>points[0]){
                 if(!computer){
                     printf("Congratulation for %s and hard luck for %s\n",name2,name1);
-                    scores(points[1],f,name2);
+                    scores(points[1],strlen(name2),name2);
                 }
                 else
                     printf("Hard luck %s\n",name1);
@@ -1389,7 +1389,7 @@ int main(int argc,char* argv[]){
                     printf("Congratulations for %s and hard luck for %s\n",name1,name2);
                 else
                     printf("Congratulations %s\n",name1);
-                scores(points[0],e,name1);
+                scores(points[0],strlen(name1),name1);
             }
         }
         printf("Press any key to proceed\n");
