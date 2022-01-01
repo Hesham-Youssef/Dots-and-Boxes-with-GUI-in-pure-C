@@ -11,7 +11,8 @@
 #define width 700
 #define height 700
 //#include "undo and redo.h"
-int e=0,f=0,p,x=0,playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0},dim=0,computer;char game=0,name1[25],name2[25]="Computer",ss[1],sG;
+int e=0,f=0,p,x=0,playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0},dim=0,computer,starttime,endtime,diftime = 0;
+char game=0,name1[25],name2[25]="Computer",ss[1],sG;
 bool mouse = false;FILE *saved;
 SDL_Window *window;
 SDL_Renderer *renderer;
@@ -26,6 +27,7 @@ void initSDL(){
     renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     font = TTF_OpenFont("Roman SD.ttf",20);
+
 }
 
 void killSDL(){
@@ -88,7 +90,7 @@ void update(char world[dim][dim],int mx1,int my1){
     strcat(scoreline,scorenum);
 
 
-    SDL_Color color = {180,180,180,255};
+    SDL_Color color = {200,200,200,255};
 
     SDL_Surface *scoretextimg1 = TTF_RenderText_Solid(font,scoreline,color);
 
@@ -192,6 +194,29 @@ void update(char world[dim][dim],int mx1,int my1){
 
     SDL_QueryTexture(remainedmove,NULL,NULL,&remainedmovespos.w,&remainedmovespos.h);
 
+    endtime = SDL_GetTicks();
+
+    scoreline[30] = '\0';
+    scorenum[5] = '\0';
+    strcat(scoreline,"TIME: ");
+    itoa((((endtime - starttime)/(1000*60))%60)+diftime,scorenum,10);
+    strcat(scoreline,scorenum);
+    strcat(scoreline," : ");
+    itoa((((endtime - starttime)/1000)%60)+diftime,scorenum,10);
+
+    strcat(scoreline,scorenum);
+
+    SDL_Surface *timepassedimg = TTF_RenderText_Solid(font,scoreline,color);
+
+    SDL_Texture *timepassed = SDL_CreateTextureFromSurface(renderer,timepassedimg);
+
+    SDL_FreeSurface(timepassedimg);
+
+    SDL_Rect timepassedpos = {.x = 710,.y = 460};
+
+    SDL_QueryTexture(timepassed,NULL,NULL,&timepassedpos.w,&timepassedpos.h);
+
+
 
 
     SDL_Surface *saveimg = IMG_Load("saveicon.png");
@@ -255,6 +280,8 @@ void update(char world[dim][dim],int mx1,int my1){
     SDL_RenderCopy(renderer,player2moves,NULL,&player2movespos);
 
     SDL_RenderCopy(renderer,remainedmove,NULL,&remainedmovespos);
+
+    SDL_RenderCopy(renderer,timepassed,NULL,&timepassedpos);
     if(mouse){
         SDL_SetRenderDrawColor(renderer,255,255,255,255);
         SDL_GetMouseState(&linex,&liney);
@@ -297,6 +324,7 @@ void update(char world[dim][dim],int mx1,int my1){
             SDL_RenderCopy(renderer,dots,NULL,&dotspos);
         }
     }
+    SDL_DestroyTexture(timepassed);
     SDL_DestroyTexture(remainedmove);
     SDL_DestroyTexture(player2moves);
     SDL_DestroyTexture(player1moves);
@@ -352,10 +380,44 @@ void updatesave(){
     SDL_DestroyTexture(save1icon);
     SDL_RenderPresent(renderer);
 }
+void gamemenu(){
+    SDL_Surface *imgwallpaper = IMG_Load("wallpaper.jpg");
+    SDL_Texture *wallpaper = SDL_CreateTextureFromSurface(renderer,imgwallpaper);
+    SDL_FreeSurface(imgwallpaper);
+    SDL_Rect wallpaperpos = {.x = 0,.y = 0,realwidth,height};
+    SDL_RenderCopy(renderer,wallpaper,NULL,&wallpaperpos);
+
+    SDL_Surface *logoimg = IMG_Load("LOGO.jpg");
+    SDL_Texture *logo = SDL_CreateTextureFromSurface(renderer,logoimg);
+    SDL_FreeSurface(logoimg);
+    SDL_Rect logopos = {.x = 250,.y = 50,500,300};
+    SDL_RenderCopy(renderer,logo,NULL,&logopos);
+    SDL_DestroyTexture(wallpaper);
+
+    SDL_Surface *newgameiconimg = IMG_Load("NEWGAME.png");
+    SDL_Texture *newgameicon = SDL_CreateTextureFromSurface(renderer,newgameiconimg);
+    SDL_FreeSurface(newgameiconimg);
+    SDL_Rect newgameiconpos = {.x = 350,.y = 400,300,80};
+    SDL_RenderCopy(renderer,newgameicon,NULL,&newgameiconpos);
+    SDL_DestroyTexture(newgameicon);
+
+    SDL_Surface *loadgameiconimg = IMG_Load("LOADGAME.png");
+    SDL_Texture *loadgameicon = SDL_CreateTextureFromSurface(renderer,loadgameiconimg);
+    SDL_FreeSurface(loadgameiconimg);
+    SDL_Rect loadgameiconpos = {.x = 350,.y = 500,300,80};
+    SDL_RenderCopy(renderer,loadgameicon,NULL,&loadgameiconpos);
+    SDL_DestroyTexture(loadgameicon);
+
+    SDL_Surface *leaderboardiconimg = IMG_Load("LEADERBOARD.png");
+    SDL_Texture *leaderboardicon = SDL_CreateTextureFromSurface(renderer,leaderboardiconimg);
+    SDL_FreeSurface(leaderboardiconimg);
+    SDL_Rect leaderboardiconpos = {.x = 350,.y = 600,300,80};
+    SDL_RenderCopy(renderer,leaderboardicon,NULL,&leaderboardiconpos);
+    SDL_DestroyTexture(leaderboardicon);
 
 
-
-
+    SDL_RenderPresent(renderer);
+}
 
 
 void printAIwolrd(int dim,int AIworld[dim][dim]){
@@ -731,7 +793,6 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
     fwrite(&e,sizeof(int),1,saved);fwrite(&name1,sizeof(char),e,saved);
     if(!computer)
         fwrite(&f,sizeof(int),1,saved);fwrite(&name2,sizeof(char),f,saved);
-
     fclose(saved);
     printf("\nGame saved in %d",x);
 }
@@ -964,7 +1025,6 @@ void loadGame(){
     fread(&dim,sizeof(int),1,load);
     fread(&totalmoves,sizeof(int),1,load);
     int history[2 * (dim/2) * ((dim/2) + 1)][7];
-    initSDL();
     SDL_MouseButtonEvent event;
     char world[dim][dim];
     int AIworld[dim][dim];
@@ -993,7 +1053,9 @@ void loadGame(){
     if(!computer)
         fread(&f,sizeof(int),1,load);fread(&name2,sizeof(char),f,load);
     fclose(load);
+    printf("\n %d",diftime);
     int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
+    starttime = SDL_GetTicks();
     bool quit = false;
     while(totalmoves<2*((dim/2)+1)*(dim/2) && !quit){
         if(totalmoves!=0)
@@ -1008,6 +1070,7 @@ void loadGame(){
                 switch(event.type){
                 case SDL_QUIT:
                     quit = true;
+                    killSDL();
                     break;
                 case SDL_MOUSEBUTTONDOWN:
                     if(event.button == SDL_BUTTON_LEFT)
@@ -1041,8 +1104,8 @@ void loadGame(){
     }
     system("cls");
     update(world,mx1,my1);
-    while(SDL_WaitEvent(&event)){
-        if(event.type == SDL_MOUSEBUTTONDOWN)
+    while(SDL_WaitEvent(&event) && !quit){
+        if(event.type == SDL_MOUSEBUTTONDOWN  || event.type == SDL_QUIT)
             killSDL();
     }
     x=0;
@@ -1178,9 +1241,44 @@ void newGame(){
 
 int main(int argc,char* argv[]){
     do{
+    initSDL();
+    gamemenu();
+    SDL_MouseButtonEvent event;
+    int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
+    bool done = false;
+    while(!done){
+        SDL_PollEvent(&event);
+        switch(event.type){
+            case SDL_QUIT:
+                killSDL();
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if(event.button == SDL_BUTTON_LEFT){
+                    SDL_GetMouseState(&mx1,&my1);
+                    printf("\n %d   %d",mx1,my1);
+                    if(my1/100 == 4){
+                        game = '1';
+                        done = true;
+                    }
+                    else if(my1/100 == 5){
+                        game = '2';
+                        done = true;
+                    }
+                    else if(my1/100 == 6){
+                        game = '3';
+                        done = true;
+                    }
+                    break;
+            }
+        }
+    }
+
+
+
+
+
     system("color f1");
     printf("Welcome to dots and boxes by RABSOOO team\nNew game(1)\nLoad game(2)\nLeader board(3)\nSettings(4)\nExit(0)\n");
-    game = _getch();
     system("cls");
     bool quit = false;
     switch(game){
@@ -1213,16 +1311,9 @@ int main(int argc,char* argv[]){
 
         playerturn = 0;
 
-        initSDL();
-
-
-        SDL_MouseButtonEvent event;
-
-
-        int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
-
         totalmoves = 0;
         player = 1;
+        starttime = SDL_GetTicks();
         while(totalmoves<2*((dim/2)+1)*(dim/2) && !quit){
             if(totalmoves!=0)
                 p = totalmoves;

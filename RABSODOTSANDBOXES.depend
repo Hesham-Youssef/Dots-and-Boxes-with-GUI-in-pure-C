@@ -5,7 +5,7 @@
 	<conio.h>
 	<math.h>
 
-1640981781 source:c:\users\hesham youssef\documents\github\rabsooodotsandboxes\main.c
+1641054561 source:c:\users\hesham youssef\documents\github\rabsooodotsandboxes\main.c
 	<stdio.h>
 	<stdlib.h>
 	<conio.h>
@@ -415,4 +415,15 @@
 	"SDL.h"
 	"begin_code.h"
 	"close_code.h"
+
+1641065451 source:c:\users\hesham youssef\desktop\asdasd\rabsooodotsandboxes\main.c
+	<stdio.h>
+	<stdlib.h>
+	<conio.h>
+	<math.h>
+	<SDL2/SDL.h>
+	<SDL2/SDL_image.h>
+	<SDL2/SDL_ttf.h>
+	<stdbool.h>
+	<string.h>
 
