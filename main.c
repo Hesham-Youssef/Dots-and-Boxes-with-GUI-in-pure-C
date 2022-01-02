@@ -199,10 +199,10 @@ void update(char world[dim][dim],int mx1,int my1){
     scoreline[30] = '\0';
     scorenum[5] = '\0';
     strcat(scoreline,"TIME: ");
-    itoa((((endtime - starttime)/(1000*60))%60)+diftime/60,scorenum,10);
+    itoa((((endtime - starttime)/(1000*60))%60)+((diftime/60)%60),scorenum,10);
     strcat(scoreline,scorenum);
     strcat(scoreline," : ");
-    itoa((((endtime - starttime)/1000)%60)+diftime,scorenum,10);
+    itoa((((endtime - starttime)/1000)%60)+(diftime%60),scorenum,10);
 
     strcat(scoreline,scorenum);
 
@@ -800,16 +800,18 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
                 fwrite(&AIworld[i][j],1,(dim)*(dim),saved);
         }
     }
+    char tempdif[10];
+    diftime = (endtime - starttime)/1000;
+    itoa(diftime,tempdif,10);
+    fwrite(&tempdif,sizeof(char),10,saved);
+    printf("\n %s",tempdif);
+    diftime = 0;
     int e = strlen(name1);
     int f = strlen(name2);
     fwrite(&e,sizeof(int),1,saved);fwrite(&name1,sizeof(char),e,saved);
     if(!computer)
         fwrite(&f,sizeof(int),1,saved);fwrite(&name2,sizeof(char),f,saved);
 
-    diftime = (endtime - starttime)/1000;
-    fwrite(&diftime,sizeof(int),1,saved);
-    printf("\n %d",diftime);
-    diftime = 0;
     fclose(saved);
     printf("\nGame saved in %d",x);
 }
@@ -1066,13 +1068,14 @@ void loadGame(){
                 fread(&AIworld[i][j],1,(dim)*(dim),load);
         }
     }
+    char tempdif[10];
+    fread(&tempdif,sizeof(char),10,load);
+    diftime = atoi(tempdif);
+    printf("\n %s",tempdif);
+    printf("\n %d",diftime);
     fread(&e,sizeof(int),1,load);fread(&name1,sizeof(char),e,load);
     if(!computer)
         fread(&f,sizeof(int),1,load);fread(&name2,sizeof(char),f,load);
-
-    fread(&diftime,sizeof(int),1,load);
-
-    printf("\n %d",diftime);
 
     fclose(load);
 
