@@ -199,10 +199,10 @@ void update(char world[dim][dim],int mx1,int my1){
     scoreline[30] = '\0';
     scorenum[5] = '\0';
     strcat(scoreline,"TIME: ");
-    itoa((((endtime - starttime)/(1000*60))%60)+((diftime/60)%60),scorenum,10);
+    itoa(((((endtime - starttime)/1000 + diftime)/60)%60),scorenum,10);
     strcat(scoreline,scorenum);
     strcat(scoreline," : ");
-    itoa((((endtime - starttime)/1000)%60)+(diftime%60),scorenum,10);
+    itoa(((((endtime - starttime)/1000)+diftime)%60),scorenum,10);
 
     strcat(scoreline,scorenum);
 
@@ -801,11 +801,9 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
         }
     }
     char tempdif[10];
-    diftime = (endtime - starttime)/1000;
-    itoa(diftime,tempdif,10);
+    itoa(((endtime - starttime)/1000)+diftime,tempdif,10);
     fwrite(&tempdif,sizeof(char),10,saved);
     printf("\n %s",tempdif);
-    diftime = 0;
     int e = strlen(name1);
     int f = strlen(name2);
     fwrite(&e,sizeof(int),1,saved);fwrite(&name1,sizeof(char),e,saved);
@@ -1014,6 +1012,7 @@ int scores(int point,int l,char name[l]){
 }
 
 void loadGame(){
+    bool quit = false;
     FILE *load;
     printf("Choose a file (1,2,3,4,5) or press any key to return");
     sG = _getche();
@@ -1081,7 +1080,6 @@ void loadGame(){
 
     int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
     starttime = SDL_GetTicks();
-    bool quit = false;
     while(totalmoves<2*((dim/2)+1)*(dim/2) && !quit){
         if(totalmoves!=0)
             p = totalmoves;
@@ -1096,6 +1094,7 @@ void loadGame(){
                 case SDL_QUIT:
                     quit = true;
                     killSDL();
+                    goto end;
                     break;
                 case SDL_MOUSEBUTTONDOWN:
                     if(event.button == SDL_BUTTON_LEFT)
@@ -1111,8 +1110,12 @@ void loadGame(){
                             while(computer && history[totalmoves][6] == 2)
                                 redo(dim,history,world);
                         }
-                        else if(mx1/100 == 7 && my1/100 == 1)
+                        else if(mx1/100 == 7 && my1/100 == 1){
                                 saveGame(totalmoves,dim,AIworld,world,history);
+                        }
+                        else if(mx1/100 > 7 && my1/100 == 6){
+                                goto end;
+                        }
                         break;
                 case SDL_MOUSEBUTTONUP:
                     mouse = false;
@@ -1128,30 +1131,39 @@ void loadGame(){
         }
     }
     system("cls");
-    update(world,mx1,my1);
-    while(SDL_WaitEvent(&event) && !quit){
-        if(event.type == SDL_MOUSEBUTTONDOWN  || event.type == SDL_QUIT)
-            killSDL();
-    }
-    x=0;
-    if(totalmoves==2*((dim/2)+1)*(dim/2)){
-        if(points[1]>points[0]){
-            if(!computer){
-                printf("Congratulation for %s and hard luck for %s\n",name2,name1);
-                scores(points[1],strlen(name2),name2);
+        update(world,mx1,my1);
+        bool done = false;
+        x=0;
+        if(totalmoves==2*((dim/2)+1)*(dim/2)){
+            if(points[1]>points[0]){
+                if(!computer){
+                    printf("Congratulation for %s and hard luck for %s\n",name2,name1);
+                    scores(points[1],strlen(name2),name2);
+                }
+                else
+                    printf("Hard luck %s\n",name1);
+            }else{
+                if(!computer)
+                    printf("Congratulations for %s and hard luck for %s\n",name1,name2);
+                else
+                    printf("Congratulations %s\n",name1);
+                scores(points[0],strlen(name1),name1);
             }
-            else
-                printf("Hard luck %s\n",name1);
-        }else{
-            if(!computer)
-                printf("Congratulations for %s and hard luck for %s\n",name1,name2);
-            else
-                printf("Congratulations %s\n",name1);
-            scores(points[0],strlen(name1),name1);
         }
-    }
-    printf("Press any key to proceed\n");
-    ss[0]=_getch();
+        printf("Press any key to proceed\n");
+        while(!done){
+            while(SDL_PollEvent(&event) && !quit){
+                switch(event.type){
+                    case SDL_QUIT:
+                        killSDL();
+                        break;
+                    case SDL_MOUSEBUTTONDOWN:
+                        done = true;
+                        break;
+                }
+            }
+        }
+    end:
 }
 
 
@@ -1272,6 +1284,7 @@ int main(int argc,char* argv[]){
         SDLrun = true;
     }
     jump:
+    x = 0;
     diftime = 0;
     gamemenu();
     SDL_MouseButtonEvent event;
