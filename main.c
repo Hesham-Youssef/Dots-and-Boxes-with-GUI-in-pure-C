@@ -13,7 +13,8 @@
 //#include "undo and redo.h"
 int e=0,f=0,p,x=0,playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0},dim=0,computer,starttime,endtime,diftime = 0;
 char game=0,name1[25],name2[25]="Computer",ss[1],sG;
-bool mouse = false;FILE *saved;
+bool mouse = false, SDLrun = false;
+FILE *saved;
 SDL_Window *window;
 SDL_Renderer *renderer;
 TTF_Font *font;
@@ -26,7 +27,7 @@ void initSDL(){
 
     renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-    font = TTF_OpenFont("Roman SD.ttf",20);
+    font = TTF_OpenFont("Lato-Italic.ttf",20);
 
 }
 
@@ -255,6 +256,14 @@ void update(char world[dim][dim],int mx1,int my1){
 
     SDL_FreeSurface(imagedots);
 
+    SDL_Surface *returnbuttonimg = IMG_Load("BACK.png");
+
+    SDL_Texture *returnbutton = SDL_CreateTextureFromSurface(renderer,returnbuttonimg);
+
+    SDL_FreeSurface(returnbuttonimg);
+
+    SDL_Rect returnbuttonpos = {.x = 700,.y = 600,.w = 280,.h = 50};
+
     SDL_SetRenderDrawColor(renderer,0,0,0,255);
 
     SDL_RenderClear(renderer);
@@ -282,6 +291,8 @@ void update(char world[dim][dim],int mx1,int my1){
     SDL_RenderCopy(renderer,remainedmove,NULL,&remainedmovespos);
 
     SDL_RenderCopy(renderer,timepassed,NULL,&timepassedpos);
+
+    SDL_RenderCopy(renderer,returnbutton,NULL,&returnbuttonpos);
     if(mouse){
         SDL_SetRenderDrawColor(renderer,255,255,255,255);
         SDL_GetMouseState(&linex,&liney);
@@ -324,6 +335,7 @@ void update(char world[dim][dim],int mx1,int my1){
             SDL_RenderCopy(renderer,dots,NULL,&dotspos);
         }
     }
+    SDL_DestroyTexture(returnbutton);
     SDL_DestroyTexture(timepassed);
     SDL_DestroyTexture(remainedmove);
     SDL_DestroyTexture(player2moves);
@@ -418,6 +430,7 @@ void gamemenu(){
 
     SDL_RenderPresent(renderer);
 }
+
 
 
 void printAIwolrd(int dim,int AIworld[dim][dim]){
@@ -1240,8 +1253,13 @@ void newGame(){
 
 
 int main(int argc,char* argv[]){
+    bool quit = false;
     do{
-    initSDL();
+    if(!SDLrun){
+        initSDL();
+        SDLrun = true;
+    }
+    jump:
     gamemenu();
     SDL_MouseButtonEvent event;
     int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
@@ -1250,6 +1268,7 @@ int main(int argc,char* argv[]){
         SDL_PollEvent(&event);
         switch(event.type){
             case SDL_QUIT:
+                quit = true;
                 killSDL();
                 break;
             case SDL_MOUSEBUTTONDOWN:
@@ -1280,7 +1299,6 @@ int main(int argc,char* argv[]){
     system("color f1");
     printf("Welcome to dots and boxes by RABSOOO team\nNew game(1)\nLoad game(2)\nLeader board(3)\nSettings(4)\nExit(0)\n");
     system("cls");
-    bool quit = false;
     switch(game){
     case '1':{
         system("color f0");
@@ -1335,10 +1353,12 @@ int main(int argc,char* argv[]){
                     case SDL_QUIT:
                         quit = true;
                         killSDL();
+                        goto end;
                         break;
                     case SDL_MOUSEBUTTONDOWN:
                         if(event.button == SDL_BUTTON_LEFT)
                             mouse = true;
+                            printf("\n %d  %d",mx1,my1);
                             SDL_GetMouseState(&mx1,&my1);
                             if(mx1/100 == 7 && my1/100 == 0){
                                 undo(dim,history,world);
@@ -1352,6 +1372,10 @@ int main(int argc,char* argv[]){
                             }
                             else if(mx1/100 == 7 && my1/100 == 1){
                                 saveGame(totalmoves,dim,AIworld,world,history);
+                            }
+                            else if(mx1/100 > 7 && my1/100 == 6){
+                                    goto jump;
+
                             }
                             break;
                     case SDL_MOUSEBUTTONUP:
@@ -1371,10 +1395,7 @@ int main(int argc,char* argv[]){
 
         system("cls");
         update(world,mx1,my1);
-        while(SDL_WaitEvent(&event) && !quit){
-            if(event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_QUIT)
-                killSDL();
-        }
+        done = false;
         x=0;
         if(totalmoves==2*((dim/2)+1)*(dim/2)){
             if(points[1]>points[0]){
@@ -1393,9 +1414,19 @@ int main(int argc,char* argv[]){
             }
         }
         printf("Press any key to proceed\n");
-        ss[0]=_getch();
+        while(!done){
+            while(SDL_PollEvent(&event) && !quit){
+                switch(event.type){
+                    case SDL_QUIT:
+                        killSDL();
+                        break;
+                    case SDL_MOUSEBUTTONDOWN:
+                        done = true;
+                        break;
+                }
+            }
+        }
         break;
-        scanf("%c",&argv);
     }
     case '2':
         system("cls");
@@ -1433,14 +1464,10 @@ int main(int argc,char* argv[]){
         system("cls");
         printf("thanks for playing :)\n");
         break;
-    default:
-        system("cls");
-        printf("Enter a valid input\n");
-        main(NULL,NULL);
     }
-    }while(game < 1 || game >5);
+    }while(!quit);
 
 
-
+    end:
     return 0;
 }
