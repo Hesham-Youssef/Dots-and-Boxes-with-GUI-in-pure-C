@@ -13,7 +13,7 @@
 //#include "undo and redo.h"
 int e=0,f=0,p,x=0,playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0},dim=0,computer,starttime,endtime,diftime = 0;
 char game=0,name1[25],name2[25]="Computer",ss[1],sG;
-bool mouse = false, SDLrun = false;
+bool mouse = false, SDLrun = false,quit = false;
 FILE *saved;
 SDL_Window *window;
 SDL_Renderer *renderer;
@@ -1012,7 +1012,6 @@ int scores(int point,int l,char name[l]){
 }
 
 void loadGame(){
-    bool quit = false;
     FILE *load;
     printf("Choose a file (1,2,3,4,5) or press any key to return");
     sG = _getche();
@@ -1070,14 +1069,13 @@ void loadGame(){
     char tempdif[10];
     fread(&tempdif,sizeof(char),10,load);
     diftime = atoi(tempdif);
-    printf("\n %s",tempdif);
-    printf("\n %d",diftime);
     fread(&e,sizeof(int),1,load);fread(&name1,sizeof(char),e,load);
     if(!computer)
         fread(&f,sizeof(int),1,load);fread(&name2,sizeof(char),f,load);
 
     fclose(load);
-
+    points[0] = history[totalmoves-1][4];
+    points[1] = history[totalmoves-1][5];
     int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
     starttime = SDL_GetTicks();
     while(totalmoves<2*((dim/2)+1)*(dim/2) && !quit){
@@ -1107,7 +1105,7 @@ void loadGame(){
                         }
                         else if(mx1/100 == 9 && my1/100 == 0){
                             redo(dim,history,world);
-                            while(computer && history[totalmoves][6] == 2)
+                            while(computer && history[totalmoves][6] == 2 && totalmoves < maxmoves)
                                 redo(dim,history,world);
                         }
                         else if(mx1/100 == 7 && my1/100 == 1){
@@ -1277,7 +1275,6 @@ void newGame(){
 
 
 int main(int argc,char* argv[]){
-    bool quit = false;
     do{
     if(!SDLrun){
         initSDL();
@@ -1290,7 +1287,8 @@ int main(int argc,char* argv[]){
     SDL_MouseButtonEvent event;
     int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
     bool done = false;
-    while(!done){
+    printf("%d",quit);
+    while(!done && !quit){
         SDL_PollEvent(&event);
         switch(event.type){
             case SDL_QUIT:
@@ -1457,6 +1455,8 @@ int main(int argc,char* argv[]){
     case '2':
         system("cls");
         loadGame();
+        if(quit)
+            goto end;
         break;
     case '3':
         int j,y,u=0;char names[10][25],v[10],i=0,score[10];
