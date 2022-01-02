@@ -196,11 +196,10 @@ void update(char world[dim][dim],int mx1,int my1){
     SDL_QueryTexture(remainedmove,NULL,NULL,&remainedmovespos.w,&remainedmovespos.h);
 
     endtime = SDL_GetTicks();
-
     scoreline[30] = '\0';
     scorenum[5] = '\0';
     strcat(scoreline,"TIME: ");
-    itoa((((endtime - starttime)/(1000*60))%60)+diftime,scorenum,10);
+    itoa((((endtime - starttime)/(1000*60))%60)+diftime/60,scorenum,10);
     strcat(scoreline,scorenum);
     strcat(scoreline," : ");
     itoa((((endtime - starttime)/1000)%60)+diftime,scorenum,10);
@@ -807,7 +806,7 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
     if(!computer)
         fwrite(&f,sizeof(int),1,saved);fwrite(&name2,sizeof(char),f,saved);
 
-    diftime = endtime - starttime;
+    diftime = (endtime - starttime)/1000;
     fwrite(&diftime,sizeof(int),1,saved);
     printf("\n %d",diftime);
     diftime = 0;
