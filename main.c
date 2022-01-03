@@ -102,8 +102,8 @@ void update(char world[dim][dim],int mx1,int my1){
     SDL_Rect scoretext1pos = {.x = 710,.y = 300};
 
     SDL_QueryTexture(scoretext1,NULL,NULL,&scoretext1pos.w,&scoretext1pos.h);
-    scoreline[30] = '\0';
-    scorenum[5] = '\0';
+    scoreline[0] = '\0';
+    scorenum[0] = '\0';
     if(!computer){
         strcat(scoreline,name2);
         strcat(scoreline," (2): ");
@@ -124,8 +124,8 @@ void update(char world[dim][dim],int mx1,int my1){
 
     SDL_QueryTexture(scoretext2,NULL,NULL,&scoretext2pos.w,&scoretext2pos.h);
 
-    scoreline[30] = '\0';
-    scorenum[5] = '\0';
+    scoreline[0] = '\0';
+    scorenum[0] = '\0';
     strcat(scoreline,"PLAYER TURN : ");
     itoa(player,scorenum,10);
     strcat(scoreline,scorenum);
@@ -143,8 +143,8 @@ void update(char world[dim][dim],int mx1,int my1){
 
 
 
-    scoreline[30] = '\0';
-    scorenum[5] = '\0';
+    scoreline[0] = '\0';
+    scorenum[0] = '\0';
     strcat(scoreline,"PLAYER ONE MOVES: ");
     itoa(moves[0],scorenum,10);
     strcat(scoreline,scorenum);
@@ -160,8 +160,8 @@ void update(char world[dim][dim],int mx1,int my1){
     SDL_QueryTexture(player1moves,NULL,NULL,&player1movespos.w,&player1movespos.h);
 
 
-    scoreline[30] = '\0';
-    scorenum[5] = '\0';
+    scoreline[0] = '\0';
+    scorenum[0] = '\0';
     strcat(scoreline,"PLAYER TWO MOVES: ");
     itoa(moves[1],scorenum,10);
     strcat(scoreline,scorenum);
@@ -178,8 +178,8 @@ void update(char world[dim][dim],int mx1,int my1){
 
 
 
-    scoreline[30] = '\0';
-    scorenum[5] = '\0';
+    scoreline[0] = '\0';
+    scorenum[0] = '\0';
     strcat(scoreline,"REMAINED MOVES: ");
     itoa((2 * (dim/2) * (dim/2 + 1)) - (moves[0] + moves[1]),scorenum,10);
 
@@ -196,8 +196,8 @@ void update(char world[dim][dim],int mx1,int my1){
     SDL_QueryTexture(remainedmove,NULL,NULL,&remainedmovespos.w,&remainedmovespos.h);
 
     endtime = SDL_GetTicks();
-    scoreline[30] = '\0';
-    scorenum[5] = '\0';
+    scoreline[0] = '\0';
+    scorenum[0] = '\0';
     strcat(scoreline,"TIME: ");
     itoa(((((endtime - starttime)/1000 + diftime)/60)%60),scorenum,10);
     strcat(scoreline,scorenum);
@@ -430,6 +430,44 @@ void gamemenu(){
     SDL_RenderPresent(renderer);
 }
 
+void newgamemenu(){
+    SDL_Surface *imgwallpaper = IMG_Load("wallpaper.jpg");
+    SDL_Texture *wallpaper = SDL_CreateTextureFromSurface(renderer,imgwallpaper);
+    SDL_FreeSurface(imgwallpaper);
+    SDL_Rect wallpaperpos = {.x = 0,.y = 0,realwidth,height};
+    SDL_RenderCopy(renderer,wallpaper,NULL,&wallpaperpos);
+
+    SDL_Surface *logoimg = IMG_Load("LOGO.jpg");
+    SDL_Texture *logo = SDL_CreateTextureFromSurface(renderer,logoimg);
+    SDL_FreeSurface(logoimg);
+    SDL_Rect logopos = {.x = 250,.y = 50,500,300};
+    SDL_RenderCopy(renderer,logo,NULL,&logopos);
+    SDL_DestroyTexture(wallpaper);
+
+    SDL_Surface *newgameiconimg = IMG_Load("vscomputer.png");
+    SDL_Texture *newgameicon = SDL_CreateTextureFromSurface(renderer,newgameiconimg);
+    SDL_FreeSurface(newgameiconimg);
+    SDL_Rect newgameiconpos = {.x = 350,.y = 400,300,80};
+    SDL_RenderCopy(renderer,newgameicon,NULL,&newgameiconpos);
+    SDL_DestroyTexture(newgameicon);
+
+    SDL_Surface *loadgameiconimg = IMG_Load("vsplayer.png");
+    SDL_Texture *loadgameicon = SDL_CreateTextureFromSurface(renderer,loadgameiconimg);
+    SDL_FreeSurface(loadgameiconimg);
+    SDL_Rect loadgameiconpos = {.x = 350,.y = 500,300,80};
+    SDL_RenderCopy(renderer,loadgameicon,NULL,&loadgameiconpos);
+    SDL_DestroyTexture(loadgameicon);
+
+    SDL_Surface *leaderboardiconimg = IMG_Load("BACK.png");
+    SDL_Texture *leaderboardicon = SDL_CreateTextureFromSurface(renderer,leaderboardiconimg);
+    SDL_FreeSurface(leaderboardiconimg);
+    SDL_Rect leaderboardiconpos = {.x = 350,.y = 600,300,80};
+    SDL_RenderCopy(renderer,leaderboardicon,NULL,&leaderboardiconpos);
+    SDL_DestroyTexture(leaderboardicon);
+
+
+    SDL_RenderPresent(renderer);
+}
 
 
 void printAIwolrd(int dim,int AIworld[dim][dim]){
@@ -1250,9 +1288,37 @@ void twoNewGame(){
 }
 
 void newGame(){
-    system("cls");
-    printf("Back(0)\n\nChoose a mode:\nVs Computer(1)\nVs Human(2)\n");
-    game = _getch();
+    newgamemenu();
+    SDL_MouseButtonEvent event;
+    bool done = false;
+    int mx1,my1;
+    while(!done && !quit){
+        SDL_PollEvent(&event);
+        switch(event.type){
+            case SDL_QUIT:
+                quit = true;
+                killSDL();
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if(event.button == SDL_BUTTON_LEFT){
+                    SDL_GetMouseState(&mx1,&my1);
+                    printf("\n %d   %d",mx1,my1);
+                    if(my1/100 == 4){
+                        game = '1';
+                        done = true;
+                    }
+                    else if(my1/100 == 5){
+                        game = '2';
+                        done = true;
+                    }
+                    else if(my1/100 == 6){
+                        game = '0';
+                        done = true;
+                    }
+                    break;
+            }
+        }
+    }
     switch(game){
     case '0':
         system("cls");
@@ -1287,7 +1353,6 @@ int main(int argc,char* argv[]){
     SDL_MouseButtonEvent event;
     int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
     bool done = false;
-    printf("%d",quit);
     while(!done && !quit){
         SDL_PollEvent(&event);
         switch(event.type){
