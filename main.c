@@ -27,7 +27,7 @@ void initSDL(){
 
     renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-    font = TTF_OpenFont("Lato-Italic.ttf",20);
+    font = TTF_OpenFont("Lato-Italic.ttf",23);
 
 }
 
@@ -91,6 +91,21 @@ void update(char world[dim][dim],int mx1,int my1){
     strcat(scoreline,scorenum);
 
 
+    SDL_Surface *imgwallpaper = IMG_Load("wallpaper.jpg");
+
+    SDL_Texture *wallpaper = SDL_CreateTextureFromSurface(renderer,imgwallpaper);
+
+    SDL_FreeSurface(imgwallpaper);
+
+    SDL_Rect pos = {.x = 0,.y = 0,realwidth,height};
+
+    SDL_RenderCopy(renderer,wallpaper,NULL,&pos);
+
+    SDL_DestroyTexture(wallpaper);
+
+
+
+
     SDL_Color color = {200,200,200,255};
 
     SDL_Surface *scoretextimg1 = TTF_RenderText_Solid(font,scoreline,color);
@@ -99,9 +114,16 @@ void update(char world[dim][dim],int mx1,int my1){
 
     SDL_FreeSurface(scoretextimg1);
 
-    SDL_Rect scoretext1pos = {.x = 710,.y = 300};
+    pos.x = 710;
+    pos.y = 300;
 
-    SDL_QueryTexture(scoretext1,NULL,NULL,&scoretext1pos.w,&scoretext1pos.h);
+    SDL_QueryTexture(scoretext1,NULL,NULL,&pos.w,&pos.h);
+
+    SDL_RenderCopy(renderer,scoretext1,NULL,&pos);
+
+    SDL_DestroyTexture(scoretext1);
+
+
     scoreline[0] = '\0';
     scorenum[0] = '\0';
     if(!computer){
@@ -120,9 +142,14 @@ void update(char world[dim][dim],int mx1,int my1){
 
     SDL_FreeSurface(scoretextimg2);
 
-    SDL_Rect scoretext2pos = {.x = 710,.y = 320};
+    pos.x = 710;
+    pos.y = 320;
 
-    SDL_QueryTexture(scoretext2,NULL,NULL,&scoretext2pos.w,&scoretext2pos.h);
+    SDL_QueryTexture(scoretext2,NULL,NULL,&pos.w,&pos.h);
+
+    SDL_RenderCopy(renderer,scoretext2,NULL,&pos);
+
+    SDL_DestroyTexture(scoretext2);
 
     scoreline[0] = '\0';
     scorenum[0] = '\0';
@@ -136,11 +163,14 @@ void update(char world[dim][dim],int mx1,int my1){
 
     SDL_FreeSurface(playerturntextimg);
 
-    SDL_Rect playerturntextpos = {.x = 710,.y = 350};
+    pos.x = 710;
+    pos.y = 350;
 
-    SDL_QueryTexture(playerturntext,NULL,NULL,&playerturntextpos.w,&playerturntextpos.h);
+    SDL_QueryTexture(playerturntext,NULL,NULL,&pos.w,&pos.h);
 
+    SDL_RenderCopy(renderer,playerturntext,NULL,&pos);
 
+    SDL_DestroyTexture(playerturntext);
 
 
     scoreline[0] = '\0';
@@ -155,9 +185,14 @@ void update(char world[dim][dim],int mx1,int my1){
 
     SDL_FreeSurface(player1movesimg);
 
-    SDL_Rect player1movespos = {.x = 710,.y = 380};
+    pos.x = 710;
+    pos.y = 380;
 
-    SDL_QueryTexture(player1moves,NULL,NULL,&player1movespos.w,&player1movespos.h);
+    SDL_QueryTexture(player1moves,NULL,NULL,&pos.w,&pos.h);
+
+    SDL_RenderCopy(renderer,player1moves,NULL,&pos);
+
+    SDL_DestroyTexture(player1moves);
 
 
     scoreline[0] = '\0';
@@ -172,11 +207,14 @@ void update(char world[dim][dim],int mx1,int my1){
 
     SDL_FreeSurface(player2movesimg);
 
-    SDL_Rect player2movespos = {.x = 710,.y = 400};
+    pos.x = 710;
+    pos.y = 400;
 
-    SDL_QueryTexture(player2moves,NULL,NULL,&player2movespos.w,&player2movespos.h);
+    SDL_QueryTexture(player2moves,NULL,NULL,&pos.w,&pos.h);
 
+    SDL_RenderCopy(renderer,player2moves,NULL,&pos);
 
+    SDL_DestroyTexture(player2moves);
 
     scoreline[0] = '\0';
     scorenum[0] = '\0';
@@ -191,9 +229,14 @@ void update(char world[dim][dim],int mx1,int my1){
 
     SDL_FreeSurface(remainedmovesimg);
 
-    SDL_Rect remainedmovespos = {.x = 710,.y = 430};
+    pos.x = 710;
+    pos.y = 430;
 
-    SDL_QueryTexture(remainedmove,NULL,NULL,&remainedmovespos.w,&remainedmovespos.h);
+    SDL_QueryTexture(remainedmove,NULL,NULL,&pos.w,&pos.h);
+
+    SDL_RenderCopy(renderer,remainedmove,NULL,&pos);
+
+    SDL_DestroyTexture(remainedmove);
 
     endtime = SDL_GetTicks();
     scoreline[0] = '\0';
@@ -212,11 +255,14 @@ void update(char world[dim][dim],int mx1,int my1){
 
     SDL_FreeSurface(timepassedimg);
 
-    SDL_Rect timepassedpos = {.x = 710,.y = 460};
+    pos.x = 710;
+    pos.y = 460;
 
-    SDL_QueryTexture(timepassed,NULL,NULL,&timepassedpos.w,&timepassedpos.h);
+    SDL_QueryTexture(timepassed,NULL,NULL,&pos.w,&pos.h);
 
+    SDL_RenderCopy(renderer,timepassed,NULL,&pos);
 
+    SDL_DestroyTexture(timepassed);
 
 
     SDL_Surface *saveimg = IMG_Load("saveicon.png");
@@ -225,29 +271,51 @@ void update(char world[dim][dim],int mx1,int my1){
 
     SDL_FreeSurface(saveimg);
 
-    SDL_Rect savepos = {.x = 710,.y = 120,.w = 100,.h = 100};
+    pos.x = 710;
+    pos.y = 120;
+    pos.w = 100;
+    pos.h = 100;
+
+    SDL_RenderCopy(renderer,saveicon,NULL,&pos);
+
+    SDL_DestroyTexture(saveicon);
+
 
     SDL_Surface *imgredo = IMG_Load("redo.png");
 
     SDL_Texture *redoicon = SDL_CreateTextureFromSurface(renderer,imgredo);
 
+    pos.x = 900;
+    pos.y = 20;
+    pos.w = 80;
+    pos.h = 80;
+
     SDL_FreeSurface(imgredo);
 
-    SDL_Rect redopos = {.x = 900,.y = 20,.w = 80,.h = 80};
+    SDL_RenderCopy(renderer,redoicon,NULL,&pos);
+
+    SDL_DestroyTexture(redoicon);
+
+
+
 
     SDL_Surface *imgundo = IMG_Load("undo.png");
 
     SDL_Texture *undoicon = SDL_CreateTextureFromSurface(renderer,imgundo);
 
+    pos.x = 720;
+    pos.y = 20;
+    pos.w = 80;
+    pos.h = 80;
+
     SDL_FreeSurface(imgundo);
 
-    SDL_Rect undopos = {.x = 720,.y = 20,.w = 80,.h = 80};
+    SDL_RenderCopy(renderer,undoicon,NULL,&pos);
 
-    SDL_Surface *imgwallpaper = IMG_Load("wallpaper.jpg");
+    SDL_DestroyTexture(undoicon);
 
-    SDL_Texture *wallpaper = SDL_CreateTextureFromSurface(renderer,imgwallpaper);
 
-    SDL_FreeSurface(imgwallpaper);
+
 
     SDL_Surface *imagedots = IMG_Load("dots.png");
 
@@ -261,37 +329,16 @@ void update(char world[dim][dim],int mx1,int my1){
 
     SDL_FreeSurface(returnbuttonimg);
 
-    SDL_Rect returnbuttonpos = {.x = 700,.y = 600,.w = 280,.h = 50};
+    pos.x = 700;
+    pos.y = 600;
+    pos.w = 280;
+    pos.h = 50;
 
-    SDL_SetRenderDrawColor(renderer,0,0,0,255);
+    SDL_RenderCopy(renderer,returnbutton,NULL,&pos);
 
-    SDL_RenderClear(renderer);
+    SDL_DestroyTexture(returnbutton);
 
-    SDL_Rect wallpaperpos = {.x = 0,.y = 0,realwidth,height};
 
-    SDL_RenderCopy(renderer,wallpaper,NULL,&wallpaperpos);
-
-    SDL_RenderCopy(renderer,redoicon,NULL,&redopos);
-
-    SDL_RenderCopy(renderer,undoicon,NULL,&undopos);
-
-    SDL_RenderCopy(renderer,saveicon,NULL,&savepos);
-
-    SDL_RenderCopy(renderer,scoretext1,NULL,&scoretext1pos);
-
-    SDL_RenderCopy(renderer,scoretext2,NULL,&scoretext2pos);
-
-    SDL_RenderCopy(renderer,playerturntext,NULL,&playerturntextpos);
-
-    SDL_RenderCopy(renderer,player1moves,NULL,&player1movespos);
-
-    SDL_RenderCopy(renderer,player2moves,NULL,&player2movespos);
-
-    SDL_RenderCopy(renderer,remainedmove,NULL,&remainedmovespos);
-
-    SDL_RenderCopy(renderer,timepassed,NULL,&timepassedpos);
-
-    SDL_RenderCopy(renderer,returnbutton,NULL,&returnbuttonpos);
     if(mouse){
         SDL_SetRenderDrawColor(renderer,255,255,255,255);
         SDL_GetMouseState(&linex,&liney);
@@ -304,48 +351,53 @@ void update(char world[dim][dim],int mx1,int my1){
                 SDL_SetRenderDrawColor(renderer,180,180,180,180);
 
                 if((i%2 && !(j%2)) && world[i][j] == '1'){ // HORIZONTAL
-                    SDL_Rect ballrect = {.x = (i-a) * width/dim + shift , .y = (j) * height/dim + shift , .w = wz , .h = L};
-                    SDL_RenderFillRect(renderer,&ballrect); // VERTICAL
+                    pos.x = (i-a) * width/dim + shift;
+                    pos.y = (j) * height/dim + shift;
+                    pos.w = wz;
+                    pos.h = L;
+                    SDL_RenderFillRect(renderer,&pos); // VERTICAL
                 }else if((!(i%2) && (j%2) )&& world[i][j] == '1'){
-                    SDL_Rect ballrect = {.x = (i) * width/dim + shift , .y = (j-b) * height/dim + shift , .w = L , .h = hv};
-                    SDL_RenderFillRect(renderer,&ballrect);
+                    pos.x = (i) * width/dim + shift;
+                    pos.y = (j-b) * height/dim + shift;
+                    pos.w = L;
+                    pos.h = hv;
+                    SDL_RenderFillRect(renderer,&pos);
                 }
 
             }
             else if(world[i][j] == 'X'){
 
                 SDL_SetRenderDrawColor(renderer,255,0,0,255);
-                SDL_Rect ballrect = {.x = (i-a+c) * width/dim + shift , .y = (j-b+d) * height/dim + shift , .w = wz - e , .h = hv - f};
+                pos.x = (i-a+c) * width/dim + shift;
+                pos.y = (j-b+d) * height/dim + shift;
+                pos.w = wz - e;
+                pos.h = hv - f;
 
-                SDL_RenderFillRect(renderer,&ballrect);
+                SDL_RenderFillRect(renderer,&pos);
             }
             else if(world[i][j] == 'O'){
 
                 SDL_SetRenderDrawColor(renderer,0,0,255,255);
-                SDL_Rect ballrect = {.x = (i-a+c) * width/dim + shift , .y = (j-b+d) * height/dim + shift , .w = wz - e , .h = hv - f};
+                pos.x = (i-a+c) * width/dim + shift;
+                pos.y = (j-b+d) * height/dim + shift;
+                pos.w = wz - e;
+                pos.h = hv - f;
 
-                SDL_RenderFillRect(renderer,&ballrect);
+                SDL_RenderFillRect(renderer,&pos);
             }
         }
     }
     for(int i=0;i<dim;i=i+2){
         for(int j=0;j<dim;j=j+2){
-            SDL_Rect dotspos = {.x = i * width/dim + shift , .y = j * height/dim + shift , .w = L , .h = L};
-            SDL_RenderCopy(renderer,dots,NULL,&dotspos);
+            pos.x = i * width/dim + shift;
+            pos.y = j * height/dim + shift;
+            pos.w = L;
+            pos.h = L;
+            SDL_RenderCopy(renderer,dots,NULL,&pos);
         }
     }
-    SDL_DestroyTexture(returnbutton);
-    SDL_DestroyTexture(timepassed);
-    SDL_DestroyTexture(remainedmove);
-    SDL_DestroyTexture(player2moves);
-    SDL_DestroyTexture(player1moves);
-    SDL_DestroyTexture(playerturntext);
-    SDL_DestroyTexture(scoretext2);
-    SDL_DestroyTexture(scoretext1);
-    SDL_DestroyTexture(undoicon);
-    SDL_DestroyTexture(redoicon);
-    SDL_DestroyTexture(wallpaper);
     SDL_DestroyTexture(dots);
+
     SDL_RenderPresent(renderer);
 
 }
@@ -354,76 +406,99 @@ void updatesave(){
     SDL_Surface *save1iconimg = IMG_Load("1saveimg.png");
     SDL_Texture *save1icon = SDL_CreateTextureFromSurface(renderer,save1iconimg);
     SDL_FreeSurface(save1iconimg);
-    SDL_Rect save1pos = {.x = 800,.y = 120,.w = 120,.h = 80};
-    SDL_RenderCopy(renderer,save1icon,NULL,&save1pos);
-
+    SDL_Rect pos = {800,120,120,80};
+    SDL_RenderCopy(renderer,save1icon,NULL,&pos);
+    SDL_DestroyTexture(save1icon);
 
     SDL_Surface *save2iconimg = IMG_Load("2saveimg.png");
     SDL_Texture *save2icon = SDL_CreateTextureFromSurface(renderer,save2iconimg);
     SDL_FreeSurface(save2iconimg);
-    SDL_Rect save2pos = {.x = 900,.y = 120,.w = 120,.h = 80};
-    SDL_RenderCopy(renderer,save2icon,NULL,&save2pos);
+    pos.x = 900;
+    pos.y = 120;
+    pos.w = 120;
+    pos.h = 80;
+    SDL_RenderCopy(renderer,save2icon,NULL,&pos);
+    SDL_DestroyTexture(save2icon);
 
     SDL_Surface *save3iconimg = IMG_Load("3saveimg.png");
     SDL_Texture *save3icon = SDL_CreateTextureFromSurface(renderer,save3iconimg);
     SDL_FreeSurface(save3iconimg);
-    SDL_Rect save3pos = {.x = 800,.y = 180,.w = 120,.h = 80};
-    SDL_RenderCopy(renderer,save3icon,NULL,&save3pos);
+    pos.x = 800;
+    pos.y = 180;
+    pos.w = 120;
+    pos.h = 80;
+    SDL_RenderCopy(renderer,save3icon,NULL,&pos);
+    SDL_DestroyTexture(save3icon);
 
     SDL_Surface *save4iconimg = IMG_Load("4saveimg.png");
     SDL_Texture *save4icon = SDL_CreateTextureFromSurface(renderer,save4iconimg);
     SDL_FreeSurface(save4iconimg);
-    SDL_Rect save4pos = {.x = 900,.y = 180,.w = 120,.h = 80};
-    SDL_RenderCopy(renderer,save4icon,NULL,&save4pos);
+    pos.x = 900;
+    pos.y = 180;
+    pos.w = 120;
+    pos.h = 80;
+    SDL_RenderCopy(renderer,save4icon,NULL,&pos);
+    SDL_DestroyTexture(save4icon);
 
     SDL_Surface *save5iconimg = IMG_Load("5saveimg.png");
     SDL_Texture *save5icon = SDL_CreateTextureFromSurface(renderer,save5iconimg);
     SDL_FreeSurface(save5iconimg);
-    SDL_Rect save5pos = {.x = 800,.y = 230,.w = 120,.h = 80};
-    SDL_RenderCopy(renderer,save5icon,NULL,&save5pos);
-
-
-
+    pos.x = 800;
+    pos.y = 230;
+    pos.w = 120;
+    pos.h = 80;
+    SDL_RenderCopy(renderer,save5icon,NULL,&pos);
     SDL_DestroyTexture(save5icon);
-    SDL_DestroyTexture(save4icon);
-    SDL_DestroyTexture(save3icon);
-    SDL_DestroyTexture(save2icon);
-    SDL_DestroyTexture(save1icon);
+
+
     SDL_RenderPresent(renderer);
 }
 void gamemenu(){
     SDL_Surface *imgwallpaper = IMG_Load("wallpaper.jpg");
     SDL_Texture *wallpaper = SDL_CreateTextureFromSurface(renderer,imgwallpaper);
     SDL_FreeSurface(imgwallpaper);
-    SDL_Rect wallpaperpos = {.x = 0,.y = 0,realwidth,height};
-    SDL_RenderCopy(renderer,wallpaper,NULL,&wallpaperpos);
+    SDL_Rect pos = {.x = 0,.y = 0,realwidth,height};
+    SDL_RenderCopy(renderer,wallpaper,NULL,&pos);
+    SDL_DestroyTexture(wallpaper);
 
     SDL_Surface *logoimg = IMG_Load("LOGO.jpg");
     SDL_Texture *logo = SDL_CreateTextureFromSurface(renderer,logoimg);
     SDL_FreeSurface(logoimg);
-    SDL_Rect logopos = {.x = 250,.y = 50,500,300};
-    SDL_RenderCopy(renderer,logo,NULL,&logopos);
-    SDL_DestroyTexture(wallpaper);
+    pos.x = 250;
+    pos.y = 0;
+    pos.w = 500;
+    pos.h = 300;
+    SDL_RenderCopy(renderer,logo,NULL,&pos);
+    SDL_DestroyTexture(logo);
 
     SDL_Surface *newgameiconimg = IMG_Load("NEWGAME.png");
     SDL_Texture *newgameicon = SDL_CreateTextureFromSurface(renderer,newgameiconimg);
     SDL_FreeSurface(newgameiconimg);
-    SDL_Rect newgameiconpos = {.x = 350,.y = 400,300,80};
-    SDL_RenderCopy(renderer,newgameicon,NULL,&newgameiconpos);
+    pos.x = 350;
+    pos.y = 400;
+    pos.w = 300;
+    pos.h = 80;
+    SDL_RenderCopy(renderer,newgameicon,NULL,&pos);
     SDL_DestroyTexture(newgameicon);
 
     SDL_Surface *loadgameiconimg = IMG_Load("LOADGAME.png");
     SDL_Texture *loadgameicon = SDL_CreateTextureFromSurface(renderer,loadgameiconimg);
     SDL_FreeSurface(loadgameiconimg);
-    SDL_Rect loadgameiconpos = {.x = 350,.y = 500,300,80};
-    SDL_RenderCopy(renderer,loadgameicon,NULL,&loadgameiconpos);
+    pos.x = 350;
+    pos.y = 500;
+    pos.w = 300;
+    pos.h = 80;
+    SDL_RenderCopy(renderer,loadgameicon,NULL,&pos);
     SDL_DestroyTexture(loadgameicon);
 
     SDL_Surface *leaderboardiconimg = IMG_Load("LEADERBOARD.png");
     SDL_Texture *leaderboardicon = SDL_CreateTextureFromSurface(renderer,leaderboardiconimg);
     SDL_FreeSurface(leaderboardiconimg);
-    SDL_Rect leaderboardiconpos = {.x = 350,.y = 600,300,80};
-    SDL_RenderCopy(renderer,leaderboardicon,NULL,&leaderboardiconpos);
+    pos.x = 350;
+    pos.y = 600;
+    pos.w = 300;
+    pos.h = 80;
+    SDL_RenderCopy(renderer,leaderboardicon,NULL,&pos);
     SDL_DestroyTexture(leaderboardicon);
 
 
@@ -434,42 +509,192 @@ void newgamemenu(){
     SDL_Surface *imgwallpaper = IMG_Load("wallpaper.jpg");
     SDL_Texture *wallpaper = SDL_CreateTextureFromSurface(renderer,imgwallpaper);
     SDL_FreeSurface(imgwallpaper);
-    SDL_Rect wallpaperpos = {.x = 0,.y = 0,realwidth,height};
-    SDL_RenderCopy(renderer,wallpaper,NULL,&wallpaperpos);
+    SDL_Rect pos = {.x = 0,.y = 0,realwidth,height};
+    SDL_RenderCopy(renderer,wallpaper,NULL,&pos);
+    SDL_DestroyTexture(wallpaper);
 
     SDL_Surface *logoimg = IMG_Load("LOGO.jpg");
     SDL_Texture *logo = SDL_CreateTextureFromSurface(renderer,logoimg);
     SDL_FreeSurface(logoimg);
-    SDL_Rect logopos = {.x = 250,.y = 50,500,300};
-    SDL_RenderCopy(renderer,logo,NULL,&logopos);
-    SDL_DestroyTexture(wallpaper);
+    pos.x = 250;
+    pos.y = 0;
+    pos.w = 500;
+    pos.h = 300;
+    SDL_RenderCopy(renderer,logo,NULL,&pos);
+    SDL_DestroyTexture(logo);
 
     SDL_Surface *newgameiconimg = IMG_Load("vscomputer.png");
     SDL_Texture *newgameicon = SDL_CreateTextureFromSurface(renderer,newgameiconimg);
     SDL_FreeSurface(newgameiconimg);
-    SDL_Rect newgameiconpos = {.x = 350,.y = 400,300,80};
-    SDL_RenderCopy(renderer,newgameicon,NULL,&newgameiconpos);
+    pos.x = 350;
+    pos.y = 400;
+    pos.w = 300;
+    pos.h = 80;
+    SDL_RenderCopy(renderer,newgameicon,NULL,&pos);
     SDL_DestroyTexture(newgameicon);
 
     SDL_Surface *loadgameiconimg = IMG_Load("vsplayer.png");
     SDL_Texture *loadgameicon = SDL_CreateTextureFromSurface(renderer,loadgameiconimg);
     SDL_FreeSurface(loadgameiconimg);
-    SDL_Rect loadgameiconpos = {.x = 350,.y = 500,300,80};
-    SDL_RenderCopy(renderer,loadgameicon,NULL,&loadgameiconpos);
+    pos.x = 350;
+    pos.y = 500;
+    pos.w = 300;
+    pos.h = 80;
+    SDL_RenderCopy(renderer,loadgameicon,NULL,&pos);
     SDL_DestroyTexture(loadgameicon);
 
     SDL_Surface *leaderboardiconimg = IMG_Load("BACK.png");
     SDL_Texture *leaderboardicon = SDL_CreateTextureFromSurface(renderer,leaderboardiconimg);
     SDL_FreeSurface(leaderboardiconimg);
-    SDL_Rect leaderboardiconpos = {.x = 350,.y = 600,300,80};
-    SDL_RenderCopy(renderer,leaderboardicon,NULL,&leaderboardiconpos);
+    pos.x = 350;
+    pos.y = 600;
+    pos.w = 300;
+    pos.h = 80;
+    SDL_RenderCopy(renderer,leaderboardicon,NULL,&pos);
     SDL_DestroyTexture(leaderboardicon);
 
 
     SDL_RenderPresent(renderer);
 }
 
+void difcultnewgamemenu(){
+    SDL_Surface *imgwallpaper = IMG_Load("wallpaper.jpg");
+    SDL_Texture *wallpaper = SDL_CreateTextureFromSurface(renderer,imgwallpaper);
+    SDL_FreeSurface(imgwallpaper);
+    SDL_Rect pos = {.x = 0,.y = 0,realwidth,height};
+    SDL_RenderCopy(renderer,wallpaper,NULL,&pos);
+    SDL_DestroyTexture(wallpaper);
 
+    SDL_Surface *logoimg = IMG_Load("LOGO.jpg");
+    SDL_Texture *logo = SDL_CreateTextureFromSurface(renderer,logoimg);
+    SDL_FreeSurface(logoimg);
+    pos.x = 250;
+    pos.y = 0;
+    pos.w = 500;
+    pos.h = 300;
+    SDL_RenderCopy(renderer,logo,NULL,&pos);
+    SDL_DestroyTexture(logo);
+
+    SDL_Surface *newgameiconimg = IMG_Load("EASYBUTTON.png");
+    SDL_Texture *newgameicon = SDL_CreateTextureFromSurface(renderer,newgameiconimg);
+    SDL_FreeSurface(newgameiconimg);
+    pos.x = 350;
+    pos.y = 300;
+    pos.w = 300;
+    pos.h = 80;
+    SDL_RenderCopy(renderer,newgameicon,NULL,&pos);
+    SDL_DestroyTexture(newgameicon);
+
+    SDL_Surface *loadgameiconimg = IMG_Load("NORMALBUTTON.png");
+    SDL_Texture *loadgameicon = SDL_CreateTextureFromSurface(renderer,loadgameiconimg);
+    SDL_FreeSurface(loadgameiconimg);
+    pos.x = 350;
+    pos.y = 400;
+    pos.w = 300;
+    pos.h = 80;
+    SDL_RenderCopy(renderer,loadgameicon,NULL,&pos);
+    SDL_DestroyTexture(loadgameicon);
+
+    SDL_Surface *HARDgameiconimg = IMG_Load("HARDBUTTON.png");
+    SDL_Texture *HARDgameicon = SDL_CreateTextureFromSurface(renderer,HARDgameiconimg);
+    SDL_FreeSurface(HARDgameiconimg);
+    pos.x = 350;
+    pos.y = 500;
+    pos.w = 300;
+    pos.h = 80;
+    SDL_RenderCopy(renderer,HARDgameicon,NULL,&pos);
+    SDL_DestroyTexture(HARDgameicon);
+
+
+    SDL_Surface *leaderboardiconimg = IMG_Load("BACKBUTTON.png");
+    SDL_Texture *leaderboardicon = SDL_CreateTextureFromSurface(renderer,leaderboardiconimg);
+    SDL_FreeSurface(leaderboardiconimg);
+    pos.x = 350;
+    pos.y = 600;
+    pos.w = 300;
+    pos.h = 80;
+    SDL_RenderCopy(renderer,leaderboardicon,NULL,&pos);
+    SDL_DestroyTexture(leaderboardicon);
+
+
+    SDL_RenderPresent(renderer);
+}
+void leaderboard(){
+    char scoreline[30] = "";
+    char scorenum[5] = "";
+    SDL_Color color = {200,200,200,255};
+    font = TTF_OpenFont("Lato-Italic.ttf",36);
+
+    SDL_Surface *imgwallpaper = IMG_Load("wallpaper.jpg");
+    SDL_Texture *wallpaper = SDL_CreateTextureFromSurface(renderer,imgwallpaper);
+    SDL_FreeSurface(imgwallpaper);
+    SDL_Rect pos = {.x = 0,.y = 0,realwidth,height};
+    SDL_RenderCopy(renderer,wallpaper,NULL,&pos);
+    SDL_DestroyTexture(wallpaper);
+
+    SDL_Surface *scoretextimg1 = TTF_RenderText_Solid(font,"<vs Computer>",color);
+    SDL_Texture *scoretext1 = SDL_CreateTextureFromSurface(renderer,scoretextimg1);
+    SDL_FreeSurface(scoretextimg1);
+    pos.x = 60 ;
+    pos.y = 50 ;
+    SDL_QueryTexture(scoretext1,NULL,NULL,&pos.w,&pos.h);
+    SDL_RenderCopy(renderer,scoretext1,NULL,&pos);
+    SDL_DestroyTexture(scoretext1);
+
+    scoretextimg1 = TTF_RenderText_Solid(font,"<vs Player>",color);
+    scoretext1 = SDL_CreateTextureFromSurface(renderer,scoretextimg1);
+    SDL_FreeSurface(scoretextimg1);
+    pos.x = 560 ;
+    pos.y = 50 ;
+    SDL_QueryTexture(scoretext1,NULL,NULL,&pos.w,&pos.h);
+    SDL_RenderCopy(renderer,scoretext1,NULL,&pos);
+    SDL_DestroyTexture(scoretext1);
+
+    int j,y,u=0;char names[10][25],v[10],i=0,score[10];
+    FILE *bS;
+    for(u=0;u<2;u++){
+        if(u==0){
+            bS=fopen("Ranks1.bin","r");
+        }else{
+            bS=fopen("Ranks2.bin","r");
+            i=0;
+        }
+        fread(&i,sizeof(char),1,bS);
+        for(j=0;j<i;j++){
+            fread(&v[j],sizeof(char),1,bS);
+            fread(names+j,sizeof(char),v[j],bS);
+            fread(&score[j],sizeof(char),1,bS);
+            scoreline[0] = '\0';
+            scorenum[0] = '\0';
+            strcat(scoreline,names[j]);
+            printf("\n\n%s",scoreline);
+            strcat(scoreline," : ");
+            itoa(score[j],scorenum,10);
+            strcat(scoreline,scorenum);
+            printf("\n%s",scoreline);
+
+            SDL_Surface *scoretextimg1 = TTF_RenderText_Solid(font,scoreline,color);
+
+            SDL_Texture *scoretext1 = SDL_CreateTextureFromSurface(renderer,scoretextimg1);
+
+            SDL_FreeSurface(scoretextimg1);
+
+            pos.x = 100 + u * 500;
+            pos.y = 110 + j*60;
+
+            SDL_QueryTexture(scoretext1,NULL,NULL,&pos.w,&pos.h);
+
+            SDL_RenderCopy(renderer,scoretext1,NULL,&pos);
+
+            SDL_DestroyTexture(scoretext1);
+
+        }
+        fclose(bS);
+    }
+    SDL_RenderPresent(renderer);
+    font = TTF_OpenFont("Lato-Italic.ttf",23);
+
+}
 void printAIwolrd(int dim,int AIworld[dim][dim]){
     for(int i=0;i<dim;i++){
         for(int j=0;j<dim;j++){
@@ -743,7 +968,7 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
         updatesave();
         done = false;
         while(!done){
-        SDL_PollEvent(&event);
+        while(SDL_PollEvent(&event)){
         switch(event.type){
             case SDL_QUIT:
                 killSDL();
@@ -776,6 +1001,7 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
                     }
                     break;
             }
+        }
         }
         printf("\nChoose a file to save(1,2,3,4,5) or press any key to return:");
         if(sG=='5'){
@@ -841,7 +1067,6 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
     char tempdif[10];
     itoa(((endtime - starttime)/1000)+diftime,tempdif,10);
     fwrite(&tempdif,sizeof(char),10,saved);
-    printf("\n %s",tempdif);
     int e = strlen(name1);
     int f = strlen(name2);
     fwrite(&e,sizeof(int),1,saved);fwrite(&name1,sizeof(char),e,saved);
@@ -1206,10 +1431,44 @@ void loadGame(){
 
 
 void oneNewGame(){
+    difcultnewgamemenu();
+    SDL_MouseButtonEvent event;
+    bool done = false;
+    int my1;
+    while(!done && !quit){
+        while(SDL_WaitEvent(&event) && !done){
+        switch(event.type){
+            case SDL_QUIT:
+                quit = true;
+                killSDL();
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if(event.button == SDL_BUTTON_LEFT){
+                    SDL_GetMouseState(NULL,&my1);
+                    switch(my1/100){
+                    case 3:
+                        game = '1';
+                        done = true;
+                        break;
+                    case 4:
+                        game = '2';
+                        done = true;
+                        break;
+                    case 5:
+                        game = '3';
+                        done = true;
+                        break;
+                    case 6:
+                        game = '0';
+                        done = true;
+                    }
+            }
+        }
+    }
+    }
     computer = 1;
     system("cls");
     printf("Back(0)\n\nEnter difficulty:\nEasy(1)\nNormal(2)\nHard(3)\n");
-    game = _getch();
     switch(game){
         case '0':
             return newGame();
@@ -1244,9 +1503,43 @@ void oneNewGame(){
 }
 
 void twoNewGame(){
+    difcultnewgamemenu();
+    SDL_MouseButtonEvent event;
+    bool done = false;
+    int my1;
+    while(!done && !quit){
+        while(SDL_WaitEvent(&event) && !done){
+        switch(event.type){
+            case SDL_QUIT:
+                quit = true;
+                killSDL();
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if(event.button == SDL_BUTTON_LEFT){
+                    SDL_GetMouseState(NULL,&my1);
+                    switch(my1/100){
+                    case 3:
+                        game = '1';
+                        done = true;
+                        break;
+                    case 4:
+                        game = '2';
+                        done = true;
+                        break;
+                    case 5:
+                        game = '3';
+                        done = true;
+                        break;
+                    case 6:
+                        game = '0';
+                        done = true;
+                    }
+            }
+        }
+    }
+    }
     system("cls");
     printf("Back(0)\n\nEnter difficulty:\nEasy(1)\nNormal(2)\nHard(3)\n");
-    game = _getch();
     switch(game){
         case '0':
             return newGame();
@@ -1291,9 +1584,9 @@ void newGame(){
     newgamemenu();
     SDL_MouseButtonEvent event;
     bool done = false;
-    int mx1,my1;
+    int my1;
     while(!done && !quit){
-        SDL_PollEvent(&event);
+        while(SDL_WaitEvent(&event) && !done){
         switch(event.type){
             case SDL_QUIT:
                 quit = true;
@@ -1301,23 +1594,24 @@ void newGame(){
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if(event.button == SDL_BUTTON_LEFT){
-                    SDL_GetMouseState(&mx1,&my1);
-                    printf("\n %d   %d",mx1,my1);
-                    if(my1/100 == 4){
+                    SDL_GetMouseState(NULL,&my1);
+                    switch(my1/100){
+                    case 4:
                         game = '1';
                         done = true;
-                    }
-                    else if(my1/100 == 5){
+                        break;
+                    case 5:
                         game = '2';
                         done = true;
-                    }
-                    else if(my1/100 == 6){
+                        break;
+                    case 6:
                         game = '0';
                         done = true;
+                        break;
                     }
-                    break;
             }
         }
+    }
     }
     switch(game){
     case '0':
@@ -1354,7 +1648,7 @@ int main(int argc,char* argv[]){
     int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
     bool done = false;
     while(!done && !quit){
-        SDL_PollEvent(&event);
+        SDL_WaitEvent(&event);
         switch(event.type){
             case SDL_QUIT:
                 quit = true;
@@ -1363,7 +1657,6 @@ int main(int argc,char* argv[]){
             case SDL_MOUSEBUTTONDOWN:
                 if(event.button == SDL_BUTTON_LEFT){
                     SDL_GetMouseState(&mx1,&my1);
-                    printf("\n %d   %d",mx1,my1);
                     if(my1/100 == 4){
                         game = '1';
                         done = true;
@@ -1427,17 +1720,12 @@ int main(int argc,char* argv[]){
             else
                 p=1;
 
-
-
-
             update(world,mx1,my1);
-
             if(computer && (player == 2)){
                 makeamove(dim,world,NULL,NULL,NULL,NULL,points,history,AIworld);
 
             }else{
             while(SDL_PollEvent(&event)){
-                    int f = 0;
                     switch(event.type){
                     case SDL_QUIT:
                         quit = true;
@@ -1446,8 +1734,6 @@ int main(int argc,char* argv[]){
                         break;
                     case SDL_MOUSEBUTTONDOWN:
                         if(event.button == SDL_BUTTON_LEFT)
-                            mouse = true;
-                            printf("\n %d  %d",mx1,my1);
                             SDL_GetMouseState(&mx1,&my1);
                             if(mx1/100 == 7 && my1/100 == 0){
                                 undo(dim,history,world);
@@ -1461,13 +1747,18 @@ int main(int argc,char* argv[]){
                             }
                             else if(mx1/100 == 7 && my1/100 == 1){
                                 saveGame(totalmoves,dim,AIworld,world,history);
+                                break;
                             }
                             else if(mx1/100 > 7 && my1/100 == 6){
                                     goto jump;
 
-                            }
+                            }else
+                                mouse = true;
                             break;
                     case SDL_MOUSEBUTTONUP:
+                        if(!mouse)
+                            break;
+                        printf("asd");
                         mouse = false;
                         if(event.button == SDL_BUTTON_LEFT){
                             SDL_GetMouseState(&mx2,&my2);
@@ -1475,6 +1766,7 @@ int main(int argc,char* argv[]){
                         if(!((mx1/(height/dim))%2 || (my1/(width/dim))%2 || (mx2/(height/dim)%2 || (my2/(width/dim))%2))){
                             makeamove(dim,world,mx1/(height/dim),my1/(width/dim),mx2/(height/dim),my2/(width/dim),points,history,AIworld);
                         }
+
                         break;
 
                     }
@@ -1504,7 +1796,7 @@ int main(int argc,char* argv[]){
         }
         printf("Press any key to proceed\n");
         while(!done){
-            while(SDL_PollEvent(&event) && !quit){
+            while(SDL_WaitEvent(&event) && !quit && !done){
                 switch(event.type){
                     case SDL_QUIT:
                         killSDL();
@@ -1524,30 +1816,20 @@ int main(int argc,char* argv[]){
             goto end;
         break;
     case '3':
-        int j,y,u=0;char names[10][25],v[10],i=0,score[10];
-        FILE *bS;
-        for(u=0;u<2;u++){
-            if(u==0){
-                bS=fopen("Ranks1.bin","r");
-                printf("Press any key to return\n\nOne player mode\n\n");
-            }else{
-                bS=fopen("Ranks2.bin","r");
-                printf("\nTwo player mode\n\n");
-                i=0;
+        leaderboard();
+        done = false;
+        while(!done){
+            while(SDL_WaitEvent(&event) && !quit && !done){
+                switch(event.type){
+                    case SDL_QUIT:
+                        killSDL();
+                        break;
+                    case SDL_MOUSEBUTTONDOWN:
+                        done = true;
+                        break;
+                }
             }
-            fread(&i,sizeof(char),1,bS);
-            for(j=0;j<i;j++){
-                fread(&v[j],sizeof(char),1,bS);
-                fread(names+j,sizeof(char),v[j],bS);
-                fread(&score[j],sizeof(char),1,bS);
-                printf("%d) ",j+1);
-                for(y=0;y<v[j];y++)
-                    printf("%c",names[j][y]);
-                printf(": %d\n",score[j]);
-            }
-            fclose(bS);
         }
-        ss[0]=_getch();
         system("cls");
         break;
     case '4':
