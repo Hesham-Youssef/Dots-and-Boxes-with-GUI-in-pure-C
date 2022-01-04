@@ -402,51 +402,92 @@ void update(char world[dim][dim],int mx1,int my1){
 
 }
 
-void updatesave(){
+void updatesave(bool save){
+    SDL_Rect pos;
     SDL_Surface *save1iconimg = IMG_Load("1saveimg.png");
     SDL_Texture *save1icon = SDL_CreateTextureFromSurface(renderer,save1iconimg);
     SDL_FreeSurface(save1iconimg);
-    SDL_Rect pos = {800,120,120,80};
+    if(save){
+        pos.x = 800;
+        pos.y = 120;
+        pos.w = 120;
+        pos.h = 80;
+    }
+    else{
+        pos.x = 600;
+        pos.y = 500;
+        pos.w = 120;
+        pos.h = 80;
+    }
+
     SDL_RenderCopy(renderer,save1icon,NULL,&pos);
     SDL_DestroyTexture(save1icon);
 
     SDL_Surface *save2iconimg = IMG_Load("2saveimg.png");
     SDL_Texture *save2icon = SDL_CreateTextureFromSurface(renderer,save2iconimg);
     SDL_FreeSurface(save2iconimg);
-    pos.x = 900;
-    pos.y = 120;
-    pos.w = 120;
-    pos.h = 80;
+    if(save){
+        pos.x = 900;
+        pos.y = 120;
+        pos.w = 120;
+        pos.h = 80;
+    }else{
+        pos.x = 700;
+        pos.y = 500;
+        pos.w = 120;
+        pos.h = 80;
+    }
     SDL_RenderCopy(renderer,save2icon,NULL,&pos);
     SDL_DestroyTexture(save2icon);
 
     SDL_Surface *save3iconimg = IMG_Load("3saveimg.png");
     SDL_Texture *save3icon = SDL_CreateTextureFromSurface(renderer,save3iconimg);
     SDL_FreeSurface(save3iconimg);
-    pos.x = 800;
-    pos.y = 180;
-    pos.w = 120;
-    pos.h = 80;
+    if(save){
+        pos.x = 800;
+        pos.y = 180;
+        pos.w = 120;
+        pos.h = 80;
+    }else{
+        pos.x = 800;
+        pos.y = 500;
+        pos.w = 120;
+        pos.h = 80;
+    }
     SDL_RenderCopy(renderer,save3icon,NULL,&pos);
     SDL_DestroyTexture(save3icon);
 
     SDL_Surface *save4iconimg = IMG_Load("4saveimg.png");
     SDL_Texture *save4icon = SDL_CreateTextureFromSurface(renderer,save4iconimg);
     SDL_FreeSurface(save4iconimg);
-    pos.x = 900;
-    pos.y = 180;
-    pos.w = 120;
-    pos.h = 80;
+    if(save){
+        pos.x = 900;
+        pos.y = 180;
+        pos.w = 120;
+        pos.h = 80;
+    }else{
+        pos.x = 270;
+        pos.y = 500;
+        pos.w = 120;
+        pos.h = 80;
+    }
     SDL_RenderCopy(renderer,save4icon,NULL,&pos);
     SDL_DestroyTexture(save4icon);
 
     SDL_Surface *save5iconimg = IMG_Load("5saveimg.png");
     SDL_Texture *save5icon = SDL_CreateTextureFromSurface(renderer,save5iconimg);
     SDL_FreeSurface(save5iconimg);
-    pos.x = 800;
-    pos.y = 230;
-    pos.w = 120;
-    pos.h = 80;
+    if(save){
+        pos.x = 800;
+        pos.y = 230;
+        pos.w = 120;
+        pos.h = 80;
+    }else{
+        pos.x = 170;
+        pos.y = 500;
+        pos.w = 120;
+        pos.h = 80;
+    }
     SDL_RenderCopy(renderer,save5icon,NULL,&pos);
     SDL_DestroyTexture(save5icon);
 
@@ -666,7 +707,7 @@ void leaderboard(){
             fread(&score[j],sizeof(char),1,bS);
             scoreline[0] = '\0';
             scorenum[0] = '\0';
-            strcat(scoreline,names[j]);
+            strncat(scoreline,names[j],v[j]);
             printf("\n\n%s",scoreline);
             strcat(scoreline," : ");
             itoa(score[j],scorenum,10);
@@ -961,20 +1002,19 @@ void redo(int dim,int history[][7],char array[dim][dim]){
 }
 
 void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],int history[][7]){
-    SDL_MouseButtonEvent event;
-    int mx,my;
-    bool done = false;
     if(x==0){
-        updatesave();
+        SDL_Event event;
+        int mx,my;
+        bool done = false;
+        updatesave(true);
         done = false;
         while(!done){
-        while(SDL_PollEvent(&event)){
+        SDL_PollEvent(&event);
         switch(event.type){
             case SDL_QUIT:
                 killSDL();
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                if(event.button == SDL_BUTTON_LEFT){
                     SDL_GetMouseState(&mx,&my);
                     if(mx/100 == 8 && my/100 == 1){
                         sG = '1';
@@ -996,12 +1036,13 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
                         sG = '5';
                         done = true;
                     }
-                    else if(mx/100 == 7 && my/100 == 1)
+                    else if(mx/100 == 7 && my/100 == 1){
+                        printf("\nasdf");
                         return;
                     }
                     break;
             }
-        }
+
         }
         printf("\nChoose a file to save(1,2,3,4,5) or press any key to return:");
         if(sG=='5'){
@@ -1152,6 +1193,7 @@ void AI(int dim,char world[dim][dim],int AIworld[dim][dim],int history[][7]){
                     else if(numberoflines2 == 2)
                         numberoflines2 -=10;
                 }
+                printf("\nqweasd");
                 AIworld[i][j] = numberoflines1 + numberoflines2;
             }
         }
@@ -1275,10 +1317,51 @@ int scores(int point,int l,char name[l]){
 }
 
 void loadGame(){
+    updatesave(false);
     FILE *load;
-    printf("Choose a file (1,2,3,4,5) or press any key to return");
-    sG = _getche();
-    system("cls");
+    SDL_MouseButtonEvent event;
+    int mx,my;
+    bool done = false;
+    printf("\ndasd");
+    while(!done){
+        while(SDL_PollEvent(&event)){
+        switch(event.type){
+            case SDL_QUIT:
+                killSDL();
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if(event.button == SDL_BUTTON_LEFT){
+                    SDL_GetMouseState(&mx,&my);
+                    if(((mx/100 == 6) && (mx>660)) && my/100 == 5){
+                        sG = '1';
+                        done = true;
+                    }
+                    else if((mx/100 == 7)  && my/100 == 5){
+                        sG = '2';
+                        done = true;
+                    }
+                    else if(mx/100 == 8 && my/100 == 5){
+                        sG = '3';
+                        done = true;
+                    }
+                    else if(((mx > 270) && (mx < 350))&& my/100 == 5){
+                        sG = '4';
+                        done = true;
+                    }
+                    else if(((mx>170) && (mx<250))&& my/100 == 5){
+                        sG = '5';
+                        done = true;
+                    }
+                    else if(((mx>350) && (mx<650))&& my/100 == 5){
+                        sG = '6';
+                        done = true;
+                    }
+                    break;
+            }
+        }
+    }
+    }
+    printf("%c",sG);
     if(sG=='5'){
         load = fopen("saved5.bin","r");
         x=5;
@@ -1300,12 +1383,11 @@ void loadGame(){
         x=4;
     }
     else
-        return main(NULL,NULL);
+        return;
     fread(&computer,sizeof(int),1,load);
     fread(&dim,sizeof(int),1,load);
     fread(&totalmoves,sizeof(int),1,load);
     int history[2 * (dim/2) * ((dim/2) + 1)][7];
-    SDL_MouseButtonEvent event;
     char world[dim][dim];
     int AIworld[dim][dim];
     int temp[dim][dim];
@@ -1393,7 +1475,7 @@ void loadGame(){
     }
     system("cls");
         update(world,mx1,my1);
-        bool done = false;
+        done = false;
         x=0;
         if(totalmoves==2*((dim/2)+1)*(dim/2)){
             if(points[1]>points[0]){
@@ -1538,7 +1620,6 @@ void twoNewGame(){
         }
     }
     }
-    system("cls");
     printf("Back(0)\n\nEnter difficulty:\nEasy(1)\nNormal(2)\nHard(3)\n");
     switch(game){
         case '0':
@@ -1596,22 +1677,22 @@ void newGame(){
                 if(event.button == SDL_BUTTON_LEFT){
                     SDL_GetMouseState(NULL,&my1);
                     switch(my1/100){
-                    case 4:
-                        game = '1';
-                        done = true;
-                        break;
-                    case 5:
-                        game = '2';
-                        done = true;
-                        break;
-                    case 6:
-                        game = '0';
-                        done = true;
-                        break;
+                        case 4:
+                            game = '1';
+                            done = true;
+                            break;
+                        case 5:
+                            game = '2';
+                            done = true;
+                            break;
+                        case 6:
+                            game = '0';
+                            done = true;
+                            break;
                     }
+                }
             }
         }
-    }
     }
     switch(game){
     case '0':
@@ -1674,13 +1755,6 @@ int main(int argc,char* argv[]){
         }
     }
 
-
-
-
-
-    system("color f1");
-    printf("Welcome to dots and boxes by RABSOOO team\nNew game(1)\nLoad game(2)\nLeader board(3)\nSettings(4)\nExit(0)\n");
-    system("cls");
     switch(game){
     case '1':{
         system("color f0");
@@ -1711,6 +1785,8 @@ int main(int argc,char* argv[]){
 
         playerturn = 0;
 
+        SDL_MouseButtonEvent click;
+
         totalmoves = 0;
         player = 1;
         starttime = SDL_GetTicks();
@@ -1719,21 +1795,20 @@ int main(int argc,char* argv[]){
                 p = totalmoves;
             else
                 p=1;
-
             update(world,mx1,my1);
             if(computer && (player == 2)){
                 makeamove(dim,world,NULL,NULL,NULL,NULL,points,history,AIworld);
 
             }else{
-            while(SDL_PollEvent(&event)){
-                    switch(event.type){
+            while(SDL_PollEvent(&click)){
+                    switch(click.type){
                     case SDL_QUIT:
                         quit = true;
                         killSDL();
                         goto end;
                         break;
                     case SDL_MOUSEBUTTONDOWN:
-                        if(event.button == SDL_BUTTON_LEFT)
+                        if(click.button == SDL_BUTTON_LEFT)
                             SDL_GetMouseState(&mx1,&my1);
                             if(mx1/100 == 7 && my1/100 == 0){
                                 undo(dim,history,world);
@@ -1747,7 +1822,7 @@ int main(int argc,char* argv[]){
                             }
                             else if(mx1/100 == 7 && my1/100 == 1){
                                 saveGame(totalmoves,dim,AIworld,world,history);
-                                break;
+
                             }
                             else if(mx1/100 > 7 && my1/100 == 6){
                                     goto jump;
@@ -1758,9 +1833,8 @@ int main(int argc,char* argv[]){
                     case SDL_MOUSEBUTTONUP:
                         if(!mouse)
                             break;
-                        printf("asd");
                         mouse = false;
-                        if(event.button == SDL_BUTTON_LEFT){
+                        if(click.button == SDL_BUTTON_LEFT){
                             SDL_GetMouseState(&mx2,&my2);
                         }
                         if(!((mx1/(height/dim))%2 || (my1/(width/dim))%2 || (mx2/(height/dim)%2 || (my2/(width/dim))%2))){
