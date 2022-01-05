@@ -484,6 +484,7 @@ void updatesave(bool save){
     }
     SDL_RenderCopy(renderer,save5icon,NULL,&pos);
     SDL_DestroyTexture(save5icon);
+    printf("sadas");
 
 
     SDL_RenderPresent(renderer);
@@ -1288,7 +1289,7 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
         updatesave(true);
         done = false;
         while(!done){
-        SDL_PollEvent(&event);
+        SDL_WaitEvent(&event);
         switch(event.type){
             case SDL_QUIT:
                 killSDL();
@@ -1597,7 +1598,7 @@ void loadGame(){
     int mx,my;
     bool done = false;
     while(!done){
-        while(SDL_PollEvent(&event)){
+        SDL_WaitEvent(&event);
         switch(event.type){
             case SDL_QUIT:
                     quit = true;
@@ -1634,7 +1635,7 @@ void loadGame(){
                     break;
             }
         }
-    }
+
     }
 
     if(sG=='5'){
@@ -2071,6 +2072,7 @@ int main(int argc,char* argv[]){
             ran = true;
             if(computer && (player == 2)){
                 makeamove(dim,world,NULL,NULL,NULL,NULL,points,history,AIworld);
+                SDL_Delay(100);
             }else{
             SDL_PollEvent(&click);
                     switch(click.type){
@@ -2096,7 +2098,6 @@ int main(int argc,char* argv[]){
                                 saveGame(totalmoves,dim,AIworld,world,history);
                                 if(quit)
                                     return 0;
-
                             }
                             else if(mx1 > 720 && my1/100 == 6){
                                     goto jump;
