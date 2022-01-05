@@ -18,12 +18,20 @@ FILE *saved;
 SDL_Window *window;
 SDL_Renderer *renderer;
 TTF_Font *font;
-    SDL_Surface *imgwallpaper;
-    SDL_Surface *saveimg;
-    SDL_Surface *imgredo;
-    SDL_Surface *imgundo;
-    SDL_Surface *returnbuttonimg;
-    SDL_Surface *imagedots;
+SDL_Surface *imgwallpaper;
+SDL_Surface *saveimg;
+SDL_Surface *imgredo;
+SDL_Surface *imgundo;
+SDL_Surface *returnbuttonimg;
+SDL_Surface *imagedots;
+SDL_Texture *wallpaper;
+SDL_Texture *redoicon;
+SDL_Texture *undoicon;
+SDL_Texture *dots;
+SDL_Texture *saveicon;
+SDL_Texture *returnbutton;
+SDL_Surface *logoimg;
+SDL_Texture *logo;
 void initSDL(){
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
@@ -41,7 +49,14 @@ void initSDL(){
     imgundo = IMG_Load("undo.png");
     returnbuttonimg = IMG_Load("BACK.png");
     imagedots = IMG_Load("dots.png");
-
+    logoimg = IMG_Load("LOGO.jpg");
+    wallpaper = SDL_CreateTextureFromSurface(renderer,imgwallpaper);
+    redoicon = SDL_CreateTextureFromSurface(renderer,imgredo);
+    undoicon = SDL_CreateTextureFromSurface(renderer,imgundo);
+    dots = SDL_CreateTextureFromSurface(renderer,imagedots);
+    saveicon = SDL_CreateTextureFromSurface(renderer,saveimg);
+    returnbutton = SDL_CreateTextureFromSurface(renderer,returnbuttonimg);
+    logo = SDL_CreateTextureFromSurface(renderer,logoimg);
 }
 
 void killSDL(){
@@ -103,13 +118,9 @@ void update(char world[dim][dim],int mx1,int my1){
     itoa(points[0],scorenum,10);
     strcat(scoreline,scorenum);
 
-    SDL_Texture *wallpaper = SDL_CreateTextureFromSurface(renderer,imgwallpaper);
-
     SDL_Rect pos = {.x = 0,.y = 0,realwidth,height};
 
     SDL_RenderCopy(renderer,wallpaper,NULL,&pos);
-
-    SDL_DestroyTexture(wallpaper);
 
 
 
@@ -119,6 +130,8 @@ void update(char world[dim][dim],int mx1,int my1){
     SDL_Surface *scoretextimg1 = TTF_RenderText_Blended(font,scoreline,color);
 
     SDL_Texture *scoretext1 = SDL_CreateTextureFromSurface(renderer,scoretextimg1);
+
+    SDL_FreeSurface(scoretextimg1);
 
     pos.x = 710;
     pos.y = 300;
@@ -272,50 +285,31 @@ void update(char world[dim][dim],int mx1,int my1){
 
 
 
-
-    SDL_Texture *saveicon = SDL_CreateTextureFromSurface(renderer,saveimg);
-
     pos.x = 710;
     pos.y = 120;
     pos.w = 100;
     pos.h = 100;
-
     SDL_RenderCopy(renderer,saveicon,NULL,&pos);
 
-    SDL_DestroyTexture(saveicon);
-
-
-
-
-    SDL_Texture *redoicon = SDL_CreateTextureFromSurface(renderer,imgredo);
 
     pos.x = 900;
     pos.y = 20;
     pos.w = 80;
     pos.h = 80;
-
-
-
     SDL_RenderCopy(renderer,redoicon,NULL,&pos);
 
-    SDL_DestroyTexture(redoicon);
 
-
-    SDL_Texture *undoicon = SDL_CreateTextureFromSurface(renderer,imgundo);
 
     pos.x = 720;
     pos.y = 20;
     pos.w = 80;
     pos.h = 80;
-
-
     SDL_RenderCopy(renderer,undoicon,NULL,&pos);
 
-    SDL_DestroyTexture(undoicon);
 
 
 
-    SDL_Texture *dots = SDL_CreateTextureFromSurface(renderer,imagedots);
+
 
 
 
@@ -397,7 +391,6 @@ void update(char world[dim][dim],int mx1,int my1){
             SDL_RenderCopy(renderer,dots,NULL,&pos);
         }
     }
-    SDL_DestroyTexture(dots);
 
     SDL_RenderPresent(renderer);
 
@@ -496,12 +489,10 @@ void updatesave(bool save){
     SDL_RenderPresent(renderer);
 }
 void gamemenu(){
-    SDL_Surface *imgwallpaper = IMG_Load("wallpaper.jpg");
-    SDL_Texture *wallpaper = SDL_CreateTextureFromSurface(renderer,imgwallpaper);
-    SDL_FreeSurface(imgwallpaper);
+
     SDL_Rect pos = {.x = 0,.y = 0,realwidth,height};
     SDL_RenderCopy(renderer,wallpaper,NULL,&pos);
-    SDL_DestroyTexture(wallpaper);
+
 
     SDL_Surface *logoimg = IMG_Load("LOGO.jpg");
     SDL_Texture *logo = SDL_CreateTextureFromSurface(renderer,logoimg);
@@ -918,25 +909,19 @@ void nameinput(){
             }
             if( renderText )
             {
-                SDL_Surface *imgwallpaper = IMG_Load("wallpaper.jpg");
-                SDL_Texture *wallpaper = SDL_CreateTextureFromSurface(renderer,imgwallpaper);
-                SDL_FreeSurface(imgwallpaper);
                 pos.x = 0;
                 pos.y = 0;
                 pos.w = realwidth;
                 pos.h = height;
                 SDL_RenderCopy(renderer,wallpaper,NULL,&pos);
-                SDL_DestroyTexture(wallpaper);
 
-                SDL_Surface *logoimg = IMG_Load("LOGO.jpg");
-                SDL_Texture *logo = SDL_CreateTextureFromSurface(renderer,logoimg);
-                SDL_FreeSurface(logoimg);
+
                 pos.x = 250;
                 pos.y = 0;
                 pos.w = 500;
                 pos.h = 300;
                 SDL_RenderCopy(renderer,logo,NULL,&pos);
-                SDL_DestroyTexture(logo);
+
 
                 pos.x = 300;
                 pos.y = 400;
