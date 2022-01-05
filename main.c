@@ -800,7 +800,7 @@ void nameinput(){
 
     pos.x = 300;
     pos.y = 400;
-    pos.w = 400;
+    pos.w = 350;
     pos.h = 60;
     SDL_SetRenderDrawColor(renderer,255,255,255,255);
     SDL_RenderFillRect(renderer,&pos);
@@ -815,10 +815,21 @@ void nameinput(){
     SDL_RenderCopy(renderer,scoretext1,NULL,&pos);
     SDL_DestroyTexture(scoretext1);
 
+    imgwallpaper = IMG_Load("PLAY.png");
+    wallpaper = SDL_CreateTextureFromSurface(renderer,imgwallpaper);
+    SDL_FreeSurface(imgwallpaper);
+    pos.x = 300;
+    pos.y = 600;
+    pos.w = 300;
+    pos.h = 80;
+    SDL_RenderCopy(renderer,wallpaper,NULL,&pos);
+    SDL_DestroyTexture(wallpaper);
+
+
     if(!computer){
         pos.x = 300;
         pos.y = 500;
-        pos.w = 400;
+        pos.w = 350;
         pos.h = 60;
         SDL_SetRenderDrawColor(renderer,255,255,255,255);
         SDL_RenderFillRect(renderer,&pos);
@@ -837,10 +848,13 @@ void nameinput(){
 
 
     name1[0] = '\0';
+    if(!computer)
+        name2[0] = '\0';
+    char tempname[20] = "";
+    int p = 0;
     bool done = false;
     SDL_Event event;
     int mx,my;
-    SDL_StartTextInput();
     while( !done )
         {
             bool renderText = false;
@@ -848,48 +862,61 @@ void nameinput(){
             {
                 if( event.type == SDL_QUIT )
                 {
+                    killSDL();
                     quit = true;
                     done = true;
+                    return;
                 }
+
                 else if(event.type == SDL_MOUSEBUTTONDOWN){
                     SDL_GetMouseState(&mx,&my);
-                    if(mx>700 || mx<300 || my<400 || my>460)
-                        SDL_StopTextInput();
-                    else
+                    if(mx<700 && mx>300 && my>500 && my<560){
                         SDL_StartTextInput();
-                }
-                else if( event.type == SDL_KEYDOWN )
-                {
-                    if( event.key.keysym.sym == SDLK_BACKSPACE && strlen(name1) > 0 )
-                    {
-                        name1[strlen(name1)-1] = '\0';
-                        renderText = true;
+                        strcpy(tempname,name2);
+                        p = 2;
                     }
-                    else if( event.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL )
-                    {
-                        SDL_SetClipboardText(name1);
+                    else if(mx<700 && mx>300 && my>400 && my<460){
+                        SDL_StartTextInput();
+                        strcpy(tempname,name1);
+                        p = 1;
                     }
-                    else if( event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL )
-                    {
-                        strncat(name1,SDL_GetClipboardText(),12-strlen(name1));
-                        renderText = true;
-                    }
-                    else if(event.key.keysym.scancode == SDL_SCANCODE_RETURN){
-                        done = true;
+                    else if(mx>300 && mx<600 && my>600 && my<680)
+                        done =true;
+                    else{
+                        SDL_StopTextInput();
+                        p = 0;
                     }
                 }
-                else if( event.type == SDL_TEXTINPUT )
-                {
-                    if( !( SDL_GetModState() & KMOD_CTRL && ( event.text.text[ 0 ] == 'c' || event.text.text[ 0 ] == 'C' || event.text.text[ 0 ] == 'v' || event.text.text[ 0 ] == 'V' ) || strlen(name1)>11 ) )
-                    {
-                        strncat(name1,event.text.text,1);
-                        renderText = true;
-                    }
+                if(p){
+                        if( event.type == SDL_KEYDOWN )
+                        {
+                            if( event.key.keysym.sym == SDLK_BACKSPACE && strlen(tempname) > 0 )
+                            {
+                                tempname[strlen(tempname)-1] = '\0';
+                                renderText = true;
+                            }
+                            else if( event.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL )
+                            {
+                                SDL_SetClipboardText(tempname);
+                            }
+                            else if( event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL )
+                            {
+                                strncat(tempname,SDL_GetClipboardText(),12-strlen(tempname));
+                                renderText = true;
+                            }
+                        }
+                        else if( event.type == SDL_TEXTINPUT )
+                        {
+                            if( !( SDL_GetModState() & KMOD_CTRL && ( event.text.text[ 0 ] == 'c' || event.text.text[ 0 ] == 'C' || event.text.text[ 0 ] == 'v' || event.text.text[ 0 ] == 'V' ) || strlen(tempname)>11 ) )
+                            {
+                                strncat(tempname,event.text.text,1);
+                                renderText = true;
+                            }
+                        }
                 }
             }
             if( renderText )
             {
-                printf("\n %d",strlen(name1));
                 SDL_Surface *imgwallpaper = IMG_Load("wallpaper.jpg");
                 SDL_Texture *wallpaper = SDL_CreateTextureFromSurface(renderer,imgwallpaper);
                 SDL_FreeSurface(imgwallpaper);
@@ -912,7 +939,7 @@ void nameinput(){
 
                 pos.x = 300;
                 pos.y = 400;
-                pos.w = 400;
+                pos.w = 350;
                 pos.h = 60;
                 SDL_SetRenderDrawColor(renderer,255,255,255,255);
                 SDL_RenderFillRect(renderer,&pos);
@@ -928,23 +955,13 @@ void nameinput(){
                 SDL_QueryTexture(scoretext1,NULL,NULL,&pos.w,&pos.h);
                 SDL_RenderCopy(renderer,scoretext1,NULL,&pos);
                 SDL_DestroyTexture(scoretext1);
-
                 color.r = 0;
                 color.g = 0;
                 color.b = 0;
-                scoretextimg1 = TTF_RenderText_Blended(font,name1,color);
-                scoretext1 = SDL_CreateTextureFromSurface(renderer,scoretextimg1);
-                SDL_FreeSurface(scoretextimg1);
-                pos.x = 310;
-                pos.y = 400;
-                SDL_QueryTexture(scoretext1,NULL,NULL,&pos.w,&pos.h);
-                SDL_RenderCopy(renderer,scoretext1,NULL,&pos);
-                SDL_DestroyTexture(scoretext1);
-
                 if(!computer){
                     pos.x = 300;
                     pos.y = 500;
-                    pos.w = 400;
+                    pos.w = 350;
                     pos.h = 60;
                     SDL_SetRenderDrawColor(renderer,255,255,255,255);
                     SDL_RenderFillRect(renderer,&pos);
@@ -960,9 +977,48 @@ void nameinput(){
                     SDL_DestroyTexture(scoretext1);
 
                 }
+                if(p == 1){
+                    scoretextimg1 = TTF_RenderText_Blended(font,tempname,color);
+                    scoretext1 = SDL_CreateTextureFromSurface(renderer,scoretextimg1);
+                    SDL_FreeSurface(scoretextimg1);
+                    pos.x = 310;
+                    pos.y = 400;
+                    SDL_QueryTexture(scoretext1,NULL,NULL,&pos.w,&pos.h);
+                    SDL_RenderCopy(renderer,scoretext1,NULL,&pos);
+                    SDL_DestroyTexture(scoretext1);
+                    strcpy(name1,tempname);
+                }else if(p == 2){
+                    strcpy(name2,tempname);
+                }
+
+                scoretextimg1 = TTF_RenderText_Blended(font,name1,color);
+                scoretext1 = SDL_CreateTextureFromSurface(renderer,scoretextimg1);
+                SDL_FreeSurface(scoretextimg1);
+                pos.x = 310;
+                pos.y = 400;
+                SDL_QueryTexture(scoretext1,NULL,NULL,&pos.w,&pos.h);
+                SDL_RenderCopy(renderer,scoretext1,NULL,&pos);
+                SDL_DestroyTexture(scoretext1);
+                if(!computer){
+                    scoretextimg1 = TTF_RenderText_Blended(font,name2,color);
+                    scoretext1 = SDL_CreateTextureFromSurface(renderer,scoretextimg1);
+                    SDL_FreeSurface(scoretextimg1);
+                    pos.x = 310;
+                    pos.y = 500;
+                    SDL_QueryTexture(scoretext1,NULL,NULL,&pos.w,&pos.h);
+                    SDL_RenderCopy(renderer,scoretext1,NULL,&pos);
+                    SDL_DestroyTexture(scoretext1);
+                }
+                imgwallpaper = IMG_Load("PLAY.png");
+                wallpaper = SDL_CreateTextureFromSurface(renderer,imgwallpaper);
+                SDL_FreeSurface(imgwallpaper);
+                pos.x = 300;
+                pos.y = 600;
+                pos.w = 300;
+                pos.h = 80;
+                SDL_RenderCopy(renderer,wallpaper,NULL,&pos);
+                SDL_DestroyTexture(wallpaper);
             }
-
-
             SDL_RenderPresent(renderer);
 			}
 			SDL_StopTextInput();
@@ -1212,7 +1268,7 @@ void undo(int dim,int history[][7],char array[dim][dim]){
                 break;
         }
     }else{
-        printf("How do you think it is supposed to undo IF YOU HAVEN'T PLAYED YET!\a\n");
+        printf("\a");
 
     }
 }
@@ -1230,7 +1286,7 @@ void redo(int dim,int history[][7],char array[dim][dim]){
         totalmoves++;
 
     }else{
-        printf("How do you think it is supposed to redo IF THERE IS NO UNDO MOVES!\a\n");
+        printf("\a");
 
     }
 }
@@ -1279,7 +1335,6 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
             }
 
         }
-        printf("\nChoose a file to save(1,2,3,4,5) or press any key to return:");
         if(sG=='5'){
             saved = fopen("saved5.bin","w");
             x=5;
@@ -1301,7 +1356,6 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
             x=4;
         }
         else{
-            printf("\nenter a valid thing");
             return;
         }
     }else{
@@ -1350,7 +1404,6 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
         fwrite(&f,sizeof(int),1,saved);fwrite(&name2,sizeof(char),f,saved);
 
     fclose(saved);
-    printf("\nGame saved in %d",x);
 }
 
 
@@ -1362,7 +1415,7 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
     if(!computer && player == 2 || player == 1){
 
         if((array[((n1+n2)/2)][((m1+m2)/2)] =='1') || (n1 > dim - 1) || (m1 > dim - 1) || (n2 > dim - 1) || (m2 > dim - 1) || (n1 < 0) || (m1 < 0) || (n2 < 0) || (m2 < 0) || !(((abs(n1-n2) == 2) && (m1==m2)) ^ ((abs(m1-m2) == 2) && (n1==n2)))){
-            printf("enter a valid move\n");
+
             return;
         }
         history[totalmoves][0] = n1 ; history[totalmoves][1] = m1 ;history[totalmoves][2] = n2 ; history[totalmoves][3] = m2;
@@ -1379,9 +1432,7 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
         array[history[totalmoves][2]][history[totalmoves][3]] = '1';
         array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='1';
     }
-    else{
-        printf("enter a valid thing");
-    }
+
 
     checkforsquares(history[totalmoves][0],history[totalmoves][1],dim,array,history,points);
     history[totalmoves][4] = points[0];
@@ -1593,7 +1644,7 @@ void loadGame(){
         }
     }
     }
-    printf("%c",sG);
+
     if(sG=='5'){
         load = fopen("saved5.bin","r");
         x=5;
@@ -1715,20 +1766,20 @@ void loadGame(){
                 }
                 else{
                     displaygameresult("Computer");
-                    printf("Hard luck %s\n",name1);
+
                 }
             }else{
                 if(!computer){
-                    printf("Congratulations for %s and hard luck for %s\n",name1,name2);
+
                     displaygameresult(name1);
                 }else{
-                    printf("Congratulations %s\n",name1);
+
                     displaygameresult(name1);
                 }
                 scores(points[0],strlen(name1),name1);
             }
         }
-        printf("Press any key to proceed\n");
+
         while(!done){
             while(SDL_PollEvent(&event) && !quit){
                 switch(event.type){
@@ -1765,7 +1816,7 @@ void oneNewGame(){
             case SDL_MOUSEBUTTONDOWN:
                 if(event.button == SDL_BUTTON_LEFT){
                     SDL_GetMouseState(&mx1,&my1);
-                    printf("\ n %d %d",mx1,my1);
+
                     if(mx1>380 && mx1<610){
                     switch(my1/100){
                     case 3:
@@ -1790,7 +1841,7 @@ void oneNewGame(){
     }
     }
     computer = 1;
-    printf("Back(0)\n\nEnter difficulty:\nEasy(1)\nNormal(2)\nHard(3)\n");
+
     switch(game){
         case '0':
             return newGame();
@@ -1798,25 +1849,19 @@ void oneNewGame(){
         case '1':
             do{
             nameinput();
-            printf("\nless than 12 chars");
-            printf("\nEnter first player's name: ");
-            }while(strlen(name1) > 12 || strlen(name1) == 0);
+            }while((strlen(name1) > 12 || strlen(name1) == 0) && !quit);
             dim = 7;
             break;
         case '2':
             do{
-            printf("\nless than 12 chars");
-            printf("\nEnter first player's name: ");
-            gets(name1);
-            }while(strlen(name1) > 12 || strlen(name1) == 0);
+            nameinput();
+            }while((strlen(name1) > 12 || strlen(name1) == 0) && !quit);
             dim = 11;
             break;
         case '3':
             do{
-            printf("\nless than 12 chars");
-            printf("\nEnter first player's name: ");
-            gets(name1);
-            }while(strlen(name1) > 12 || strlen(name1) == 0);
+            nameinput();
+            }while((strlen(name1) > 12 || strlen(name1) == 0) && !quit);
             dim = 15;
             break;
         default:
@@ -1864,7 +1909,7 @@ void twoNewGame(){
         }
     }
     }
-    printf("Back(0)\n\nEnter difficulty:\nEasy(1)\nNormal(2)\nHard(3)\n");
+
     switch(game){
         case '0':
             return newGame();
@@ -1872,29 +1917,19 @@ void twoNewGame(){
         case '1':
             do{
             nameinput();
-            printf("\nless than 12 chars");
-            printf("\nEnter first player's name: ");
-            }while(strlen(name1) > 12 || strlen(name2) > 12 || strlen(name1) == 0 || strlen(name2) == 0);
+            }while((strlen(name1) > 12 || strlen(name2) > 12 || strlen(name1) == 0 || strlen(name2) == 0) && !quit);
             dim = 7;
             break;
         case '2':
             do{
-            printf("\nless than 12 chars");
-            printf("\nEnter first player's name: ");
-            gets(name1);
-            printf("\nEnter second player's name: ");
-            gets(name2);
-            }while(strlen(name1) > 12 || strlen(name2) > 12 || strlen(name1) == 0 || strlen(name2) == 0);
+            nameinput();
+            }while((strlen(name1) > 12 || strlen(name2) > 12 || strlen(name1) == 0 || strlen(name2) == 0) && !quit);
             dim = 11;
             break;
         case '3':
             do{
-            printf("\nless than 12 chars");
-            printf("\nEnter first player's name: ");
-            gets(name1);
-            printf("\nEnter second player's name: ");
-            gets(name2);
-            }while(strlen(name1) > 12 || strlen(name2) > 12 || strlen(name1) == 0 || strlen(name2) == 0);
+            nameinput();
+            }while((strlen(name1) > 12 || strlen(name2) > 12 || strlen(name1) == 0 || strlen(name2) == 0) && !quit);
             dim = 15;
             break;
         default:
@@ -1970,7 +2005,7 @@ int main(int argc,char* argv[]){
     x = 0;
     diftime = 0;
     gamemenu();
-    SDL_MouseButtonEvent event;
+    SDL_Event event;
     int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
     bool done = false;
     while(!done && !quit){
@@ -1981,9 +2016,9 @@ int main(int argc,char* argv[]){
                 killSDL();
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                if(event.button == SDL_BUTTON_LEFT){
+
                     SDL_GetMouseState(&mx1,&my1);
-                    printf("\n %d  %d",mx1,my1);
+                     // leave it as it is!!!!!
                     if(my1/100 == 4 && (mx1>350 && mx1<650)){
                         game = '1';
                         done = true;
@@ -1997,7 +2032,7 @@ int main(int argc,char* argv[]){
                         done = true;
                     }
                     break;
-            }
+
         }
     }
 
@@ -2016,7 +2051,7 @@ int main(int argc,char* argv[]){
 
         int AIworld[dim][dim];
 
-        int temp[dim][dim];
+        int temp[dim][dim]; //leave this toooooooo!!!
 
         createAIwolrd(dim,AIworld);
 
@@ -2116,7 +2151,6 @@ int main(int argc,char* argv[]){
         loadGame();
         if(quit){
             goto end;
-            printf("asd");
         }
         break;
     case '3':
