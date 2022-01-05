@@ -13,11 +13,17 @@
 //#include "undo and redo.h"
 int e=0,f=0,p,x=0,playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0},dim=0,computer,starttime,endtime,diftime = 0;
 char game=0,name1[25],name2[25]="Computer",ss[1],sG;
-bool mouse = false, SDLrun = false,quit = false;
+bool mouse = false, SDLrun = false,quit = false,ran = false;
 FILE *saved;
 SDL_Window *window;
 SDL_Renderer *renderer;
 TTF_Font *font;
+    SDL_Surface *imgwallpaper;
+    SDL_Surface *saveimg;
+    SDL_Surface *imgredo;
+    SDL_Surface *imgundo;
+    SDL_Surface *returnbuttonimg;
+    SDL_Surface *imagedots;
 void initSDL(){
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
@@ -28,6 +34,13 @@ void initSDL(){
     renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     font = TTF_OpenFont("Lato-Italic.ttf",23);
+
+    imgwallpaper = IMG_Load("wallpaper.jpg");
+    saveimg = IMG_Load("saveicon.png");
+    imgredo = IMG_Load("redo.png");
+    imgundo = IMG_Load("undo.png");
+    returnbuttonimg = IMG_Load("BACK.png");
+    imagedots = IMG_Load("dots.png");
 
 }
 
@@ -90,12 +103,7 @@ void update(char world[dim][dim],int mx1,int my1){
     itoa(points[0],scorenum,10);
     strcat(scoreline,scorenum);
 
-
-    SDL_Surface *imgwallpaper = IMG_Load("wallpaper.jpg");
-
     SDL_Texture *wallpaper = SDL_CreateTextureFromSurface(renderer,imgwallpaper);
-
-    SDL_FreeSurface(imgwallpaper);
 
     SDL_Rect pos = {.x = 0,.y = 0,realwidth,height};
 
@@ -111,8 +119,6 @@ void update(char world[dim][dim],int mx1,int my1){
     SDL_Surface *scoretextimg1 = TTF_RenderText_Blended(font,scoreline,color);
 
     SDL_Texture *scoretext1 = SDL_CreateTextureFromSurface(renderer,scoretextimg1);
-
-    SDL_FreeSurface(scoretextimg1);
 
     pos.x = 710;
     pos.y = 300;
@@ -265,11 +271,9 @@ void update(char world[dim][dim],int mx1,int my1){
     SDL_DestroyTexture(timepassed);
 
 
-    SDL_Surface *saveimg = IMG_Load("saveicon.png");
+
 
     SDL_Texture *saveicon = SDL_CreateTextureFromSurface(renderer,saveimg);
-
-    SDL_FreeSurface(saveimg);
 
     pos.x = 710;
     pos.y = 120;
@@ -281,7 +285,7 @@ void update(char world[dim][dim],int mx1,int my1){
     SDL_DestroyTexture(saveicon);
 
 
-    SDL_Surface *imgredo = IMG_Load("redo.png");
+
 
     SDL_Texture *redoicon = SDL_CreateTextureFromSurface(renderer,imgredo);
 
@@ -290,16 +294,12 @@ void update(char world[dim][dim],int mx1,int my1){
     pos.w = 80;
     pos.h = 80;
 
-    SDL_FreeSurface(imgredo);
+
 
     SDL_RenderCopy(renderer,redoicon,NULL,&pos);
 
     SDL_DestroyTexture(redoicon);
 
-
-
-
-    SDL_Surface *imgundo = IMG_Load("undo.png");
 
     SDL_Texture *undoicon = SDL_CreateTextureFromSurface(renderer,imgundo);
 
@@ -308,7 +308,6 @@ void update(char world[dim][dim],int mx1,int my1){
     pos.w = 80;
     pos.h = 80;
 
-    SDL_FreeSurface(imgundo);
 
     SDL_RenderCopy(renderer,undoicon,NULL,&pos);
 
@@ -316,18 +315,13 @@ void update(char world[dim][dim],int mx1,int my1){
 
 
 
-
-    SDL_Surface *imagedots = IMG_Load("dots.png");
-
     SDL_Texture *dots = SDL_CreateTextureFromSurface(renderer,imagedots);
 
-    SDL_FreeSurface(imagedots);
 
-    SDL_Surface *returnbuttonimg = IMG_Load("BACK.png");
+
 
     SDL_Texture *returnbutton = SDL_CreateTextureFromSurface(renderer,returnbuttonimg);
 
-    SDL_FreeSurface(returnbuttonimg);
 
     pos.x = 700;
     pos.y = 600;
@@ -1727,7 +1721,7 @@ void loadGame(){
         if(computer && (player == 2)){
             makeamove(dim,world,NULL,NULL,NULL,NULL,points,history,AIworld);
         }else{
-        SDL_WaitEvent(&event);
+        SDL_PollEvent(&event);
                 switch(event.type){
                 case SDL_QUIT:
                     quit = true;
@@ -2080,16 +2074,18 @@ int main(int argc,char* argv[]){
         totalmoves = 0;
         player = 1;
         starttime = SDL_GetTicks();
+        ran = false;
         while(totalmoves<2*((dim/2)+1)*(dim/2) && !quit){
             if(totalmoves!=0)
                 p = totalmoves;
             else
                 p=1;
             update(world,mx1,my1);
+            ran = true;
             if(computer && (player == 2)){
                 makeamove(dim,world,NULL,NULL,NULL,NULL,points,history,AIworld);
             }else{
-            SDL_WaitEvent(&click);
+            SDL_PollEvent(&click);
                     switch(click.type){
                     case SDL_QUIT:
                             quit = true;
