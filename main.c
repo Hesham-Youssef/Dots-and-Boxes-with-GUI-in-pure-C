@@ -346,28 +346,35 @@ void update(char world[dim][dim],int mx1,int my1){
     }
     for(int i=0;i<dim;i++){
         for(int j=0;j<dim;j++){
-            if(world[i][j] == '0' || world[i][j] == '1'){
+            if(world[i][j] == '0' || world[i][j] == '2' || world[i][j] == '3'){
 
-                SDL_SetRenderDrawColor(renderer,180,180,180,180);
-
-                if((i%2 && !(j%2)) && world[i][j] == '1'){ // HORIZONTAL
+                if((i%2 && !(j%2)) && world[i][j] != ' '){ // HORIZONTAL
                     pos.x = (i-a) * width/dim + shift;
                     pos.y = (j) * height/dim + shift;
                     pos.w = wz;
                     pos.h = L;
-                    SDL_RenderFillRect(renderer,&pos); // VERTICAL
-                }else if((!(i%2) && (j%2) )&& world[i][j] == '1'){
+                    if(world[i][j] == '2')
+                        SDL_SetRenderDrawColor(renderer,230,0,0,255);
+                    else if(world[i][j] == '3')
+                        SDL_SetRenderDrawColor(renderer,0,0,230,255);
+
+                    SDL_RenderFillRect(renderer,&pos);
+                }else if((!(i%2) && (j%2) )&& world[i][j] != ' '){ // VERTICAL
                     pos.x = (i) * width/dim + shift;
                     pos.y = (j-b) * height/dim + shift;
                     pos.w = L;
                     pos.h = hv;
+                    if(world[i][j] == '2')
+                        SDL_SetRenderDrawColor(renderer,230,0,0,255);
+                    else if(world[i][j] == '3')
+                        SDL_SetRenderDrawColor(renderer,0,0,230,255);
                     SDL_RenderFillRect(renderer,&pos);
                 }
 
             }
             else if(world[i][j] == 'X'){
 
-                SDL_SetRenderDrawColor(renderer,255,0,0,255);
+                SDL_SetRenderDrawColor(renderer,180,0,0,255);
                 pos.x = (i-a+c) * width/dim + shift;
                 pos.y = (j-b+d) * height/dim + shift;
                 pos.w = wz - e;
@@ -377,7 +384,7 @@ void update(char world[dim][dim],int mx1,int my1){
             }
             else if(world[i][j] == 'O'){
 
-                SDL_SetRenderDrawColor(renderer,0,0,255,255);
+                SDL_SetRenderDrawColor(renderer,0,0,180,255);
                 pos.x = (i-a+c) * width/dim + shift;
                 pos.y = (j-b+d) * height/dim + shift;
                 pos.w = wz - e;
@@ -1056,7 +1063,7 @@ void printhistory(int dim,int history[][7]){
 void printworld(int dim,char array[dim][dim]){
     for(int i=0;i<dim;i++){
         for(int j=0;j<dim;j++){
-            printf("%c  ",array[i][j]);
+            printf("%c  ",array[j][i]);
         }
         printf("\n");
     }
@@ -1085,13 +1092,13 @@ void resetarray(int array[]){
 
 int checkforotherlines(int dim,int history[][7],char array[][dim],int n1,int m1){
     int f=0;
-    if(array[n1][m1+1] == '1')
+    if(array[n1][m1+1] != ' ')
         f++;
-    if(array[n1][m1-1] == '1')
+    if(array[n1][m1-1] != ' ')
         f++;
-    if(array[n1+1][m1] == '1')
+    if(array[n1+1][m1] != ' ')
         f++;
-    if(array[n1-1][m1] == '1')
+    if(array[n1-1][m1] != ' ')
         f++;
     return f;
 }
@@ -1102,10 +1109,10 @@ int checkforotherlines(int dim,int history[][7],char array[][dim],int n1,int m1)
 int upperright(int n1,int m1,int dim,char array[dim][dim]){
     if((m1 == dim -1) || (n1 == 0) || array[n1-1][m1+1] == 'X' || array[n1-1][m1+1] == 'O')
         return 0;
-    if(array[n1][m1+1]=='1'){
-            if(array[n1-1][m1]=='1'){
-                if(array[n1-1][m1+2]=='1'){
-                    if(array[n1-2][m1+1]=='1'){
+    if(array[n1][m1+1]!=' '){
+            if(array[n1-1][m1]!=' '){
+                if(array[n1-1][m1+2]!=' '){
+                    if(array[n1-2][m1+1]!=' '){
                         switch(player){
                             case 1:
                                 array[n1-1][m1+1] = 'X';
@@ -1125,10 +1132,10 @@ int upperright(int n1,int m1,int dim,char array[dim][dim]){
 int upperleft(int n1,int m1,int dim,char array[dim][dim]){
     if((m1 == 0) || (n1 == 0) || array[n1-1][m1-1] == 'X' || array[n1-1][m1-1] == 'O')
         return 0;
-    if(array[n1][m1-1]=='1'){
-            if(array[n1-1][m1]=='1'){
-                if(array[n1-1][m1-2]=='1'){
-                    if(array[n1-2][m1-1]=='1'){
+    if(array[n1][m1-1]!=' '){
+            if(array[n1-1][m1]!=' '){
+                if(array[n1-1][m1-2]!=' '){
+                    if(array[n1-2][m1-1]!=' '){
                         switch(player){
                             case 1:
                                 array[n1-1][m1-1] = 'X';
@@ -1148,10 +1155,10 @@ int upperleft(int n1,int m1,int dim,char array[dim][dim]){
 int downright(int n1,int m1,int dim,char array[dim][dim]){
     if((m1 == dim -1) || (n1 == dim -1) || array[n1+1][m1+1] == 'X' || array[n1+1][m1+1] == 'O')
         return 0;
-    if(array[n1][m1+1]=='1'){
-            if(array[n1+1][m1]=='1'){
-                if(array[n1+1][m1+2]=='1'){
-                    if(array[n1+2][m1+1]=='1'){
+    if(array[n1][m1+1]!=' '){
+            if(array[n1+1][m1]!=' '){
+                if(array[n1+1][m1+2]!=' '){
+                    if(array[n1+2][m1+1]!=' '){
                         switch(player){
                             case 1:
 
@@ -1172,10 +1179,10 @@ int downright(int n1,int m1,int dim,char array[dim][dim]){
 int downleft(int n1,int m1,int dim,char array[dim][dim]){
     if((m1 == 0) || (n1 == dim-1) || array[n1+1][m1-1] == 'X' || array[n1+1][m1-1] == 'O')
         return 0;
-    if(array[n1][m1-1]=='1'){
-            if(array[n1+1][m1]=='1'){
-                if(array[n1+1][m1-2]=='1'){
-                    if(array[n1+2][m1-1]=='1'){
+    if(array[n1][m1-1]!=' '){
+            if(array[n1+1][m1]!=' '){
+                if(array[n1+1][m1-2]!=' '){
+                    if(array[n1+2][m1-1]!=' '){
                         switch(player){
                             case 1:
 
@@ -1208,8 +1215,9 @@ void checkforsquares(int n1,int m1,int dim,char array[dim][dim],int history[][7]
         case 2:
             moves[1]++;
     }
-    if(sum != 0)
+    if(sum != 0){
         playerturn++;
+    }
     else{
         player=player==1?2:1;
     }
@@ -1276,8 +1284,10 @@ void undo(int dim,int history[][7],char array[dim][dim]){
 void redo(int dim,int history[][7],char array[dim][dim]){
     if(totalmoves < maxmoves && (maxmoves > 1)){
         int n1 = history[totalmoves][0];int m1 = history[totalmoves][1];
-        array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='1';
-
+        if(history[totalmoves][6] == 1)
+            array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='2';
+        else if(history[totalmoves][6] == 2)
+            array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='3';
         array[history[totalmoves][0]][history[totalmoves][1]] = '1';
 
         array[history[totalmoves][2]][history[totalmoves][3]] = '1';
@@ -1414,7 +1424,7 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
 
     if(!computer && player == 2 || player == 1){
 
-        if((array[((n1+n2)/2)][((m1+m2)/2)] =='1') || (n1 > dim - 1) || (m1 > dim - 1) || (n2 > dim - 1) || (m2 > dim - 1) || (n1 < 0) || (m1 < 0) || (n2 < 0) || (m2 < 0) || !(((abs(n1-n2) == 2) && (m1==m2)) ^ ((abs(m1-m2) == 2) && (n1==n2)))){
+        if((array[((n1+n2)/2)][((m1+m2)/2)] !=' ') || (n1 > dim - 1) || (m1 > dim - 1) || (n2 > dim - 1) || (m2 > dim - 1) || (n1 < 0) || (m1 < 0) || (n2 < 0) || (m2 < 0) || !(((abs(n1-n2) == 2) && (m1==m2)) ^ ((abs(m1-m2) == 2) && (n1==n2)))){
 
             return;
         }
@@ -1430,7 +1440,10 @@ void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int poin
     if(!(history[totalmoves][1]%2 || history[totalmoves][0]%2 )){
         array[history[totalmoves][0]][history[totalmoves][1]] = '1';
         array[history[totalmoves][2]][history[totalmoves][3]] = '1';
-        array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='1';
+        if(player == 1)
+            array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='2';
+        else if(player == 2)
+            array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='3';
     }
 
 
@@ -1452,15 +1465,15 @@ void AI(int dim,char world[dim][dim],int AIworld[dim][dim],int history[][7]){
         for(int j=1;j<dim;j=j+2){
             numberoflines1 = 0;
             numberoflines2 = 0;
-            if(world[i][j] == '1')
+            if(world[i][j] != ' ')
                 AIworld[i][j] = -100;
             else{
                 if( i != 0){
-                    if(world[i-1][j+1] == '1')
+                    if(world[i-1][j+1] != ' ')
                          numberoflines1++;
-                    if(world[i-1][j-1] == '1')
+                    if(world[i-1][j-1] != ' ')
                          numberoflines1++;
-                    if(world[i-2][j] == '1')
+                    if(world[i-2][j] != ' ')
                          numberoflines1++;
                     if(numberoflines1 == 3)
                          numberoflines1 += 10;
@@ -1468,11 +1481,11 @@ void AI(int dim,char world[dim][dim],int AIworld[dim][dim],int history[][7]){
                         numberoflines1 -=10;
                 }
                 if( i != dim - 1){
-                    if(world[i+1][j-1] == '1')
+                    if(world[i+1][j-1] != ' ')
                          numberoflines2++;
-                    if(world[i+1][j+1] == '1')
+                    if(world[i+1][j+1] != ' ')
                          numberoflines2++;
-                    if(world[i+2][j] == '1')
+                    if(world[i+2][j] != ' ')
                          numberoflines2++;
                     if(numberoflines2 == 3)
                         numberoflines2 +=10;
@@ -1488,15 +1501,15 @@ void AI(int dim,char world[dim][dim],int AIworld[dim][dim],int history[][7]){
         for(int j=0;j<dim;j=j+2){
             numberoflines1 = 0;
             numberoflines2 = 0;
-            if(world[i][j] == '1')
+            if(world[i][j] != ' ')
                 AIworld[i][j] = -100;
             else{
                 if( j != 0){
-                    if(world[i-1][j-1] == '1')
+                    if(world[i-1][j-1] != ' ')
                          numberoflines1++;
-                    if(world[i+1][j-1] == '1')
+                    if(world[i+1][j-1] != ' ')
                          numberoflines1++;
-                    if(world[i][j-2] == '1')
+                    if(world[i][j-2] != ' ')
                          numberoflines1++;
                     if(numberoflines1 == 3)
                          numberoflines1 += 10;
@@ -1504,11 +1517,11 @@ void AI(int dim,char world[dim][dim],int AIworld[dim][dim],int history[][7]){
                         numberoflines1 -=10;
                 }
                 if( j != dim-1){
-                    if(world[i+1][j+1] == '1')
+                    if(world[i+1][j+1] != ' ')
                          numberoflines2++;
-                    if(world[i-1][j+1] == '1')
+                    if(world[i-1][j+1] != ' ')
                          numberoflines2++;
-                    if(world[i][j+2] == '1')
+                    if(world[i][j+2] != ' ')
                          numberoflines2++;
                     if(numberoflines2 == 3)
                         numberoflines2 +=10;
@@ -1673,7 +1686,6 @@ void loadGame(){
     int history[2 * (dim/2) * ((dim/2) + 1)][7];
     char world[dim][dim];
     int AIworld[dim][dim];
-    int temp[dim][dim];
     for(int i=0;i<totalmoves;i++){
         for(int j=0;j<7;j++)
             fread(&history[i][j],1,(dim)*(dim),load);
@@ -2005,7 +2017,7 @@ int main(int argc,char* argv[]){
     x = 0;
     diftime = 0;
     gamemenu();
-    SDL_Event event;
+    SDL_MouseButtonEvent event;
     int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
     bool done = false;
     while(!done && !quit){
@@ -2016,9 +2028,11 @@ int main(int argc,char* argv[]){
                 killSDL();
                 break;
             case SDL_MOUSEBUTTONDOWN:
-
+                if(event.button == SDL_BUTTON_LEFT){
                     SDL_GetMouseState(&mx1,&my1);
-                     // leave it as it is!!!!!
+
+                    printf(""); // leave it as it is!!!!!
+
                     if(my1/100 == 4 && (mx1>350 && mx1<650)){
                         game = '1';
                         done = true;
@@ -2032,7 +2046,7 @@ int main(int argc,char* argv[]){
                         done = true;
                     }
                     break;
-
+            }
         }
     }
 
@@ -2050,8 +2064,6 @@ int main(int argc,char* argv[]){
 
 
         int AIworld[dim][dim];
-
-        int temp[dim][dim]; //leave this toooooooo!!!
 
         createAIwolrd(dim,AIworld);
 
@@ -2076,6 +2088,7 @@ int main(int argc,char* argv[]){
             update(world,mx1,my1);
             if(computer && (player == 2)){
                 makeamove(dim,world,NULL,NULL,NULL,NULL,points,history,AIworld);
+                printAIwolrd(dim,AIworld);
             }else{
             SDL_WaitEvent(&click);
                     switch(click.type){
@@ -2118,6 +2131,7 @@ int main(int argc,char* argv[]){
                         }
                         if(!((mx1/(height/dim))%2 || (my1/(width/dim))%2 || (mx2/(height/dim)%2 || (my2/(width/dim))%2))){
                             makeamove(dim,world,mx1/(height/dim),my1/(width/dim),mx2/(height/dim),my2/(width/dim),points,history,AIworld);
+                            printworld(dim,world);
                         }
 
                         break;
