@@ -2088,7 +2088,6 @@ int main(int argc,char* argv[]){
             update(world,mx1,my1);
             if(computer && (player == 2)){
                 makeamove(dim,world,NULL,NULL,NULL,NULL,points,history,AIworld);
-                printAIwolrd(dim,AIworld);
             }else{
             SDL_WaitEvent(&click);
                     switch(click.type){
@@ -2131,7 +2130,6 @@ int main(int argc,char* argv[]){
                         }
                         if(!((mx1/(height/dim))%2 || (my1/(width/dim))%2 || (mx2/(height/dim)%2 || (my2/(width/dim))%2))){
                             makeamove(dim,world,mx1/(height/dim),my1/(width/dim),mx2/(height/dim),my2/(width/dim),points,history,AIworld);
-                            printworld(dim,world);
                         }
 
                         break;
