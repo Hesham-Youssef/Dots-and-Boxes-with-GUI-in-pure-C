@@ -1714,7 +1714,7 @@ void loadGame(){
                     goto end;
                     break;
                 case SDL_MOUSEBUTTONDOWN:
-                    if(event.button == SDL_BUTTON_LEFT)
+                    if(event.button == SDL_BUTTON_LEFT){
                         mouse = true;
                         SDL_GetMouseState(&mx1,&my1);
                         if(mx1/100 == 7 && my1/100 == 0){
@@ -1732,7 +1732,9 @@ void loadGame(){
                         }
                         else if(mx1 > 720 && my1/100 == 6){
                                 goto end;
-                        }
+                        }else
+                            mouse = true;
+                    }
                         break;
                 case SDL_MOUSEBUTTONUP:
                     mouse = false;
@@ -2078,7 +2080,7 @@ int main(int argc,char* argv[]){
                             goto end;
                         break;
                     case SDL_MOUSEBUTTONDOWN:
-                        if(click.button == SDL_BUTTON_LEFT)
+                        if(click.button == SDL_BUTTON_LEFT){
                             SDL_GetMouseState(&mx1,&my1);
                             if(mx1/100 == 7 && my1/100 == 0){
                                 undo(dim,history,world);
@@ -2101,6 +2103,7 @@ int main(int argc,char* argv[]){
 
                             }else
                                 mouse = true;
+                        }
                             break;
                     case SDL_MOUSEBUTTONUP:
                         if(!mouse)
