@@ -1726,6 +1726,7 @@ void loadGame(){
         update(world,mx1,my1);
         if(computer && (player == 2)){
             makeamove(dim,world,NULL,NULL,NULL,NULL,points,history,AIworld);
+            SDL_Delay(100);
         }else{
         SDL_PollEvent(&event);
                 switch(event.type){
