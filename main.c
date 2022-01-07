@@ -12,7 +12,7 @@
 #define height 700
 //#include "undo and redo.h"
 int e=0,f=0,p,x=0,playerturn = 0, player = 1,moves[2] = {0},totalmoves=0,maxmoves = 0,points[2] = {0},dim=0,computer,starttime,endtime,diftime = 0;
-char game=0,name1[25],name2[25]="Computer",ss[1],sG;
+char game=0,name1[25],name2[25]="Computer",ss[1],sG = '0';
 bool mouse = false, SDLrun = false,quit = false,ran = false;
 FILE *saved;
 SDL_Window *window;
@@ -283,7 +283,23 @@ void update(char world[dim][dim],int mx1,int my1){
 
     SDL_DestroyTexture(timepassed);
 
+    if(x){
+        strcpy(scoreline,"Game will be saved in ");
+        strncat(scoreline,&sG,1);
+        SDL_Surface *remainedmovesimg = TTF_RenderText_Blended(font,scoreline,color);
+        SDL_Texture *remainedmove = SDL_CreateTextureFromSurface(renderer,remainedmovesimg);
+        SDL_FreeSurface(remainedmovesimg);
 
+        pos.x = 710;
+        pos.y = 530;
+
+        SDL_QueryTexture(remainedmove,NULL,NULL,&pos.w,&pos.h);
+
+        SDL_RenderCopy(renderer,remainedmove,NULL,&pos);
+
+        SDL_DestroyTexture(remainedmove);
+
+    }
 
     pos.x = 710;
     pos.y = 120;
@@ -484,7 +500,6 @@ void updatesave(bool save){
     }
     SDL_RenderCopy(renderer,save5icon,NULL,&pos);
     SDL_DestroyTexture(save5icon);
-    printf("sadas");
 
 
     SDL_RenderPresent(renderer);
@@ -728,6 +743,11 @@ void leaderboard(){
 
 }
 void displaygameresult(){
+    SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(renderer,0,0,0,150);
+    SDL_RenderFillRect(renderer,NULL);
+
+
     char scoreline[30] = "CONGRATULATIONS ";
     SDL_Color color = {255,255,255,255};
     font = TTF_OpenFont("Lato-Italic.ttf",50);
@@ -1298,23 +1318,23 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
                 break;
             case SDL_MOUSEBUTTONDOWN:
                     SDL_GetMouseState(&mx,&my);
-                    if(mx/100 == 8 && my/100 == 1){
+                    if((mx>825 && mx<900) && (my>140 && my<180)){
                         sG = '1';
                         done = true;
                     }
-                    else if(mx/100 == 9 && my/100 == 1){
+                    else if(mx>925 && mx<1000 && my<180 && my>140){
                         sG = '2';
                         done = true;
                     }
-                    else if(mx/100 == 8 && my/100 == 2 && my%100 < 50){
+                    else if(mx>825 && mx<900 && my>200 && my<240){
                         sG = '3';
                         done = true;
                     }
-                    else if(mx/100 == 9 && my/100 == 2){
+                    else if(mx>925 && mx<1000 && my>200 && my<240){
                         sG = '4';
                         done = true;
                     }
-                    else if(mx/100 == 8 && my/100 == 2 && my%100 > 50){
+                    else if((mx>825 && mx<900) && my>250 && my<290){
                         sG = '5';
                         done = true;
                     }
@@ -2096,6 +2116,7 @@ int main(int argc,char* argv[]){
                             }
                             else if(mx1/100 == 7 && my1/100 == 1){
                                 saveGame(totalmoves,dim,AIworld,world,history);
+                                SDL_Delay(90);
                                 if(quit)
                                     return 0;
                             }
