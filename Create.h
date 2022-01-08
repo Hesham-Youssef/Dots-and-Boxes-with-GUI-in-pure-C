@@ -24,32 +24,4 @@ void createAIwolrd(int dim,int AIworld[dim][dim]){
         }
     }
 }
-void printworld(int dim,char array[dim][dim]){
-    for(int i=0;i<dim;i++){
-        for(int j=0;j<dim;j++){
-            printf("%c  ",array[j][i]);
-        }
-        printf("\n");
-    }
-}
-void printhistory(int dim,int history[][7],int maxmoves){
-    for(int i=0;i<maxmoves;i++){
-        for(int j=0;j<7;j++){
-            printf("  %d -",history[i][j]);
-        }
-        printf("\n");
-    }
-}
-void printAIwolrd(int dim,int AIworld[dim][dim]){
-    for(int i=0;i<dim;i++){
-        for(int j=0;j<dim;j++){
-            printf("%d  ",AIworld[i][j]);
-        }
-        printf("\n");
-    }
-}
-
-
-
-
 #endif // CREATE_AND_PRINT_H_INCLUDED

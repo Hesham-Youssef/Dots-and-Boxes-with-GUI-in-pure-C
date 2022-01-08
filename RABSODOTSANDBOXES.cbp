@@ -33,9 +33,12 @@
 		</Compiler>
 		<Unit filename="AI.h" />
 		<Unit filename="Create and print.h" />
+		<Unit filename="MoveAndRedo.h" />
+		<Unit filename="Undo.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="undo and redo.h" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

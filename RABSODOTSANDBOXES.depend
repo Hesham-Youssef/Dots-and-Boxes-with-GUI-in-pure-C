@@ -16,7 +16,7 @@
 	<stdbool.h>
 	<string.h>
 
-1641668586 source:c:\users\yahya\onedrive\desktop\rabsooodotsandboxes\main.c
+1641674904 source:c:\users\yahya\onedrive\desktop\rabsooodotsandboxes\main.c
 	<stdio.h>
 	<stdlib.h>
 	<conio.h>
@@ -27,6 +27,9 @@
 	<stdbool.h>
 	<string.h>
 	"AI.h"
+	"Create.h"
+	"Undo.h"
+	"MoveAndRedo.h"
 
 1638567155 c:\msys64\mingw64\include\sdl2\sdl.h
 	"SDL_main.h"
@@ -433,4 +436,13 @@
 	<stdlib.h>
 	<conio.h>
 	<math.h>
+
+1641670197 c:\users\yahya\onedrive\desktop\rabsooodotsandboxes\create and print.h
+
+1641670197 c:\users\yahya\onedrive\desktop\rabsooodotsandboxes\create.h
+
+1641672115 c:\users\yahya\onedrive\desktop\rabsooodotsandboxes\undo.h
+
+1641675123 c:\users\yahya\onedrive\desktop\rabsooodotsandboxes\moveandredo.h
+	"AI.h"
 

@@ -10,9 +10,10 @@
 #define realwidth 1000
 #define width 700
 #define height 700
-//#include "undo and redo.h"
 #include "AI.h"
-#include "Create and print.h"
+#include "Create.h"
+#include "Undo.h"
+#include "MoveAndRedo.h"
 int e=0,f=0,p,x=0,player=1,totalmoves=0,maxmoves=0,dim=0,computer,starttime,endtime,diftime = 0;
 char game=0,ss[1],sG='0';
 struct{
@@ -1042,210 +1043,6 @@ void nameinput(){
 			font = TTF_OpenFont("Lato-Italic.ttf",23);
 }
 
-int checkforotherlines(int dim,int history[][7],char array[][dim],int n1,int m1){
-    int f=0;
-    if(array[n1][m1+1] != ' ')
-        f++;
-    if(array[n1][m1-1] != ' ')
-        f++;
-    if(array[n1+1][m1] != ' ')
-        f++;
-    if(array[n1-1][m1] != ' ')
-        f++;
-    return f;
-}
-
-
-
-
-int upperright(int n1,int m1,int dim,char array[dim][dim]){
-    if((m1 == dim -1) || (n1 == 0) || array[n1-1][m1+1] == 'X' || array[n1-1][m1+1] == 'O')
-        return 0;
-    if(array[n1][m1+1]!=' '){
-            if(array[n1-1][m1]!=' '){
-                if(array[n1-1][m1+2]!=' '){
-                    if(array[n1-2][m1+1]!=' '){
-                        switch(player){
-                            case 1:
-                                array[n1-1][m1+1] = 'X';
-                                break;
-                            case 2:
-
-                                array[n1-1][m1+1] = 'O';
-                                break;
-                        }
-                        return 1;
-                    }
-                }
-            }
-    }
-   return 0;
-}
-int upperleft(int n1,int m1,int dim,char array[dim][dim]){
-    if((m1 == 0) || (n1 == 0) || array[n1-1][m1-1] == 'X' || array[n1-1][m1-1] == 'O')
-        return 0;
-    if(array[n1][m1-1]!=' '){
-            if(array[n1-1][m1]!=' '){
-                if(array[n1-1][m1-2]!=' '){
-                    if(array[n1-2][m1-1]!=' '){
-                        switch(player){
-                            case 1:
-                                array[n1-1][m1-1] = 'X';
-                                break;
-                            case 2:
-
-                                array[n1-1][m1-1] = 'O';
-                                break;
-                        }
-                        return 1;
-                    }
-                }
-            }
-    }
-    return 0;
-}
-int downright(int n1,int m1,int dim,char array[dim][dim]){
-    if((m1 == dim -1) || (n1 == dim -1) || array[n1+1][m1+1] == 'X' || array[n1+1][m1+1] == 'O')
-        return 0;
-    if(array[n1][m1+1]!=' '){
-            if(array[n1+1][m1]!=' '){
-                if(array[n1+1][m1+2]!=' '){
-                    if(array[n1+2][m1+1]!=' '){
-                        switch(player){
-                            case 1:
-
-                                array[n1+1][m1+1] = 'X';
-                                break;
-                            case 2:
-
-                                array[n1+1][m1+1] = 'O';
-                                break;
-                        }
-                        return 1;
-                    }
-                }
-            }
-    }
-    return 0;
-}
-int downleft(int n1,int m1,int dim,char array[dim][dim]){
-    if((m1 == 0) || (n1 == dim-1) || array[n1+1][m1-1] == 'X' || array[n1+1][m1-1] == 'O')
-        return 0;
-    if(array[n1][m1-1]!=' '){
-            if(array[n1+1][m1]!=' '){
-                if(array[n1+1][m1-2]!=' '){
-                    if(array[n1+2][m1-1]!=' '){
-                        switch(player){
-                            case 1:
-
-                                array[n1+1][m1-1] = 'X';
-                                break;
-                            case 2:
-
-                                array[n1+1][m1-1] = 'O';
-                                break;
-                        }
-                        return 1;
-                    }
-                }
-            }
-    }
-    return 0;
-}
-void checkforsquares(int n1,int m1,int dim,char array[dim][dim],int history[][7]){
-    int sum=0;
-    sum = upperright(n1,m1,dim,array) + upperleft(n1,m1,dim,array) + downright(n1,m1,dim,array) + downleft(n1,m1,dim,array);
-    if(player==2)
-        player2.points += sum;
-    else
-        player1.points += sum;
-    switch(player){
-        case 1:
-            player1.moves++;
-            break;
-        case 2:
-            player2.moves++;
-    }
-    if(sum == 0)
-        player=player==1?2:1;
-}
-
-void undo(int dim,int history[][7],char array[dim][dim]){
-    if(totalmoves > 0){
-        totalmoves--;
-        int n1 = history[totalmoves][0] , m1 = history[totalmoves][1] ,  n2 = history[totalmoves][2] ,  m2 = history[totalmoves][3];
-        array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] =' ';
-        if(!(checkforotherlines(dim,history,array,history[totalmoves][0],history[totalmoves][1]) >= 1))
-            array[history[totalmoves][0]][history[totalmoves][1]] = '0';
-
-        if(!(checkforotherlines(dim,history,array,history[totalmoves][2],history[totalmoves][3]) >= 1))
-            array[history[totalmoves][2]][history[totalmoves][3]] = '0';
-
-        if(n1==n2){
-            if(n1==0)
-                array[n1+1][(m1+m2)/2]=' ';
-            else if(n1==dim-1)
-                array[n1-1][(m1+m2)/2]=' ';
-            else{
-                array[n1+1][(m1+m2)/2]=' ';
-                array[n1-1][(m1+m2)/2]=' ';
-            }
-        }else{
-            if(m1==0)
-                array[(n1+n2)/2][m1+1]=' ';
-            else if(m1==dim-1)
-                array[(n1+n2)/2][m1-1]=' ';
-            else{
-                array[(n1+n2)/2][m1+1]=' ';
-                array[(n1+n2)/2][m1-1]=' ';
-            }
-        }
-
-        if(player==history[totalmoves][6]){
-            switch(player){
-                case 1:
-                    player1.points = history[totalmoves-1][4];
-                    break;
-                case 2:
-                    player2.points = history[totalmoves-1][5];
-                    break;
-            }
-        }
-        player = history[totalmoves][6];
-        switch(player){
-            case 1:
-                player1.moves--;
-                break;
-            case 2:
-                player2.moves--;
-                break;
-        }
-    }else{
-        printf("\a");
-
-    }
-}
-
-void redo(int dim,int history[][7],char array[dim][dim]){
-    if(totalmoves < maxmoves && (maxmoves > 1)){
-        int n1 = history[totalmoves][0];int m1 = history[totalmoves][1];
-        if(history[totalmoves][6] == 1)
-            array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='2';
-        else if(history[totalmoves][6] == 2)
-            array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='3';
-        array[history[totalmoves][0]][history[totalmoves][1]] = '1';
-
-        array[history[totalmoves][2]][history[totalmoves][3]] = '1';
-
-        checkforsquares(n1,m1,dim,array,history);
-        totalmoves++;
-
-    }else{
-        printf("\a");
-
-    }
-}
-
 void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],int history[][7]){
     if(x==0){
         SDL_Event event;
@@ -1360,49 +1157,6 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
     }
     fclose(saved);
 }
-
-
-
-
-
-void makeamove(int dim,char array[dim][dim],int n1,int m1,int n2,int m2,int history[][7],int AIworld[dim][dim]){
-
-    if(!computer && player == 2 || player == 1){
-
-        if((array[((n1+n2)/2)][((m1+m2)/2)] !=' ') || (n1 > dim - 1) || (m1 > dim - 1) || (n2 > dim - 1) || (m2 > dim - 1) || (n1 < 0) || (m1 < 0) || (n2 < 0) || (m2 < 0) || !(((abs(n1-n2) == 2) && (m1==m2)) ^ ((abs(m1-m2) == 2) && (n1==n2)))){
-
-            return;
-        }
-        history[totalmoves][0] = n1 ; history[totalmoves][1] = m1 ;history[totalmoves][2] = n2 ; history[totalmoves][3] = m2;
-
-    }else{
-        AI(dim,array,AIworld,history,totalmoves);
-    }
-
-    history[totalmoves][6] = player;
-
-
-    if(!(history[totalmoves][1]%2 || history[totalmoves][0]%2 )){
-        array[history[totalmoves][0]][history[totalmoves][1]] = '1';
-        array[history[totalmoves][2]][history[totalmoves][3]] = '1';
-        if(player == 1)
-            array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='2';
-        else if(player == 2)
-            array[(history[totalmoves][0]+history[totalmoves][2])/2][(history[totalmoves][1]+history[totalmoves][3])/2] ='3';
-    }
-
-
-    checkforsquares(history[totalmoves][0],history[totalmoves][1],dim,array,history);
-    history[totalmoves][4] = player1.points;
-    history[totalmoves][5] = player2.points;
-
-    if(totalmoves < maxmoves)
-        maxmoves = totalmoves;
-
-        maxmoves++;
-        totalmoves++;
-}
-
 
 int scores(int point,int l,char name[l]){
     int j,u=0;char names[10][13],v[10],i=0,score[10]={0};
@@ -1541,7 +1295,6 @@ void loadGame(){
             fread(&history[i][j],1,(dim)*(dim),load);
 
     }
-    printhistory(dim,history,maxmoves);
     if(computer){
         for(int i=0;i<dim;i++){
             for(int j=0;j<dim;j++)
@@ -1569,7 +1322,7 @@ void loadGame(){
             p=1;
         update(world,mx1,my1);
         if(computer && (player == 2)){
-            makeamove(dim,world,NULL,NULL,NULL,NULL,history,AIworld);
+            makeMove(dim,world,NULL,NULL,NULL,NULL,history,AIworld,computer,&player,&totalmoves,&maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves);
             SDL_Delay(100);
         }else{
         SDL_PollEvent(&event);
@@ -1585,14 +1338,14 @@ void loadGame(){
                         SDL_GetMouseState(&mx1,&my1);
                         printf("\n");
                         if(mx1/100 == 7 && my1/100 == 0){
-                            undo(dim,history,world);
+                            undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
                             while(computer && history[totalmoves][6] == 2)
-                                undo(dim,history,world);
+                                undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
                         }
                         else if(mx1/100 == 9 && my1/100 == 0){
-                            redo(dim,history,world);
+                            redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
                             while(computer && history[totalmoves][6] == 2 && totalmoves < maxmoves)
-                                redo(dim,history,world);
+                                redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
                         }
                         else if(mx1/100 == 7 && my1/100 == 1){
                                 saveGame(totalmoves,dim,AIworld,world,history);
@@ -1609,7 +1362,7 @@ void loadGame(){
                         SDL_GetMouseState(&mx2,&my2);
                     }
                     if(!((mx1/(height/dim))%2 || (my1/(width/dim))%2 || (mx2/(height/dim)%2 || (my2/(width/dim))%2))){
-                        makeamove(dim,world,mx1/(height/dim),my1/(width/dim),mx2/(height/dim),my2/(width/dim),history,AIworld);
+                        makeMove(dim,world,mx1/(height/dim),my1/(width/dim),mx2/(height/dim),my2/(width/dim),history,AIworld,computer,&player,&totalmoves,&maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves);
                     }
                     break;
                 }
@@ -1929,7 +1682,7 @@ int main(int argc,char* argv[]){
             update(world,mx1,my1);
             ran = true;
             if(computer && (player == 2)){
-                makeamove(dim,world,NULL,NULL,NULL,NULL,history,AIworld);
+                makeMove(dim,world,NULL,NULL,NULL,NULL,history,AIworld,computer,&player,&totalmoves,&maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves);
                 SDL_Delay(100);
             }else{
             SDL_PollEvent(&click);
@@ -1944,14 +1697,14 @@ int main(int argc,char* argv[]){
                             SDL_GetMouseState(&mx1,&my1);
                             printf("\n");
                             if(mx1/100 == 7 && my1/100 == 0){
-                                undo(dim,history,world);
+                                undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
                                 while(computer && history[totalmoves][6] == 2)
-                                    undo(dim,history,world);
+                                    undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
                             }
                             else if(mx1/100 == 9 && my1/100 == 0){
-                                redo(dim,history,world);
+                                redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
                                 while(computer && history[totalmoves][6] == 2 && totalmoves < maxmoves)
-                                    redo(dim,history,world);
+                                    redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
                             }
                             else if(mx1/100 == 7 && my1/100 == 1){
                                 saveGame(totalmoves,dim,AIworld,world,history);
@@ -1974,7 +1727,7 @@ int main(int argc,char* argv[]){
                             SDL_GetMouseState(&mx2,&my2);
                         }
                         if(!((mx1/(height/dim))%2 || (my1/(width/dim))%2 || (mx2/(height/dim)%2 || (my2/(width/dim))%2))){
-                            makeamove(dim,world,mx1/(height/dim),my1/(width/dim),mx2/(height/dim),my2/(width/dim),history,AIworld);
+                            makeMove(dim,world,mx1/(height/dim),my1/(width/dim),mx2/(height/dim),my2/(width/dim),history,AIworld,computer,&player,&totalmoves,&maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves);
                         }
 
                         break;
