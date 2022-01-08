@@ -358,9 +358,9 @@ void update(char world[dim][dim],int mx1,int my1){
                     pos.w = wz;
                     pos.h = L;
                     if(world[i][j] == '2')
-                        SDL_SetRenderDrawColor(renderer,230,0,0,255);
+                        SDL_SetRenderDrawColor(renderer,230,170,0,255);
                     else if(world[i][j] == '3')
-                        SDL_SetRenderDrawColor(renderer,0,0,230,255);
+                        SDL_SetRenderDrawColor(renderer,0,170,255,255);
 
                     SDL_RenderFillRect(renderer,&pos);
                 }else if((!(i%2) && (j%2) )&& world[i][j] != ' '){ // VERTICAL
@@ -369,16 +369,16 @@ void update(char world[dim][dim],int mx1,int my1){
                     pos.w = L;
                     pos.h = hv;
                     if(world[i][j] == '2')
-                        SDL_SetRenderDrawColor(renderer,230,0,0,255);
+                        SDL_SetRenderDrawColor(renderer,230,170,0,255);
                     else if(world[i][j] == '3')
-                        SDL_SetRenderDrawColor(renderer,0,0,230,255);
+                        SDL_SetRenderDrawColor(renderer,0,170,255,255);
                     SDL_RenderFillRect(renderer,&pos);
                 }
 
             }
             else if(world[i][j] == 'X'){
 
-                SDL_SetRenderDrawColor(renderer,180,0,0,255);
+                SDL_SetRenderDrawColor(renderer,255,0,0,255);
                 pos.x = (i-a+c) * width/dim + shift;
                 pos.y = (j-b+d) * height/dim + shift;
                 pos.w = wz - e;
@@ -388,7 +388,7 @@ void update(char world[dim][dim],int mx1,int my1){
             }
             else if(world[i][j] == 'O'){
 
-                SDL_SetRenderDrawColor(renderer,0,0,180,255);
+                SDL_SetRenderDrawColor(renderer,0,0,255,255);
                 pos.x = (i-a+c) * width/dim + shift;
                 pos.y = (j-b+d) * height/dim + shift;
                 pos.w = wz - e;
@@ -1247,7 +1247,7 @@ void undo(int dim,int history[][7],char array[dim][dim]){
         }else{
             if(m1==0)
                 array[(n1+n2)/2][m1+1]=' ';
-            else if(n1==dim-1)
+            else if(m1==dim-1)
                 array[(n1+n2)/2][m1-1]=' ';
             else{
                 array[(n1+n2)/2][m1+1]=' ';
@@ -1258,16 +1258,13 @@ void undo(int dim,int history[][7],char array[dim][dim]){
         if(player==history[totalmoves][6]){
             playerturn-=2;
             switch(player){
-            case 1:
-                points[0]--;
-                break;
-            case 2:
-                points[1]--;
+                case 1:
+                    points[0] = history[totalmoves-1][4];
+                    break;
+                case 2:
+                    points[1] = history[totalmoves-1][5];
+                    break;
             }
-            if(history[totalmoves+1][4]-history[totalmoves][4] == 2)
-                points[0]--;
-            else if(history[totalmoves+1][5]-history[totalmoves][5] == 2)
-                points[1]--;
         }
         else
             playerturn--;
