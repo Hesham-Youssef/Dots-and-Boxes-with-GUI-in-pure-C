@@ -16,7 +16,7 @@
 	<stdbool.h>
 	<string.h>
 
-1640776516 source:c:\users\yahya\onedrive\desktop\rabsooodotsandboxes\main.c
+1641664936 source:c:\users\yahya\onedrive\desktop\rabsooodotsandboxes\main.c
 	<stdio.h>
 	<stdlib.h>
 	<conio.h>
@@ -26,6 +26,7 @@
 	<SDL2/SDL_ttf.h>
 	<stdbool.h>
 	<string.h>
+	"AI.h"
 
 1638567155 c:\msys64\mingw64\include\sdl2\sdl.h
 	"SDL_main.h"
@@ -426,4 +427,10 @@
 	<SDL2/SDL_ttf.h>
 	<stdbool.h>
 	<string.h>
+
+1641664786 c:\users\yahya\onedrive\desktop\rabsooodotsandboxes\ai.h
+	<stdio.h>
+	<stdlib.h>
+	<conio.h>
+	<math.h>
 
