@@ -12,14 +12,14 @@
 #define height 700
 //#include "undo and redo.h"
 #include "AI.h"
+#include "Create and print.h"
 int e=0,f=0,p,x=0,player=1,totalmoves=0,maxmoves=0,dim=0,computer,starttime,endtime,diftime = 0;
 char game=0,ss[1],sG='0';
 struct{
     char name[13];
     int points;
     int moves;
-}player1={"",0,0},
-player2={"Computer",0,0};
+}player1={"",0,0},player2={"Computer",0,0};
 bool mouse = false, SDLrun = false,quit = false,ran = false;
 FILE *saved;
 SDL_Window *window;
@@ -142,9 +142,6 @@ void update(char world[dim][dim],int mx1,int my1){
     SDL_Rect pos = {.x = 0,.y = 0,realwidth,height};
 
     SDL_RenderCopy(renderer,wallpaper,NULL,&pos);
-
-
-
 
     SDL_Color color = {200,200,200,255};
 
@@ -342,14 +339,6 @@ void update(char world[dim][dim],int mx1,int my1){
     pos.w = 80;
     pos.h = 80;
     SDL_RenderCopy(renderer,undoicon,NULL,&pos);
-
-
-
-
-
-
-
-
 
     SDL_Texture *returnbutton = SDL_CreateTextureFromSurface(renderer,returnbuttonimg);
 
@@ -1053,60 +1042,6 @@ void nameinput(){
 			font = TTF_OpenFont("Lato-Italic.ttf",23);
 }
 
-
-void printAIwolrd(int dim,int AIworld[dim][dim]){
-    for(int i=0;i<dim;i++){
-        for(int j=0;j<dim;j++){
-            printf("%d  ",AIworld[i][j]);
-        }
-        printf("\n");
-    }
-}
-void createAIwolrd(int dim,int AIworld[dim][dim]){
-    for(int i=0;i<dim;i++){
-        for(int j=0;j<dim;j++){
-            AIworld[i][j] = 0;
-        }
-    }
-}
-
-
-void printhistory(int dim,int history[][7]){
-    for(int i=0;i<maxmoves;i++){
-        for(int j=0;j<7;j++){
-            printf("  %d -",history[i][j]);
-        }
-        printf("\n");
-    }
-}
-
-
-void printworld(int dim,char array[dim][dim]){
-    for(int i=0;i<dim;i++){
-        for(int j=0;j<dim;j++){
-            printf("%c  ",array[j][i]);
-        }
-        printf("\n");
-    }
-}
-void createworld(int dim,char array[dim][dim]){
-    for(int i=0;i<dim;i++){
-        for(int j=0;j<dim;j++){
-            if(!(j%2 || i%2))
-                array[i][j]='0';
-            else
-                array[i][j]=' ';
-        }
-    }
-}
-void createhistory(int dim,int history[2 * (dim/2) * ((dim/2) + 1)][7]){
-    for(int i=0;i<2 * (dim/2) * ((dim/2) + 1);i++){
-        for(int j=0;j<7;j++){
-            history[i][j] = 0;
-        }
-    }
-}
-
 int checkforotherlines(int dim,int history[][7],char array[][dim],int n1,int m1){
     int f=0;
     if(array[n1][m1+1] != ' ')
@@ -1606,7 +1541,7 @@ void loadGame(){
             fread(&history[i][j],1,(dim)*(dim),load);
 
     }
-    printhistory(dim,history);
+    printhistory(dim,history,maxmoves);
     if(computer){
         for(int i=0;i<dim;i++){
             for(int j=0;j<dim;j++)
@@ -1648,6 +1583,7 @@ void loadGame(){
                     if(event.button == SDL_BUTTON_LEFT){
                         mouse = true;
                         SDL_GetMouseState(&mx1,&my1);
+                        printf("\n");
                         if(mx1/100 == 7 && my1/100 == 0){
                             undo(dim,history,world);
                             while(computer && history[totalmoves][6] == 2)
@@ -2006,6 +1942,7 @@ int main(int argc,char* argv[]){
                     case SDL_MOUSEBUTTONDOWN:
                         if(click.button == SDL_BUTTON_LEFT){
                             SDL_GetMouseState(&mx1,&my1);
+                            printf("\n");
                             if(mx1/100 == 7 && my1/100 == 0){
                                 undo(dim,history,world);
                                 while(computer && history[totalmoves][6] == 2)
