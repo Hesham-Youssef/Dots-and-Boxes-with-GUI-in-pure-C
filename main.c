@@ -60,6 +60,20 @@ void initSDL(){
 }
 
 void killSDL(){
+    SDL_DestroyTexture(logo);
+    SDL_DestroyTexture(returnbutton);
+    SDL_DestroyTexture(saveicon);
+    SDL_DestroyTexture(dots);
+    SDL_DestroyTexture(undoicon);
+    SDL_DestroyTexture(redoicon);
+    SDL_DestroyTexture(wallpaper);
+    SDL_FreeSurface(logoimg);
+    SDL_FreeSurface(imagedots);
+    SDL_FreeSurface(returnbuttonimg);
+    SDL_FreeSurface(imgundo);
+    SDL_FreeSurface(imgredo);
+    SDL_FreeSurface(saveimg);
+    SDL_FreeSurface(imgwallpaper);
     TTF_CloseFont(font);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
