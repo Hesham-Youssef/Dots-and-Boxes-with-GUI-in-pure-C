@@ -1106,10 +1106,6 @@ void createhistory(int dim,int history[2 * (dim/2) * ((dim/2) + 1)][7]){
         }
     }
 }
-void resetarray(int array[]){
-    for(int i=0;i<2;i++)
-        array[i] = 0;
-}
 
 int checkforotherlines(int dim,int history[][7],char array[][dim],int n1,int m1){
     int f=0;
@@ -1557,6 +1553,7 @@ void loadGame(){
                     else if(((mx>350) && (mx<670))&& my/100 == 5){
                         sG = '6';
                         done = true;
+                        return main(NULL,NULL);
                     }
                     break;
             }
@@ -1645,7 +1642,7 @@ void loadGame(){
                 case SDL_QUIT:
                     quit = true;
                     killSDL();
-                    goto end;
+                    return;
                     break;
                 case SDL_MOUSEBUTTONDOWN:
                     if(event.button == SDL_BUTTON_LEFT){
@@ -1665,7 +1662,7 @@ void loadGame(){
                                 saveGame(totalmoves,dim,AIworld,world,history);
                         }
                         else if(mx1 > 720 && my1/100 == 6){
-                                goto end;
+                                return main(NULL,NULL);
                         }else
                             mouse = true;
                     }
@@ -1717,11 +1714,11 @@ void loadGame(){
                         break;
                     case SDL_MOUSEBUTTONDOWN:
                         done = true;
+                        return main(NULL,NULL);
                         break;
                 }
             }
         }
-    end:
 }
 
 
@@ -1928,7 +1925,6 @@ int main(int argc,char* argv[]){
         initSDL();
         SDLrun = true;
     }
-    jump:
     x = 0;
     diftime = 0;
     gamemenu();
@@ -1945,8 +1941,6 @@ int main(int argc,char* argv[]){
             case SDL_MOUSEBUTTONDOWN:
                 if(event.button == SDL_BUTTON_LEFT){
                     SDL_GetMouseState(&mx1,&my1);
-
-                    printf(""); // leave it as it is!!!!!
 
                     if(my1/100 == 4 && (mx1>350 && mx1<650)){
                         game = '1';
@@ -1977,6 +1971,7 @@ int main(int argc,char* argv[]){
 
         createworld(dim,world);
 
+        printf("");
 
         int AIworld[dim][dim];
 
@@ -2006,7 +2001,7 @@ int main(int argc,char* argv[]){
                     case SDL_QUIT:
                             quit = true;
                             killSDL();
-                            goto end;
+                            return;
                         break;
                     case SDL_MOUSEBUTTONDOWN:
                         if(click.button == SDL_BUTTON_LEFT){
@@ -2028,7 +2023,7 @@ int main(int argc,char* argv[]){
                                     return 0;
                             }
                             else if(mx1 > 720 && my1/100 == 6){
-                                    goto jump;
+                                    return main(NULL,NULL);
 
                             }else
                                 mouse = true;
@@ -2065,6 +2060,7 @@ int main(int argc,char* argv[]){
                         break;
                     case SDL_MOUSEBUTTONDOWN:
                         done = true;
+                        return main(NULL,NULL);
                         break;
                 }
             }
@@ -2075,7 +2071,7 @@ int main(int argc,char* argv[]){
     case '2':
         loadGame();
         if(quit){
-            goto end;
+            return;
         }
         break;
     case '3':
@@ -2101,8 +2097,5 @@ int main(int argc,char* argv[]){
         break;
     }
     }while(!quit);
-
-
-    end:
     return 0;
 }
