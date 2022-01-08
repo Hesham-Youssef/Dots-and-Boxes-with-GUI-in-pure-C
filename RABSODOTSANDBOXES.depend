@@ -5,7 +5,7 @@
 	<conio.h>
 	<math.h>
 
-1641652923 source:c:\users\hesham youssef\documents\github\rabsooodotsandboxes\main.c
+1641676407 source:c:\users\hesham youssef\documents\github\rabsooodotsandboxes\main.c
 	<stdio.h>
 	<stdlib.h>
 	<conio.h>
@@ -15,6 +15,10 @@
 	<SDL2/SDL_ttf.h>
 	<stdbool.h>
 	<string.h>
+	"AI.h"
+	"Create.h"
+	"Undo.h"
+	"MoveAndRedo.h"
 
 1641674904 source:c:\users\yahya\onedrive\desktop\rabsooodotsandboxes\main.c
 	<stdio.h>
@@ -444,5 +448,18 @@
 1641672115 c:\users\yahya\onedrive\desktop\rabsooodotsandboxes\undo.h
 
 1641675123 c:\users\yahya\onedrive\desktop\rabsooodotsandboxes\moveandredo.h
+	"AI.h"
+
+1641666326 c:\users\hesham youssef\documents\github\rabsooodotsandboxes\ai.h
+	<stdio.h>
+	<stdlib.h>
+	<conio.h>
+	<math.h>
+
+1641676268 c:\users\hesham youssef\documents\github\rabsooodotsandboxes\create.h
+
+1641676268 c:\users\hesham youssef\documents\github\rabsooodotsandboxes\undo.h
+
+1641676268 c:\users\hesham youssef\documents\github\rabsooodotsandboxes\moveandredo.h
 	"AI.h"
 

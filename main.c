@@ -1530,19 +1530,19 @@ void twoNewGame(){
         case '1':
             do{
             nameinput();
-            }while((strlen(player1.name) > 12 || strlen(player2.name) > 12 || strlen(player1.name) == 0 || strlen(player2.name) == 0) && !quit);
+            }while((strlen(player1.name) > 12 || strlen(player2.name) > 12 || strlen(player1.name) == 0 || strlen(player2.name) == 0 || !strcmp(player1.name,player2.name)) && !quit);
             dim = 7;
             break;
         case '2':
             do{
             nameinput();
-            }while((strlen(player1.name) > 12 || strlen(player2.name) > 12 || strlen(player1.name) == 0 || strlen(player2.name) == 0) && !quit);
+            }while((strlen(player1.name) > 12 || strlen(player2.name) > 12 || strlen(player1.name) == 0 || strlen(player2.name) == 0 ||!strcmp(player1.name,player2.name)) && !quit);
             dim = 11;
             break;
         case '3':
             do{
             nameinput();
-            }while((strlen(player1.name) > 12 || strlen(player2.name) > 12 || strlen(player1.name) == 0 || strlen(player2.name) == 0) && !quit);
+            }while((strlen(player1.name) > 12 || strlen(player2.name) > 12 || strlen(player1.name) == 0 || strlen(player2.name) == 0 || !strcmp(player1.name,player2.name)) && !quit);
             dim = 15;
             break;
         default:
@@ -1614,6 +1614,8 @@ int main(int argc,char* argv[]){
         initSDL();
         SDLrun = true;
     }
+    totalmoves = 0;//////////////////////////////////
+    maxmoves = 0;
     x = 0;
     diftime = 0;
     gamemenu();
