@@ -1254,6 +1254,7 @@ void undo(int dim,int history[][7],char array[dim][dim]){
                 array[(n1+n2)/2][m1-1]=' ';
             }
         }
+
         if(player==history[totalmoves][6]){
             playerturn-=2;
             switch(player){
@@ -1263,6 +1264,10 @@ void undo(int dim,int history[][7],char array[dim][dim]){
             case 2:
                 points[1]--;
             }
+            if(history[totalmoves+1][4]-history[totalmoves][4] == 2)
+                points[0]--;
+            else if(history[totalmoves+1][5]-history[totalmoves][5] == 2)
+                points[1]--;
         }
         else
             playerturn--;
@@ -1383,11 +1388,7 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
     fwrite(&computer,sizeof(int),1,saved);
     fwrite(&dim,sizeof(int),1,saved);
     fwrite(&totalmoves,sizeof(int),1,saved);
-    for(int i=0;i<totalmoves;i++){
-        for(int j=0;j<7;j++)
-            fwrite(&history[i][j],1,(dim)*(dim),saved);
 
-    }
     for(int i=0;i<dim;i++){
         for(int j=0;j<dim;j++)
             fwrite(&array[i][j],1,(dim)*(dim),saved);
@@ -1397,6 +1398,11 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
         fwrite(&moves[i],sizeof(int),2,saved);
     fwrite(&playerturn,sizeof(int),1,saved);
     fwrite(&maxmoves,sizeof(int),1,saved);
+    for(int i=0;i<maxmoves;i++){
+        for(int j=0;j<7;j++)
+            fwrite(&history[i][j],1,(dim)*(dim),saved);
+
+    }
 
     if(computer){
         for(int i=0;i<dim;i++){
@@ -1684,13 +1690,12 @@ void loadGame(){
     fread(&dim,sizeof(int),1,load);
     fread(&totalmoves,sizeof(int),1,load);
     int history[2 * (dim/2) * ((dim/2) + 1)][7];
+    createhistory(dim,history);
     char world[dim][dim];
     int AIworld[dim][dim];
-    for(int i=0;i<totalmoves;i++){
-        for(int j=0;j<7;j++)
-            fread(&history[i][j],1,(dim)*(dim),load);
 
-    }
+    printf("\n");
+
     for(int i=0;i<dim;i++){
         for(int j=0;j<dim;j++)
             fread(&world[i][j],1,(dim)*(dim),load);
@@ -1700,6 +1705,12 @@ void loadGame(){
         fread(&moves[i],sizeof(int),2,load);
     fread(&playerturn,sizeof(int),1,load);
     fread(&maxmoves,sizeof(int),1,load);
+    for(int i=0;i<maxmoves;i++){
+        for(int j=0;j<7;j++)
+            fread(&history[i][j],1,(dim)*(dim),load);
+
+    }
+    printhistory(dim,history);
     if(computer){
         for(int i=0;i<dim;i++){
             for(int j=0;j<dim;j++)
@@ -1714,8 +1725,12 @@ void loadGame(){
         fread(&f,sizeof(int),1,load);fread(&name2,sizeof(char),f,load);
 
     fclose(load);
-    points[0] = history[totalmoves-1][4];
-    points[1] = history[totalmoves-1][5];
+    if(totalmoves != 0){
+        points[0] = history[totalmoves-1][4];
+        points[1] = history[totalmoves-1][5];
+    }else{
+        resetarray(points);
+    }
     int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
     starttime = SDL_GetTicks();
     while(totalmoves<2*((dim/2)+1)*(dim/2) && !quit){
