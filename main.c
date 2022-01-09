@@ -1333,9 +1333,10 @@ void loadGame(){
     createhistory(dim,history);
     char world[dim][dim];
     int AIworld[dim][dim];
-
+    createhistory(dim,history);
+    createworld(dim,world);
     printf("\r");
-
+    player = 1;
     for(int i=0;i<dim;i++){
         for(int j=0;j<dim;j++)
             fread(&world[i][j],1,(dim)*(dim),load);
