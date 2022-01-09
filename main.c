@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <windows.h>
 #include <conio.h>
 #include <math.h>
 #include <SDL2/SDL.h>
@@ -1773,6 +1774,10 @@ void settings(){
 }
 
 int main(int argc,char* argv[]){
+    HWND console;
+    AllocConsole();
+    console = FindWindowA("ConsoleWindowClass",NULL);
+    ShowWindow(console,0);
     do{
     if(!SDLrun){
         initSDL();
@@ -1958,7 +1963,6 @@ int main(int argc,char* argv[]){
     case '0':
         quit = true;
         killSDL();
-
         break;
     }
     }while(!quit);
