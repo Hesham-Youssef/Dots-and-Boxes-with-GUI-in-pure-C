@@ -14,7 +14,7 @@
 #include "Create.h"
 #include "Undo.h"
 #include "MoveAndRedo.h"
-int e=0,f=0,p,x=0,player=1,totalmoves=0,maxmoves=0,dim=0,computer,starttime,endtime,diftime = 0;
+int e=0,f=0,p,x=0,player=1,totalmoves=0,maxmoves=0,dim=0,computer,starttime,endtime,diftime = 0,cI=0,cO=0;
 char game=0,ss[1],sG='0';
 struct{
     char name[13];
@@ -368,10 +368,16 @@ void update(char world[dim][dim],int mx1,int my1){
                     pos.y = (j) * height/dim + shift;
                     pos.w = wz;
                     pos.h = L;
-                    if(world[i][j] == '2')
-                        SDL_SetRenderDrawColor(renderer,230,170,0,255);
-                    else if(world[i][j] == '3')
-                        SDL_SetRenderDrawColor(renderer,0,170,255,255);
+                    if(cO){
+                        if(world[i][j] == '2')
+                            SDL_SetRenderDrawColor(renderer,0,255,0,255);
+                        else if(world[i][j] == '3')
+                            SDL_SetRenderDrawColor(renderer,230,0,230,255);
+                    }else{
+                        if(world[i][j] == '2')
+                            SDL_SetRenderDrawColor(renderer,255,150,0,255);
+                        else if(world[i][j] == '3')
+                            SDL_SetRenderDrawColor(renderer,0,200,255,255);}
 
                     SDL_RenderFillRect(renderer,&pos);
                 }else if((!(i%2) && (j%2) )&& world[i][j] != ' '){ // VERTICAL
@@ -379,17 +385,24 @@ void update(char world[dim][dim],int mx1,int my1){
                     pos.y = (j-b) * height/dim + shift;
                     pos.w = L;
                     pos.h = hv;
-                    if(world[i][j] == '2')
-                        SDL_SetRenderDrawColor(renderer,230,170,0,255);
-                    else if(world[i][j] == '3')
-                        SDL_SetRenderDrawColor(renderer,0,170,255,255);
+                    if(cO){
+                        if(world[i][j] == '2')
+                            SDL_SetRenderDrawColor(renderer,0,255,0,255);
+                        else if(world[i][j] == '3')
+                            SDL_SetRenderDrawColor(renderer,230,0,230,255);
+                    }else{
+                        if(world[i][j] == '2')
+                            SDL_SetRenderDrawColor(renderer,255,150,0,255);
+                        else if(world[i][j] == '3')
+                            SDL_SetRenderDrawColor(renderer,0,200,255,255);}
                     SDL_RenderFillRect(renderer,&pos);
                 }
 
             }
             else if(world[i][j] == 'X'){
 
-                SDL_SetRenderDrawColor(renderer,255,0,0,255);
+                if(cI){SDL_SetRenderDrawColor(renderer,0,0,0,255);}
+                else{SDL_SetRenderDrawColor(renderer,255,0,0,255);}
                 pos.x = (i-a+c) * width/dim + shift;
                 pos.y = (j-b+d) * height/dim + shift;
                 pos.w = wz - e;
@@ -399,7 +412,8 @@ void update(char world[dim][dim],int mx1,int my1){
             }
             else if(world[i][j] == 'O'){
 
-                SDL_SetRenderDrawColor(renderer,0,0,255,255);
+                if(cI){SDL_SetRenderDrawColor(renderer,255,255,255,255);}
+                else{SDL_SetRenderDrawColor(renderer,0,0,255,255);}
                 pos.x = (i-a+c) * width/dim + shift;
                 pos.y = (j-b+d) * height/dim + shift;
                 pos.w = wz - e;
@@ -423,21 +437,45 @@ void update(char world[dim][dim],int mx1,int my1){
 
 }
 
-void updatesave(bool save){
+void updateSave(bool save){
     SDL_Rect pos;
+    if(!save){
+        SDL_Rect pos = {.x = 0,.y = 0,realwidth,height};
+        SDL_RenderCopy(renderer,wallpaper,NULL,&pos);
+
+        SDL_Surface *logoimg = IMG_Load("LOGO.jpg");
+        SDL_Texture *logo = SDL_CreateTextureFromSurface(renderer,logoimg);
+        SDL_FreeSurface(logoimg);
+        pos.x = 250;
+        pos.y = 0;
+        pos.w = 500;
+        pos.h = 300;
+        SDL_RenderCopy(renderer,logo,NULL,&pos);
+        SDL_DestroyTexture(logo);
+
+        SDL_Surface *backiconimg = IMG_Load("Back.png");
+        SDL_Texture *backicon = SDL_CreateTextureFromSurface(renderer,backiconimg);
+        SDL_FreeSurface(backiconimg);
+        pos.x = 510;
+        pos.y = 600;
+        pos.w = 300;
+        pos.h = 80;
+        SDL_RenderCopy(renderer,backicon,NULL,&pos);
+        SDL_DestroyTexture(backicon);
+    }
     SDL_Surface *save1iconimg = IMG_Load("1saveimg.png");
     SDL_Texture *save1icon = SDL_CreateTextureFromSurface(renderer,save1iconimg);
     SDL_FreeSurface(save1iconimg);
     if(save){
         pos.x = 800;
         pos.y = 120;
-        pos.w = 120;
-        pos.h = 80;
+        pos.w = 80;
+        pos.h = 50;
     }
     else{
-        pos.x = 600;
-        pos.y = 500;
-        pos.w = 120;
+        pos.x = 190;
+        pos.y = 400;
+        pos.w = 300;
         pos.h = 80;
     }
 
@@ -450,12 +488,12 @@ void updatesave(bool save){
     if(save){
         pos.x = 900;
         pos.y = 120;
-        pos.w = 120;
-        pos.h = 80;
+        pos.w = 80;
+        pos.h = 50;
     }else{
-        pos.x = 700;
-        pos.y = 500;
-        pos.w = 120;
+        pos.x = 510;
+        pos.y = 400;
+        pos.w = 300;
         pos.h = 80;
     }
     SDL_RenderCopy(renderer,save2icon,NULL,&pos);
@@ -467,12 +505,12 @@ void updatesave(bool save){
     if(save){
         pos.x = 800;
         pos.y = 180;
-        pos.w = 120;
-        pos.h = 80;
+        pos.w = 80;
+        pos.h = 50;
     }else{
-        pos.x = 800;
+        pos.x = 190;
         pos.y = 500;
-        pos.w = 120;
+        pos.w = 300;
         pos.h = 80;
     }
     SDL_RenderCopy(renderer,save3icon,NULL,&pos);
@@ -484,12 +522,12 @@ void updatesave(bool save){
     if(save){
         pos.x = 900;
         pos.y = 180;
-        pos.w = 120;
-        pos.h = 80;
+        pos.w = 80;
+        pos.h = 50;
     }else{
-        pos.x = 270;
+        pos.x = 510;
         pos.y = 500;
-        pos.w = 120;
+        pos.w = 300;
         pos.h = 80;
     }
     SDL_RenderCopy(renderer,save4icon,NULL,&pos);
@@ -500,13 +538,13 @@ void updatesave(bool save){
     SDL_FreeSurface(save5iconimg);
     if(save){
         pos.x = 800;
-        pos.y = 230;
-        pos.w = 120;
-        pos.h = 80;
+        pos.y = 240;
+        pos.w = 80;
+        pos.h = 50;
     }else{
-        pos.x = 170;
-        pos.y = 500;
-        pos.w = 120;
+        pos.x = 190;
+        pos.y = 600;
+        pos.w = 300;
         pos.h = 80;
     }
     SDL_RenderCopy(renderer,save5icon,NULL,&pos);
@@ -519,7 +557,6 @@ void gamemenu(){
 
     SDL_Rect pos = {.x = 0,.y = 0,realwidth,height};
     SDL_RenderCopy(renderer,wallpaper,NULL,&pos);
-
 
     SDL_Surface *logoimg = IMG_Load("LOGO.jpg");
     SDL_Texture *logo = SDL_CreateTextureFromSurface(renderer,logoimg);
@@ -561,6 +598,25 @@ void gamemenu(){
     SDL_RenderCopy(renderer,leaderboardicon,NULL,&pos);
     SDL_DestroyTexture(leaderboardicon);
 
+    SDL_Surface *settingsiconimg = IMG_Load("settings.png");
+    SDL_Texture *settingsicon = SDL_CreateTextureFromSurface(renderer,settingsiconimg);
+    SDL_FreeSurface(settingsiconimg);
+    pos.x = 670;
+    pos.y = 600;
+    pos.w = 300;
+    pos.h = 80;
+    SDL_RenderCopy(renderer,settingsicon,NULL,&pos);
+    SDL_DestroyTexture(settingsicon);
+
+    SDL_Surface *exiticonimg = IMG_Load("exit.png");
+    SDL_Texture *exiticon = SDL_CreateTextureFromSurface(renderer,exiticonimg);
+    SDL_FreeSurface(exiticonimg);
+    pos.x = 30;
+    pos.y = 600;
+    pos.w = 300;
+    pos.h = 80;
+    SDL_RenderCopy(renderer,exiticon,NULL,&pos);
+    SDL_DestroyTexture(exiticon);
 
     SDL_RenderPresent(renderer);
 }
@@ -639,7 +695,7 @@ void difcultnewgamemenu(){
     SDL_Texture *newgameicon = SDL_CreateTextureFromSurface(renderer,newgameiconimg);
     SDL_FreeSurface(newgameiconimg);
     pos.x = 350;
-    pos.y = 300;
+    pos.y = 310;
     pos.w = 300;
     pos.h = 80;
     SDL_RenderCopy(renderer,newgameicon,NULL,&pos);
@@ -649,7 +705,7 @@ void difcultnewgamemenu(){
     SDL_Texture *loadgameicon = SDL_CreateTextureFromSurface(renderer,loadgameiconimg);
     SDL_FreeSurface(loadgameiconimg);
     pos.x = 350;
-    pos.y = 400;
+    pos.y = 410;
     pos.w = 300;
     pos.h = 80;
     SDL_RenderCopy(renderer,loadgameicon,NULL,&pos);
@@ -659,18 +715,18 @@ void difcultnewgamemenu(){
     SDL_Texture *HARDgameicon = SDL_CreateTextureFromSurface(renderer,HARDgameiconimg);
     SDL_FreeSurface(HARDgameiconimg);
     pos.x = 350;
-    pos.y = 500;
+    pos.y = 510;
     pos.w = 300;
     pos.h = 80;
     SDL_RenderCopy(renderer,HARDgameicon,NULL,&pos);
     SDL_DestroyTexture(HARDgameicon);
 
 
-    SDL_Surface *leaderboardiconimg = IMG_Load("BACKBUTTON.png");
+    SDL_Surface *leaderboardiconimg = IMG_Load("BACK.png");
     SDL_Texture *leaderboardicon = SDL_CreateTextureFromSurface(renderer,leaderboardiconimg);
     SDL_FreeSurface(leaderboardiconimg);
     pos.x = 350;
-    pos.y = 600;
+    pos.y = 610;
     pos.w = 300;
     pos.h = 80;
     SDL_RenderCopy(renderer,leaderboardicon,NULL,&pos);
@@ -849,6 +905,15 @@ void nameinput(){
     SDL_RenderCopy(renderer,wallpaper,NULL,&pos);
     SDL_DestroyTexture(wallpaper);
 
+    imgwallpaper = IMG_Load("BACK.png");
+    wallpaper = SDL_CreateTextureFromSurface(renderer,imgwallpaper);
+    SDL_FreeSurface(imgwallpaper);
+    pos.x = 650;
+    pos.y = 600;
+    pos.w = 300;
+    pos.h = 80;
+    SDL_RenderCopy(renderer,wallpaper,NULL,&pos);
+    SDL_DestroyTexture(wallpaper);
 
     if(!computer){
         pos.x = 300;
@@ -906,6 +971,12 @@ void nameinput(){
                     }
                     else if(mx>300 && mx<600 && my>600 && my<680)
                         done =true;
+                    else if(mx>650 && mx<950 && my>600 && my<680){
+                        if(computer)
+                            return oneNewGame();
+                        else
+                            return twoNewGame();
+                    }
                     else{
                         SDL_StopTextInput();
                         p = 0;
@@ -1048,7 +1119,7 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
         SDL_Event event;
         int mx,my;
         bool done = false;
-        updatesave(true);
+        updateSave(true);
         done = false;
         while(!done){
         SDL_WaitEvent(&event);
@@ -1060,23 +1131,23 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
                 break;
             case SDL_MOUSEBUTTONDOWN:
                     SDL_GetMouseState(&mx,&my);
-                    if((mx>825 && mx<900) && (my>140 && my<180)){
+                    if((mx>800 && mx<880) && (my>120 && my<170)){
                         sG = '1';
                         done = true;
                     }
-                    else if(mx>925 && mx<1000 && my<180 && my>140){
+                    else if(mx>900 && mx<980 && my<170 && my>120){
                         sG = '2';
                         done = true;
                     }
-                    else if(mx>825 && mx<900 && my>200 && my<240){
+                    else if(mx>800 && mx<880 && my>180 && my<230){
                         sG = '3';
                         done = true;
                     }
-                    else if(mx>925 && mx<1000 && my>200 && my<240){
+                    else if(mx>900 && mx<980 && my>180 && my<230){
                         sG = '4';
                         done = true;
                     }
-                    else if((mx>825 && mx<900) && my>250 && my<290){
+                    else if((mx>800 && mx<880) && my>240 && my<290){
                         sG = '5';
                         done = true;
                     }
@@ -1154,7 +1225,7 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
     fwrite(&e,sizeof(int),1,saved);fwrite(&player1.name,sizeof(char),e,saved);
     if(!computer){
         fwrite(&f,sizeof(int),1,saved);fwrite(&player2.name,sizeof(char),f,saved);
-    }
+    }fwrite(&cI,1,1,saved);fwrite(&cO,1,1,saved);
     fclose(saved);
 }
 
@@ -1203,7 +1274,7 @@ int scores(int point,int l,char name[l]){
 }
 
 void loadGame(){
-    updatesave(false);
+    updateSave(false);
     FILE *load;
     SDL_MouseButtonEvent event;
     int mx,my;
@@ -1219,27 +1290,27 @@ void loadGame(){
             case SDL_MOUSEBUTTONDOWN:
                 if(event.button == SDL_BUTTON_LEFT){
                     SDL_GetMouseState(&mx,&my);
-                    if(((mx/100 == 6) && (mx>620)) && my/100 == 5){
+                    if(mx>190 && mx<490 && my>400 && my<480){
                         sG = '1';
                         done = true;
                     }
-                    else if((mx/100 == 7 && mx > 723)  && my/100 == 5){
+                    else if(mx>510 && mx<810 && my>400 && my<480){
                         sG = '2';
                         done = true;
                     }
-                    else if((mx/100 == 8 && mx > 823) && my/100 == 5){
+                    else if(mx>190 && mx<490 && my>500 && my<580){
                         sG = '3';
                         done = true;
                     }
-                    else if(((mx > 290) && (mx < 370))&& my/100 == 5){
+                    else if(mx>510 && mx<810 && my>500 && my<580){
                         sG = '4';
                         done = true;
                     }
-                    else if(((mx>180) && (mx<270))&& my/100 == 5){
+                    else if(mx>190 && mx<490 && my>600 && my<680){
                         sG = '5';
                         done = true;
                     }
-                    else if(((mx>350) && (mx<670))&& my/100 == 5){
+                    else if(mx>510 && mx<810 && my>600 && my<680){
                         sG = '6';
                         done = true;
                         return main(NULL,NULL);
@@ -1307,7 +1378,7 @@ void loadGame(){
     fread(&e,sizeof(int),1,load);fread(&player1.name,sizeof(char),e,load);
     if(!computer){
         fread(&f,sizeof(int),1,load);fread(&player2.name,sizeof(char),f,load);
-    }
+    }fread(&cI,1,1,load);fread(&cO,1,1,load);
     fclose(load);
     if(totalmoves != 0){
         player1.points = history[totalmoves-1][4];
@@ -1430,7 +1501,7 @@ void oneNewGame(){
                 if(event.button == SDL_BUTTON_LEFT){
                     SDL_GetMouseState(&mx1,&my1);
 
-                    if(mx1>380 && mx1<610){
+                    if(mx1>350 && mx1<650){
                     switch(my1/100){
                     case 3:
                         game = '1';
@@ -1606,7 +1677,103 @@ void newGame(){
     }
 }
 
+void settings(){
+    bool done = false,sets = false;
+    int mx1,my1;
+    while(!done && !quit){
+        sets = false;
+        SDL_Rect pos = {.x = 0,.y = 0,realwidth,height};
+        SDL_RenderCopy(renderer,wallpaper,NULL,&pos);
 
+        SDL_Surface *logoimg = IMG_Load("LOGO.jpg");
+        SDL_Texture *logo = SDL_CreateTextureFromSurface(renderer,logoimg);
+        SDL_FreeSurface(logoimg);
+        pos.x = 250;
+        pos.y = 0;
+        pos.w = 500;
+        pos.h = 300;
+        SDL_RenderCopy(renderer,logo,NULL,&pos);
+        SDL_DestroyTexture(logo);
+
+        SDL_Surface *settings11iconimg = IMG_Load("settings11 - Copy.png");
+        if(cI){settings11iconimg = IMG_Load("settings11.png");}
+        SDL_Texture *settings11icon = SDL_CreateTextureFromSurface(renderer,settings11iconimg);
+        SDL_FreeSurface(settings11iconimg);
+        pos.x = 190;
+        pos.y = 400;
+        pos.w = 300;
+        pos.h = 80;
+        SDL_RenderCopy(renderer,settings11icon,NULL,&pos);
+        SDL_DestroyTexture(settings11icon);
+
+        SDL_Surface *settings12iconimg = IMG_Load("settings12.png");
+        if(cI){settings12iconimg = IMG_Load("settings12 - Copy.png");}
+        SDL_Texture *settings12icon = SDL_CreateTextureFromSurface(renderer,settings12iconimg);
+        SDL_FreeSurface(settings12iconimg);
+        pos.x = 510;
+        pos.y = 400;
+        pos.w = 300;
+        pos.h = 80;
+        SDL_RenderCopy(renderer,settings12icon,NULL,&pos);
+        SDL_DestroyTexture(settings12icon);
+
+        SDL_Surface *settings21iconimg = IMG_Load("settings21 - Copy.png");
+        if(cO){settings21iconimg = IMG_Load("settings21.png");}
+        SDL_Texture *settings21icon = SDL_CreateTextureFromSurface(renderer,settings21iconimg);
+        SDL_FreeSurface(settings21iconimg);
+        pos.x = 190;
+        pos.y = 500;
+        pos.w = 300;
+        pos.h = 80;
+        SDL_RenderCopy(renderer,settings21icon,NULL,&pos);
+        SDL_DestroyTexture(settings21icon);
+
+        SDL_Surface *settings22iconimg = IMG_Load("settings22.png");
+        if(cO){settings22iconimg = IMG_Load("settings22 - Copy.png");}
+        SDL_Texture *settings22icon = SDL_CreateTextureFromSurface(renderer,settings22iconimg);
+        SDL_FreeSurface(settings22iconimg);
+        pos.x = 510;
+        pos.y = 500;
+        pos.w = 300;
+        pos.h = 80;
+        SDL_RenderCopy(renderer,settings22icon,NULL,&pos);
+        SDL_DestroyTexture(settings22icon);
+
+        SDL_Surface *backiconimg = IMG_Load("BACK.png");
+        SDL_Texture *backicon = SDL_CreateTextureFromSurface(renderer,backiconimg);
+        SDL_FreeSurface(backiconimg);
+        pos.x = 350;
+        pos.y = 600;
+        pos.w = 300;
+        pos.h = 80;
+        SDL_RenderCopy(renderer,backicon,NULL,&pos);
+        SDL_DestroyTexture(backicon);
+
+        SDL_RenderPresent(renderer);
+
+        SDL_MouseButtonEvent event;
+        while(SDL_WaitEvent(&event) && !done && !sets){
+        switch(event.type){
+            case SDL_QUIT:
+                quit = true;
+                killSDL();
+                return;
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if(event.button == SDL_BUTTON_LEFT){
+                    SDL_GetMouseState(&mx1,&my1);
+                    if(mx1>350 && mx1<650 && my1>600 && my1<680)
+                        done = true;
+                    else if(mx1>190 && mx1<490 && my1>400 && my1<480){cI=0;sets=true;}
+                    else if(mx1>510 && mx1<810 && my1>400 && my1<480){cI=1;sets=true;}
+                    else if(mx1>190 && mx1<490 && my1>500 && my1<580){cO=0;sets=true;}
+                    else if(mx1>510 && mx1<810 && my1>500 && my1<580){cO=1;sets=true;}
+                }
+        }
+        }
+    }
+    main(NULL,NULL);
+}
 
 int main(int argc,char* argv[]){
     do{
@@ -1633,19 +1800,22 @@ int main(int argc,char* argv[]){
                 if(event.button == SDL_BUTTON_LEFT){
                     SDL_GetMouseState(&mx1,&my1);
 
-                    if(my1/100 == 4 && (mx1>350 && mx1<650)){
+                    if(my1>400 && my1<480 && mx1>350 && mx1<650){
                         game = '1';
                         done = true;
-                    }
-                    else if(my1/100 == 5 && (mx1>380 && mx1<630)){
+                    }else if(my1>500 && my1<580 && mx1>350 && mx1<650){
                         game = '2';
                         done = true;
-                    }
-                    else if(my1/100 == 6 && (mx1>380 && mx1<630)){
+                    }else if(my1>600 && my1<680 && mx1>350 && mx1<650){
                         game = '3';
                         done = true;
-                    }
-                    break;
+                    }else if(my1>600 && my1<680 && mx1>670 && mx1<970){
+                        game = '4';
+                        done = true;
+                    }else if(my1>600 && my1<680 && mx1>30 && mx1<330){
+                        game = '0';
+                        done = true;
+                    }break;
             }
         }
     }
@@ -1785,7 +1955,10 @@ int main(int argc,char* argv[]){
         }
         break;
     case '4':
+        settings();
+        break;
     case '0':
+
         break;
     }
     }while(!quit);
