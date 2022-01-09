@@ -1179,16 +1179,17 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
         else if(sG=='4')
             saved = fopen("saved4.bin","w");
     }
-    fwrite(&computer,sizeof(int),1,saved);
-    fwrite(&dim,sizeof(int),1,saved);
-    fwrite(&totalmoves,sizeof(int),1,saved);
+    fwrite(&player,1,1,saved);
+    fwrite(&computer,1,1,saved);
+    fwrite(&dim,1,1,saved);
+    fwrite(&totalmoves,1,1,saved);
     for(int i=0;i<dim;i++){
         for(int j=0;j<dim;j++)
             fwrite(&array[i][j],1,(dim)*(dim),saved);
     }
-    fwrite(&player1.moves,sizeof(int),1,saved);
-    fwrite(&player2.moves,sizeof(int),1,saved);
-    fwrite(&maxmoves,sizeof(int),1,saved);
+    fwrite(&player1.moves,1,1,saved);
+    fwrite(&player2.moves,1,1,saved);
+    fwrite(&maxmoves,1,1,saved);
     for(int i=0;i<maxmoves;i++){
         for(int j=0;j<7;j++)
             fwrite(&history[i][j],1,(dim)*(dim),saved);
@@ -1276,26 +1277,34 @@ void loadGame(){
                     if(mx>190 && mx<490 && my>400 && my<480){
                         sG = '1';
                         done = true;
+                        load = fopen("saved1.bin","r");
+                        x=1;
                     }
                     else if(mx>510 && mx<810 && my>400 && my<480){
                         sG = '2';
                         done = true;
+                        load = fopen("saved2.bin","r");
+                        x=2;
                     }
                     else if(mx>190 && mx<490 && my>500 && my<580){
                         sG = '3';
                         done = true;
+                        load = fopen("saved3.bin","r");
+                        x=3;
                     }
                     else if(mx>510 && mx<810 && my>500 && my<580){
                         sG = '4';
                         done = true;
+                        load = fopen("saved4.bin","r");
+                        x=4;
                     }
                     else if(mx>190 && mx<490 && my>600 && my<680){
                         sG = '5';
                         done = true;
+                        load = fopen("saved5.bin","r");
+                        x=5;
                     }
                     else if(mx>510 && mx<810 && my>600 && my<680){
-                        sG = '6';
-                        done = true;
                         return main(NULL,NULL);
                     }
                     break;
@@ -1303,48 +1312,24 @@ void loadGame(){
         }
 
     }
-
-    if(sG=='5'){
-        load = fopen("saved5.bin","r");
-        x=5;
-    }
-    else if(sG=='1'){
-        load = fopen("saved1.bin","r");
-        x=1;
-    }
-    else if(sG=='2'){
-        load = fopen("saved2.bin","r");
-        x=2;
-    }
-    else if(sG=='3'){
-        load = fopen("saved3.bin","r");
-        x=3;
-    }
-    else if(sG=='4'){
-        load = fopen("saved4.bin","r");
-        x=4;
-    }
-    else
-        return;
-    fread(&computer,sizeof(int),1,load);
-    fread(&dim,sizeof(int),1,load);
-    fread(&totalmoves,sizeof(int),1,load);
+    fread(&player,1,1,load);
+    fread(&computer,1,1,load);
+    fread(&dim,1,1,load);
+    fread(&totalmoves,1,1,load);
     int history[2 * (dim/2) * ((dim/2) + 1)][7];
     createhistory(dim,history);
     char world[dim][dim];
     int AIworld[dim][dim];
-    createhistory(dim,history);
     createworld(dim,world);
     printf("\r");
-    player = 1;
     for(int i=0;i<dim;i++){
         for(int j=0;j<dim;j++)
             fread(&world[i][j],1,(dim)*(dim),load);
 
     }
-    fread(&player1.moves,sizeof(int),1,load);
-    fread(&player2.moves,sizeof(int),1,load);
-    fread(&maxmoves,sizeof(int),1,load);
+    fread(&player1.moves,1,1,load);
+    fread(&player2.moves,1,1,load);
+    fread(&maxmoves,1,1,load);
     for(int i=0;i<maxmoves;i++){
         for(int j=0;j<7;j++)
             fread(&history[i][j],1,(dim)*(dim),load);
@@ -1832,6 +1817,7 @@ int main(int argc,char* argv[]){
             else
                 p=1;
             update(world,mx1,my1);
+
             ran = true;
             if(computer && (player == 2)){
                 makeMove(dim,world,NULL,NULL,NULL,NULL,history,AIworld,computer,&player,&totalmoves,&maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves);
@@ -1852,11 +1838,14 @@ int main(int argc,char* argv[]){
                                 undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
                                 while(computer && history[totalmoves][6] == 2)
                                     undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
+
                             }
                             else if(mx1/100 == 9 && my1/100 == 0){
                                 redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
                                 while(computer && history[totalmoves][6] == 2 && totalmoves < maxmoves)
                                     redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
+
+
                             }
                             else if(mx1/100 == 7 && my1/100 == 1){
                                 saveGame(totalmoves,dim,AIworld,world,history);
@@ -1887,6 +1876,7 @@ int main(int argc,char* argv[]){
                     }
 
             }
+
         }
         update(world,mx1,my1);
         x=0;
@@ -1938,7 +1928,9 @@ int main(int argc,char* argv[]){
         settings();
         break;
     case '0':
-        return 0;
+        quit = true;
+        killSDL();
+        break;
     }
     }while(!quit);
     return 0;
