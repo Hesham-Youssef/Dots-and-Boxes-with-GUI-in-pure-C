@@ -1367,7 +1367,8 @@ void loadGame(){
         player1.points = history[totalmoves-1][4];
         player2.points = history[totalmoves-1][5];
     }
-    int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
+    int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;FILE *log;
+    log=fopen("Logging.txt","w");fclose(log);
     starttime = SDL_GetTicks();
     while(totalmoves<2*((dim/2)+1)*(dim/2) && !quit){
         if(totalmoves!=0)
@@ -1378,6 +1379,7 @@ void loadGame(){
         if(computer && (player == 2)){
             makeMove(dim,world,NULL,NULL,NULL,NULL,history,AIworld,computer,&player,&totalmoves,&maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves);
             SDL_Delay(100);
+            logging(dim,totalmoves,world,history);
         }else{
         SDL_PollEvent(&event);
                 switch(event.type){
@@ -1392,15 +1394,15 @@ void loadGame(){
                         SDL_GetMouseState(&mx1,&my1);
                         printf("\r");
                         if(mx1/100 == 7 && my1/100 == 0){
-                            undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
-                            while(computer && history[totalmoves][6] == 2)
-                                undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
-                        }
+                            undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);logging(dim,totalmoves,world,history);
+                            while(computer && history[totalmoves][6] == 2){
+                                undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);logging(dim,totalmoves,world,history);
+                        }}
                         else if(mx1/100 == 9 && my1/100 == 0){
-                            redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
-                            while(computer && history[totalmoves][6] == 2 && totalmoves < maxmoves)
-                                redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
-                        }
+                            redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);logging(dim,totalmoves,world,history);
+                            while(computer && history[totalmoves][6] == 2 && totalmoves < maxmoves){
+                                redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);logging(dim,totalmoves,world,history);
+                        }}
                         else if(mx1/100 == 7 && my1/100 == 1){
                                 saveGame(totalmoves,dim,AIworld,world,history);
                         }
@@ -1417,7 +1419,7 @@ void loadGame(){
                     }
                     if(!((mx1/(height/dim))%2 || (my1/(width/dim))%2 || (mx2/(height/dim)%2 || (my2/(width/dim))%2))){
                         makeMove(dim,world,mx1/(height/dim),my1/(width/dim),mx2/(height/dim),my2/(width/dim),history,AIworld,computer,&player,&totalmoves,&maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves);
-                    }
+                    logging(dim,totalmoves,world,history);}
                     break;
                 }
         }
@@ -1785,8 +1787,9 @@ int main(int argc,char* argv[]){
     }
     totalmoves = 0;player1.moves=0;player1.points=0;
     maxmoves = 0;player2.moves=0;player2.points=0;
-    x = 0;
-    diftime = 0;
+    x = 0;FILE *log;
+    log=fopen("Logging.txt","w");
+    diftime = 0;fclose(log);
     gamemenu();
     SDL_MouseButtonEvent event;
     int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
@@ -1854,7 +1857,7 @@ int main(int argc,char* argv[]){
             ran = true;
             if(computer && (player == 2)){
                 makeMove(dim,world,NULL,NULL,NULL,NULL,history,AIworld,computer,&player,&totalmoves,&maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves);
-                SDL_Delay(100);
+                SDL_Delay(100);logging(dim,totalmoves,world,history);
             }else{
             SDL_PollEvent(&click);
                     switch(click.type){
@@ -1868,18 +1871,13 @@ int main(int argc,char* argv[]){
                             SDL_GetMouseState(&mx1,&my1);
                             printf("\r");
                             if(mx1/100 == 7 && my1/100 == 0){
-                                undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
-                                while(computer && history[totalmoves][6] == 2)
-                                    undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
-
-                            }
+                                undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);logging(dim,totalmoves,world,history);
+                                while(computer && history[totalmoves][6] == 2){
+                                    undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);logging(dim,totalmoves,world,history);}}
                             else if(mx1/100 == 9 && my1/100 == 0){
-                                redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
-                                while(computer && history[totalmoves][6] == 2 && totalmoves < maxmoves)
-                                    redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
-
-
-                            }
+                                redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);logging(dim,totalmoves,world,history);
+                                while(computer && history[totalmoves][6] == 2 && totalmoves < maxmoves){
+                                    redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);logging(dim,totalmoves,world,history);}}
                             else if(mx1/100 == 7 && my1/100 == 1){
                                 saveGame(totalmoves,dim,AIworld,world,history);
                                 SDL_Delay(90);
@@ -1902,8 +1900,8 @@ int main(int argc,char* argv[]){
                         }
                         if(!((mx1/(height/dim))%2 || (my1/(width/dim))%2 || (mx2/(height/dim)%2 || (my2/(width/dim))%2))){
                             makeMove(dim,world,mx1/(height/dim),my1/(width/dim),mx2/(height/dim),my2/(width/dim),history,AIworld,computer,&player,&totalmoves,&maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves);
-                        }
-
+                            logging(dim,totalmoves,world,history);
+                            }
                         break;
 
                     }
@@ -1963,6 +1961,7 @@ int main(int argc,char* argv[]){
     case '0':
         quit = true;
         killSDL();
+        return 0;
         break;
     }
     }while(!quit);
