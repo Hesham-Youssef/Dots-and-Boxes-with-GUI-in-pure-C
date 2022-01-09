@@ -1280,7 +1280,7 @@ void loadGame(){
     char world[dim][dim];
     int AIworld[dim][dim];
 
-    printf("\n");
+    printf("\r");
 
     for(int i=0;i<dim;i++){
         for(int j=0;j<dim;j++)
@@ -1336,7 +1336,7 @@ void loadGame(){
                     if(event.button == SDL_BUTTON_LEFT){
                         mouse = true;
                         SDL_GetMouseState(&mx1,&my1);
-                        printf("\n");
+                        printf("\r");
                         if(mx1/100 == 7 && my1/100 == 0){
                             undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
                             while(computer && history[totalmoves][6] == 2)
@@ -1614,7 +1614,7 @@ int main(int argc,char* argv[]){
         initSDL();
         SDLrun = true;
     }
-    totalmoves = 0;//////////////////////////////////
+    totalmoves = 0;
     maxmoves = 0;
     x = 0;
     diftime = 0;
@@ -1697,7 +1697,7 @@ int main(int argc,char* argv[]){
                     case SDL_MOUSEBUTTONDOWN:
                         if(click.button == SDL_BUTTON_LEFT){
                             SDL_GetMouseState(&mx1,&my1);
-                            printf("\n");
+                            printf("\r");
                             if(mx1/100 == 7 && my1/100 == 0){
                                 undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
                                 while(computer && history[totalmoves][6] == 2)
