@@ -12,7 +12,6 @@
 #define height 700
 #include "AI.h"
 #include "Create.h"
-#include "Undo.h"
 #include "MoveAndRedo.h"
 int e=0,f=0,p,x=0,player=1,totalmoves=0,maxmoves=0,dim=0,computer,starttime,endtime,diftime = 0,cI=0,cO=0;
 char game=0,ss[1],sG='0';
@@ -571,7 +570,7 @@ void gamemenu(){
     SDL_Surface *newgameiconimg = IMG_Load("NEWGAME.png");
     SDL_Texture *newgameicon = SDL_CreateTextureFromSurface(renderer,newgameiconimg);
     SDL_FreeSurface(newgameiconimg);
-    pos.x = 350;
+    pos.x = 190;
     pos.y = 400;
     pos.w = 300;
     pos.h = 80;
@@ -581,8 +580,8 @@ void gamemenu(){
     SDL_Surface *loadgameiconimg = IMG_Load("LOADGAME.png");
     SDL_Texture *loadgameicon = SDL_CreateTextureFromSurface(renderer,loadgameiconimg);
     SDL_FreeSurface(loadgameiconimg);
-    pos.x = 350;
-    pos.y = 500;
+    pos.x = 510;
+    pos.y = 400;
     pos.w = 300;
     pos.h = 80;
     SDL_RenderCopy(renderer,loadgameicon,NULL,&pos);
@@ -591,8 +590,8 @@ void gamemenu(){
     SDL_Surface *leaderboardiconimg = IMG_Load("LEADERBOARD.png");
     SDL_Texture *leaderboardicon = SDL_CreateTextureFromSurface(renderer,leaderboardiconimg);
     SDL_FreeSurface(leaderboardiconimg);
-    pos.x = 350;
-    pos.y = 600;
+    pos.x = 190;
+    pos.y = 500;
     pos.w = 300;
     pos.h = 80;
     SDL_RenderCopy(renderer,leaderboardicon,NULL,&pos);
@@ -601,8 +600,8 @@ void gamemenu(){
     SDL_Surface *settingsiconimg = IMG_Load("settings.png");
     SDL_Texture *settingsicon = SDL_CreateTextureFromSurface(renderer,settingsiconimg);
     SDL_FreeSurface(settingsiconimg);
-    pos.x = 670;
-    pos.y = 600;
+    pos.x = 510;
+    pos.y = 500;
     pos.w = 300;
     pos.h = 80;
     SDL_RenderCopy(renderer,settingsicon,NULL,&pos);
@@ -611,7 +610,7 @@ void gamemenu(){
     SDL_Surface *exiticonimg = IMG_Load("exit.png");
     SDL_Texture *exiticon = SDL_CreateTextureFromSurface(renderer,exiticonimg);
     SDL_FreeSurface(exiticonimg);
-    pos.x = 30;
+    pos.x = 350;
     pos.y = 600;
     pos.w = 300;
     pos.h = 80;
@@ -1133,22 +1132,32 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
                     SDL_GetMouseState(&mx,&my);
                     if((mx>800 && mx<880) && (my>120 && my<170)){
                         sG = '1';
+                        saved = fopen("saved1.bin","w");
+                        x=1;
                         done = true;
                     }
                     else if(mx>900 && mx<980 && my<170 && my>120){
                         sG = '2';
+                        saved = fopen("saved2.bin","w");
+                        x=2;
                         done = true;
                     }
                     else if(mx>800 && mx<880 && my>180 && my<230){
                         sG = '3';
+                        saved = fopen("saved3.bin","w");
+                        x=3;
                         done = true;
                     }
                     else if(mx>900 && mx<980 && my>180 && my<230){
                         sG = '4';
+                        saved = fopen("saved4.bin","w");
+                        x=4;
                         done = true;
                     }
                     else if((mx>800 && mx<880) && my>240 && my<290){
                         sG = '5';
+                        saved = fopen("saved5.bin","w");
+                        x=5;
                         done = true;
                     }
                     else if(mx/100 == 7 && my/100 == 1){
@@ -1157,29 +1166,6 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
                     break;
             }
 
-        }
-        if(sG=='5'){
-            saved = fopen("saved5.bin","w");
-            x=5;
-        }
-        else if(sG=='1'){
-            saved = fopen("saved1.bin","w");
-            x=1;
-        }
-        else if(sG=='2'){
-            saved = fopen("saved2.bin","w");
-            x=2;
-        }
-        else if(sG=='3'){
-            saved = fopen("saved3.bin","w");
-            x=3;
-        }
-        else if(sG=='4'){
-            saved = fopen("saved4.bin","w");
-            x=4;
-        }
-        else{
-            return;
         }
     }else{
         if(sG=='5')
@@ -1196,11 +1182,9 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
     fwrite(&computer,sizeof(int),1,saved);
     fwrite(&dim,sizeof(int),1,saved);
     fwrite(&totalmoves,sizeof(int),1,saved);
-
     for(int i=0;i<dim;i++){
         for(int j=0;j<dim;j++)
             fwrite(&array[i][j],1,(dim)*(dim),saved);
-
     }
     fwrite(&player1.moves,sizeof(int),1,saved);
     fwrite(&player2.moves,sizeof(int),1,saved);
@@ -1210,7 +1194,6 @@ void saveGame(int totalmoves,int dim,int AIworld[dim][dim],char array[dim][dim],
             fwrite(&history[i][j],1,(dim)*(dim),saved);
 
     }
-
     if(computer){
         for(int i=0;i<dim;i++){
             for(int j=0;j<dim;j++)
@@ -1781,8 +1764,8 @@ int main(int argc,char* argv[]){
         initSDL();
         SDLrun = true;
     }
-    totalmoves = 0;
-    maxmoves = 0;
+    totalmoves = 0;player1.moves=0;player1.points=0;
+    maxmoves = 0;player2.moves=0;player2.points=0;
     x = 0;
     diftime = 0;
     gamemenu();
@@ -1800,19 +1783,19 @@ int main(int argc,char* argv[]){
                 if(event.button == SDL_BUTTON_LEFT){
                     SDL_GetMouseState(&mx1,&my1);
 
-                    if(my1>400 && my1<480 && mx1>350 && mx1<650){
+                    if(my1>400 && my1<480 && mx1>190 && mx1<490){
                         game = '1';
                         done = true;
-                    }else if(my1>500 && my1<580 && mx1>350 && mx1<650){
+                    }else if(my1>400 && my1<480 && mx1>510 && mx1<810){
                         game = '2';
                         done = true;
-                    }else if(my1>600 && my1<680 && mx1>350 && mx1<650){
+                    }else if(my1>500 && my1<580 && mx1>190 && mx1<490){
                         game = '3';
                         done = true;
-                    }else if(my1>600 && my1<680 && mx1>670 && mx1<970){
+                    }else if(my1>500 && my1<580 && mx1>510 && mx1<810){
                         game = '4';
                         done = true;
-                    }else if(my1>600 && my1<680 && mx1>30 && mx1<330){
+                    }else if(my1>600 && my1<680 && mx1>350 && mx1<650){
                         game = '0';
                         done = true;
                     }break;
@@ -1828,17 +1811,13 @@ int main(int argc,char* argv[]){
         if(quit)
             return 0;
         int history[2 * (dim/2) * ((dim/2) + 1)][7];
-        char world[dim][dim];
+        createhistory(dim,history);
 
+        char world[dim][dim];
         createworld(dim,world);
 
-        printf("");
-
         int AIworld[dim][dim];
-
         createAIwolrd(dim,AIworld);
-
-        createhistory(dim,history);
 
         SDL_MouseButtonEvent click;
 
@@ -1958,8 +1937,7 @@ int main(int argc,char* argv[]){
         settings();
         break;
     case '0':
-
-        break;
+        return 0;
     }
     }while(!quit);
     return 0;
