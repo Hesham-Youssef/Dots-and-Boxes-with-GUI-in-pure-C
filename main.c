@@ -1853,7 +1853,7 @@ int main(int argc,char* argv[]){
             else
                 p=1;
             update(world,mx1,my1);
-
+            SDL_Delay(15);
             ran = true;
             if(computer && (player == 2)){
                 makeMove(dim,world,NULL,NULL,NULL,NULL,history,AIworld,computer,&player,&totalmoves,&maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves);
