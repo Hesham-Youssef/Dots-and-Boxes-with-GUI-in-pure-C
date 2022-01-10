@@ -51,7 +51,7 @@ void initSDL(){
 
     Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2048);
 
-    backgroundmusic = Mix_LoadMUS("Erik Satie _ Once Upon A Time In Paris (Artwork by Edouard Leon Cortes).ogg");
+    backgroundmusic = Mix_LoadMUS("GameSound.mp3");
 
     window = SDL_CreateWindow("dots and boxes",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,realwidth,height,SDL_WINDOW_SHOWN);
 
