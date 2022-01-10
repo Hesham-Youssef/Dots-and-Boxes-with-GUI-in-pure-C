@@ -51,7 +51,7 @@ void initSDL(){
 
     Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2048);
 
-    backgroundmusic = Mix_LoadMUS("RAF - Self Control - (1984).mp3");
+    backgroundmusic = Mix_LoadMUS("Erik Satie _ Once Upon A Time In Paris (Artwork by Edouard Leon Cortes).ogg");
 
     window = SDL_CreateWindow("dots and boxes",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,realwidth,height,SDL_WINDOW_SHOWN);
 
@@ -1921,7 +1921,7 @@ int main(int argc,char* argv[]){
                         quit = true;
                         done = true;
                         break;
-                    case SDL_MOUSEBUTTONDOWN:
+                    case SDL_MOUSEBUTTONUP:
                         done = true;
                         return main(NULL,NULL);
                         break;
@@ -1948,7 +1948,7 @@ int main(int argc,char* argv[]){
                         killSDL();
                         quit = true;
                         break;
-                    case SDL_MOUSEBUTTONDOWN:
+                    case SDL_MOUSEBUTTONUP:
                         done = true;
                         break;
                 }
