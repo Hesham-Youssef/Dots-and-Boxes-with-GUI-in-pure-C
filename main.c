@@ -413,7 +413,7 @@ void update(char world[dim][dim],int mx1,int my1){
             }
             else if(world[i][j] == 'X'){
 
-                if(cI){SDL_SetRenderDrawColor(renderer,0,0,0,255);}
+                if(cI){SDL_SetRenderDrawColor(renderer,200,200,200,255);}
                 else{SDL_SetRenderDrawColor(renderer,255,0,0,255);}
                 pos.x = (i-a+c) * width/dim + shift;
                 pos.y = (j-b+d) * height/dim + shift;
@@ -424,7 +424,7 @@ void update(char world[dim][dim],int mx1,int my1){
             }
             else if(world[i][j] == 'O'){
 
-                if(cI){SDL_SetRenderDrawColor(renderer,255,255,255,255);}
+                if(cI){SDL_SetRenderDrawColor(renderer,255,255,0,255);}
                 else{SDL_SetRenderDrawColor(renderer,0,0,255,255);}
                 pos.x = (i-a+c) * width/dim + shift;
                 pos.y = (j-b+d) * height/dim + shift;
@@ -1703,7 +1703,7 @@ void settings(){
         SDL_DestroyTexture(settings11icon);
 
         SDL_Surface *settings12iconimg = IMG_Load("settings12.png");
-        if(cI){SDL_FreeSurface(settings11iconimg);settings12iconimg = IMG_Load("settings12 - Copy.png");}
+        if(cI){SDL_FreeSurface(settings12iconimg);settings12iconimg = IMG_Load("settings12 - Copy.png");}
         SDL_Texture *settings12icon = SDL_CreateTextureFromSurface(renderer,settings12iconimg);
         SDL_FreeSurface(settings12iconimg);
         pos.x = 510;
