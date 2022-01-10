@@ -1921,7 +1921,7 @@ int main(int argc,char* argv[]){
                         quit = true;
                         done = true;
                         break;
-                    case SDL_MOUSEBUTTONUP:
+                    case SDL_MOUSEBUTTONDOWN:
                         done = true;
                         return main(NULL,NULL);
                         break;
@@ -1948,7 +1948,7 @@ int main(int argc,char* argv[]){
                         killSDL();
                         quit = true;
                         break;
-                    case SDL_MOUSEBUTTONUP:
+                    case SDL_MOUSEBUTTONDOWN:
                         done = true;
                         break;
                 }
