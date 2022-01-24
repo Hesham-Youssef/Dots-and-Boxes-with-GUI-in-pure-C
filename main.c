@@ -41,7 +41,8 @@ SDL_Texture *saveicon;
 SDL_Texture *returnbutton;
 SDL_Surface *logoimg;
 SDL_Texture *logo;
-Mix_Music *backgroundmusic;
+Mix_Music *backgroundmusic1;
+Mix_Music *backgroundmusic2;
 void initSDL(){
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
@@ -51,7 +52,7 @@ void initSDL(){
 
     Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2048);
 
-    backgroundmusic = Mix_LoadMUS("music.ogg");
+    backgroundmusic1 = Mix_LoadMUS("music.ogg");backgroundmusic2 = Mix_LoadMUS("GameSound.mp3");
 
     window = SDL_CreateWindow("dots and boxes",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,realwidth,height,SDL_WINDOW_SHOWN);
 
@@ -73,7 +74,10 @@ void initSDL(){
     saveicon = SDL_CreateTextureFromSurface(renderer,saveimg);
     returnbutton = SDL_CreateTextureFromSurface(renderer,returnbuttonimg);
     logo = SDL_CreateTextureFromSurface(renderer,logoimg);
-    Mix_PlayMusic(backgroundmusic,-1);
+    if(cII)
+        Mix_PlayMusic(backgroundmusic2,-1);
+    else
+        Mix_PlayMusic(backgroundmusic1,-1);
 
 }
 
@@ -95,7 +99,8 @@ void killSDL(){
     TTF_CloseFont(font);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-    Mix_FreeMusic(backgroundmusic);
+    Mix_FreeMusic(backgroundmusic1);
+    Mix_FreeMusic(backgroundmusic2);
     Mix_CloseAudio();
     IMG_Quit();
     TTF_Quit();
@@ -1766,8 +1771,8 @@ void settings(){
                     else if(mx1>510 && mx1<810 && my1>400 && my1<480){cI=1;sets=true;}
                     else if(mx1>190 && mx1<490 && my1>500 && my1<580){cO=0;sets=true;}
                     else if(mx1>510 && mx1<810 && my1>500 && my1<580){cO=1;sets=true;}
-                    else if(mx1>400 && mx1<600 && my1>320 && my1<380 && !cII){cII=1;Mix_PauseMusic();sets=true;}
-                    else if(mx1>400 && mx1<600 && my1>320 && my1<380 && cII){cII=0;Mix_PlayMusic(backgroundmusic,-1);sets=true;}
+                    else if(mx1>400 && mx1<600 && my1>320 && my1<380 && !cII){cII=1;Mix_PlayMusic(backgroundmusic2,-1);sets=true;}
+                    else if(mx1>400 && mx1<600 && my1>320 && my1<380 && cII){cII=0;Mix_PlayMusic(backgroundmusic1,-1);sets=true;}
                 }
         }
         }
