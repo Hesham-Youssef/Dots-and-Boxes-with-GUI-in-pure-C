@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <windows.h>
 #include <conio.h>
 #include <math.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include <stdbool.h>
 #include <string.h>
 #define realwidth 1000
@@ -13,7 +15,7 @@
 #include "AI.h"
 #include "Create.h"
 #include "MoveAndRedo.h"
-int e=0,f=0,p,x=0,player=1,totalmoves=0,maxmoves=0,dim=0,computer,starttime,endtime,diftime = 0,cI=0,cO=0;
+int e=0,f=0,p,x=0,player=1,totalmoves=0,maxmoves=0,dim=0,computer,starttime,endtime,diftime = 0,cI=0,cO=0,cII=0;
 char game=0,ss[1],sG='0';
 struct{
     char name[13];
@@ -39,10 +41,18 @@ SDL_Texture *saveicon;
 SDL_Texture *returnbutton;
 SDL_Surface *logoimg;
 SDL_Texture *logo;
+Mix_Music *backgroundmusic1;
+Mix_Music *backgroundmusic2;
 void initSDL(){
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+
+
     TTF_Init();
     IMG_Init(IMG_INIT_PNG | IMG_INIT_PNG);
+
+    Mix_OpenAudio(44100,MIX_DEFAULT_FORMAT,2,2048);
+
+    backgroundmusic1 = Mix_LoadMUS("music.ogg");backgroundmusic2 = Mix_LoadMUS("GameSound.mp3");
 
     window = SDL_CreateWindow("dots and boxes",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,realwidth,height,SDL_WINDOW_SHOWN);
 
@@ -64,6 +74,11 @@ void initSDL(){
     saveicon = SDL_CreateTextureFromSurface(renderer,saveimg);
     returnbutton = SDL_CreateTextureFromSurface(renderer,returnbuttonimg);
     logo = SDL_CreateTextureFromSurface(renderer,logoimg);
+    if(cII)
+        Mix_PlayMusic(backgroundmusic2,-1);
+    else
+        Mix_PlayMusic(backgroundmusic1,-1);
+
 }
 
 void killSDL(){
@@ -84,6 +99,9 @@ void killSDL(){
     TTF_CloseFont(font);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    Mix_FreeMusic(backgroundmusic1);
+    Mix_FreeMusic(backgroundmusic2);
+    Mix_CloseAudio();
     IMG_Quit();
     TTF_Quit();
     SDL_Quit();
@@ -400,7 +418,7 @@ void update(char world[dim][dim],int mx1,int my1){
             }
             else if(world[i][j] == 'X'){
 
-                if(cI){SDL_SetRenderDrawColor(renderer,0,0,0,255);}
+                if(cI){SDL_SetRenderDrawColor(renderer,200,200,200,255);}
                 else{SDL_SetRenderDrawColor(renderer,255,0,0,255);}
                 pos.x = (i-a+c) * width/dim + shift;
                 pos.y = (j-b+d) * height/dim + shift;
@@ -411,7 +429,7 @@ void update(char world[dim][dim],int mx1,int my1){
             }
             else if(world[i][j] == 'O'){
 
-                if(cI){SDL_SetRenderDrawColor(renderer,255,255,255,255);}
+                if(cI){SDL_SetRenderDrawColor(renderer,255,255,0,255);}
                 else{SDL_SetRenderDrawColor(renderer,0,0,255,255);}
                 pos.x = (i-a+c) * width/dim + shift;
                 pos.y = (j-b+d) * height/dim + shift;
@@ -1269,6 +1287,7 @@ void loadGame(){
             case SDL_QUIT:
                     quit = true;
                     killSDL();
+
                     return;
                 break;
             case SDL_MOUSEBUTTONDOWN:
@@ -1353,7 +1372,8 @@ void loadGame(){
         player1.points = history[totalmoves-1][4];
         player2.points = history[totalmoves-1][5];
     }
-    int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
+    int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;FILE *log;
+    log=fopen("Logging.txt","w");fclose(log);
     starttime = SDL_GetTicks();
     while(totalmoves<2*((dim/2)+1)*(dim/2) && !quit){
         if(totalmoves!=0)
@@ -1364,6 +1384,7 @@ void loadGame(){
         if(computer && (player == 2)){
             makeMove(dim,world,NULL,NULL,NULL,NULL,history,AIworld,computer,&player,&totalmoves,&maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves);
             SDL_Delay(100);
+            logging(dim,totalmoves,world,history);
         }else{
         SDL_PollEvent(&event);
                 switch(event.type){
@@ -1378,15 +1399,15 @@ void loadGame(){
                         SDL_GetMouseState(&mx1,&my1);
                         printf("\r");
                         if(mx1/100 == 7 && my1/100 == 0){
-                            undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
-                            while(computer && history[totalmoves][6] == 2)
-                                undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
-                        }
+                            undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);logging(dim,totalmoves,world,history);
+                            while(computer && history[totalmoves][6] == 2){
+                                undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);logging(dim,totalmoves,world,history);
+                        }}
                         else if(mx1/100 == 9 && my1/100 == 0){
-                            redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
-                            while(computer && history[totalmoves][6] == 2 && totalmoves < maxmoves)
-                                redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
-                        }
+                            redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);logging(dim,totalmoves,world,history);
+                            while(computer && history[totalmoves][6] == 2 && totalmoves < maxmoves){
+                                redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);logging(dim,totalmoves,world,history);
+                        }}
                         else if(mx1/100 == 7 && my1/100 == 1){
                                 saveGame(totalmoves,dim,AIworld,world,history);
                         }
@@ -1403,7 +1424,7 @@ void loadGame(){
                     }
                     if(!((mx1/(height/dim))%2 || (my1/(width/dim))%2 || (mx2/(height/dim)%2 || (my2/(width/dim))%2))){
                         makeMove(dim,world,mx1/(height/dim),my1/(width/dim),mx2/(height/dim),my2/(width/dim),history,AIworld,computer,&player,&totalmoves,&maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves);
-                    }
+                    logging(dim,totalmoves,world,history);}
                     break;
                 }
         }
@@ -1518,7 +1539,7 @@ void oneNewGame(){
             dim = 15;
             break;
         default:
-            oneNewGame();
+            return oneNewGame();
 
     }
 }
@@ -1586,7 +1607,7 @@ void twoNewGame(){
             dim = 15;
             break;
         default:
-            twoNewGame();
+            return twoNewGame();
             break;
     }
 }
@@ -1630,7 +1651,7 @@ void newGame(){
     }
     switch(game){
     case '0':
-        main(NULL,NULL);
+        return main(NULL,NULL);
         break;
     case '1':
         computer = 1;
@@ -1641,7 +1662,7 @@ void newGame(){
         twoNewGame();
         break;
     default:
-        newGame();
+        return newGame();
         break;
     }
 }
@@ -1664,8 +1685,19 @@ void settings(){
         SDL_RenderCopy(renderer,logo,NULL,&pos);
         SDL_DestroyTexture(logo);
 
+        SDL_Surface *soundbuttonimg = IMG_Load("togglesound - Copy.png");
+        if(cII){SDL_FreeSurface(soundbuttonimg);soundbuttonimg = IMG_Load("togglesound.png");}
+        SDL_Texture *soundbutton = SDL_CreateTextureFromSurface(renderer,soundbuttonimg);
+        SDL_FreeSurface(soundbuttonimg);
+        pos.x = 400;
+        pos.y = 320;
+        pos.w = 200;
+        pos.h = 60;
+        SDL_RenderCopy(renderer,soundbutton,NULL,&pos);
+        SDL_DestroyTexture(soundbutton);
+
         SDL_Surface *settings11iconimg = IMG_Load("settings11 - Copy.png");
-        if(cI){settings11iconimg = IMG_Load("settings11.png");}
+        if(cI){SDL_FreeSurface(settings11iconimg);settings11iconimg = IMG_Load("settings11.png");}
         SDL_Texture *settings11icon = SDL_CreateTextureFromSurface(renderer,settings11iconimg);
         SDL_FreeSurface(settings11iconimg);
         pos.x = 190;
@@ -1676,7 +1708,7 @@ void settings(){
         SDL_DestroyTexture(settings11icon);
 
         SDL_Surface *settings12iconimg = IMG_Load("settings12.png");
-        if(cI){settings12iconimg = IMG_Load("settings12 - Copy.png");}
+        if(cI){SDL_FreeSurface(settings12iconimg);settings12iconimg = IMG_Load("settings12 - Copy.png");}
         SDL_Texture *settings12icon = SDL_CreateTextureFromSurface(renderer,settings12iconimg);
         SDL_FreeSurface(settings12iconimg);
         pos.x = 510;
@@ -1687,7 +1719,7 @@ void settings(){
         SDL_DestroyTexture(settings12icon);
 
         SDL_Surface *settings21iconimg = IMG_Load("settings21 - Copy.png");
-        if(cO){settings21iconimg = IMG_Load("settings21.png");}
+        if(cO){SDL_FreeSurface(settings21iconimg);settings21iconimg = IMG_Load("settings21.png");}
         SDL_Texture *settings21icon = SDL_CreateTextureFromSurface(renderer,settings21iconimg);
         SDL_FreeSurface(settings21iconimg);
         pos.x = 190;
@@ -1698,7 +1730,7 @@ void settings(){
         SDL_DestroyTexture(settings21icon);
 
         SDL_Surface *settings22iconimg = IMG_Load("settings22.png");
-        if(cO){settings22iconimg = IMG_Load("settings22 - Copy.png");}
+        if(cO){SDL_FreeSurface(settings22iconimg);settings22iconimg = IMG_Load("settings22 - Copy.png");}
         SDL_Texture *settings22icon = SDL_CreateTextureFromSurface(renderer,settings22iconimg);
         SDL_FreeSurface(settings22iconimg);
         pos.x = 510;
@@ -1726,6 +1758,8 @@ void settings(){
             case SDL_QUIT:
                 quit = true;
                 killSDL();
+                done = true;
+                sets = true;
                 return;
                 break;
             case SDL_MOUSEBUTTONDOWN:
@@ -1737,14 +1771,20 @@ void settings(){
                     else if(mx1>510 && mx1<810 && my1>400 && my1<480){cI=1;sets=true;}
                     else if(mx1>190 && mx1<490 && my1>500 && my1<580){cO=0;sets=true;}
                     else if(mx1>510 && mx1<810 && my1>500 && my1<580){cO=1;sets=true;}
+                    else if(mx1>400 && mx1<600 && my1>320 && my1<380 && !cII){cII=1;Mix_PlayMusic(backgroundmusic2,-1);sets=true;}
+                    else if(mx1>400 && mx1<600 && my1>320 && my1<380 && cII){cII=0;Mix_PlayMusic(backgroundmusic1,-1);sets=true;}
                 }
         }
         }
     }
-    main(NULL,NULL);
+    return main(NULL,NULL);
 }
 
 int main(int argc,char* argv[]){
+    HWND console;
+    AllocConsole();
+    console = FindWindowA("ConsoleWindowClass",NULL);
+    ShowWindow(console,0);
     do{
     if(!SDLrun){
         initSDL();
@@ -1752,8 +1792,9 @@ int main(int argc,char* argv[]){
     }
     totalmoves = 0;player1.moves=0;player1.points=0;
     maxmoves = 0;player2.moves=0;player2.points=0;
-    x = 0;
-    diftime = 0;
+    x = 0;FILE *log;
+    log=fopen("Logging.txt","w");
+    diftime = 0;fclose(log);
     gamemenu();
     SDL_MouseButtonEvent event;
     int mx1 = 0, my1 = 0, mx2 = 0, my2 = 0;
@@ -1817,36 +1858,31 @@ int main(int argc,char* argv[]){
             else
                 p=1;
             update(world,mx1,my1);
-
+            SDL_Delay(15);
             ran = true;
             if(computer && (player == 2)){
                 makeMove(dim,world,NULL,NULL,NULL,NULL,history,AIworld,computer,&player,&totalmoves,&maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves);
-                SDL_Delay(100);
+                SDL_Delay(100);logging(dim,totalmoves,world,history);
             }else{
             SDL_PollEvent(&click);
                     switch(click.type){
                     case SDL_QUIT:
                             quit = true;
                             killSDL();
-                            return;
+                            return 0;
                         break;
                     case SDL_MOUSEBUTTONDOWN:
                         if(click.button == SDL_BUTTON_LEFT){
                             SDL_GetMouseState(&mx1,&my1);
                             printf("\r");
                             if(mx1/100 == 7 && my1/100 == 0){
-                                undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
-                                while(computer && history[totalmoves][6] == 2)
-                                    undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
-
-                            }
+                                undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);logging(dim,totalmoves,world,history);
+                                while(computer && history[totalmoves][6] == 2){
+                                    undo(dim,history,world,&totalmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);logging(dim,totalmoves,world,history);}}
                             else if(mx1/100 == 9 && my1/100 == 0){
-                                redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
-                                while(computer && history[totalmoves][6] == 2 && totalmoves < maxmoves)
-                                    redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);
-
-
-                            }
+                                redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);logging(dim,totalmoves,world,history);
+                                while(computer && history[totalmoves][6] == 2 && totalmoves < maxmoves){
+                                    redo(dim,history,world,&totalmoves,maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves,&player);logging(dim,totalmoves,world,history);}}
                             else if(mx1/100 == 7 && my1/100 == 1){
                                 saveGame(totalmoves,dim,AIworld,world,history);
                                 SDL_Delay(90);
@@ -1869,8 +1905,8 @@ int main(int argc,char* argv[]){
                         }
                         if(!((mx1/(height/dim))%2 || (my1/(width/dim))%2 || (mx2/(height/dim)%2 || (my2/(width/dim))%2))){
                             makeMove(dim,world,mx1/(height/dim),my1/(width/dim),mx2/(height/dim),my2/(width/dim),history,AIworld,computer,&player,&totalmoves,&maxmoves,&player1.points,&player2.points,&player1.moves,&player2.moves);
-                        }
-
+                            logging(dim,totalmoves,world,history);
+                            }
                         break;
 
                     }
@@ -1930,6 +1966,7 @@ int main(int argc,char* argv[]){
     case '0':
         quit = true;
         killSDL();
+        return 0;
         break;
     }
     }while(!quit);
